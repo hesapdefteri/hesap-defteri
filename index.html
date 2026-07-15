@@ -320,14 +320,14 @@
   /* ===== Stok Kartı Modülü ===== */
   .sk-search-bar{display:flex;align-items:center;gap:10px;background:var(--green);padding:22px 16px 16px 16px;flex-shrink:0;}
   .sk-list{flex:1;overflow-y:auto;padding:14px 16px;background:#f4f7f8;display:flex;flex-direction:column;gap:12px;}
-  .sk-card{background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(20,40,50,.08);padding:14px 16px;cursor:pointer;}
+  .sk-card{background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(20,40,50,.08);padding:20px 20px;cursor:pointer;}
   .sk-card.pasif{opacity:.5;}
   .sk-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
-  .sk-card-name{font-size:15.5px;font-weight:700;color:#3d4b50;}
-  .sk-card-code{font-size:11.5px;color:var(--muted);margin-top:2px;}
-  .sk-card-qty{font-size:16px;font-weight:800;text-align:right;white-space:nowrap;}
+  .sk-card-name{font-size:19px;font-weight:700;color:#3d4b50;}
+  .sk-card-code{font-size:13.5px;color:var(--muted);margin-top:3px;}
+  .sk-card-qty{font-size:19px;font-weight:800;text-align:right;white-space:nowrap;}
   .sk-card-qty.neg{color:var(--red);}
-  .sk-card-bottom{display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--muted);}
+  .sk-card-bottom{display:flex;justify-content:space-between;margin-top:12px;font-size:15px;font-weight:600;color:var(--ink);}
 
   .sk-detail{position:fixed;inset:0;background:#f4f7f8;z-index:30;display:none;flex-direction:column;}
   .sk-detail.show{display:flex;}
@@ -3067,6 +3067,7 @@ function renderUrunler(){
           <div class="sk-card-qty ${miktar < 0 ? 'neg' : ''}">${fmtPlain(miktar)} ${c.birim}</div>
         </div>
         <div class="sk-card-bottom">
+          <span>Alış: ${fmt(toNum(c.fiyatlar.sonAlis))}</span>
           <span>Satış: ${fmt(toNum(c.fiyatlar.satis1))}</span>
         </div>
       </div>`;
