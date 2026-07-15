@@ -1902,6 +1902,7 @@ function bindSiparisDetayEvents(){
   };
   document.getElementById('siparisTurAlici').onclick = () => { draftSiparis.ledgerKey = 'cari'; renderSiparisDetayBody(); };
   document.getElementById('siparisTurTedarikci').onclick = () => { draftSiparis.ledgerKey = 'tedarikci'; renderSiparisDetayBody(); };
+  document.getElementById('siparisKalemEkleBtn').onclick = () => openSiparisPicker();
   document.querySelectorAll('.fatura-table .fatura-row').forEach(row=>{
     row.onclick = () => {
       const idx = +row.dataset.idx;
