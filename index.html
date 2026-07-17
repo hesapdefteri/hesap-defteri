@@ -205,6 +205,7 @@
 
   .d-list{flex:1;overflow-y:auto;padding:6px 16px 0 16px;}
   .tx-row{padding:14px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;cursor:pointer;}
+  .rapor-section-title{margin:18px 0 4px 0;font-size:13px;font-weight:800;color:#7a8590;text-transform:uppercase;letter-spacing:.03em;}
   .tx-row.selected{background:var(--accent-soft);margin:0 -16px;padding:14px 16px;}
   .tx-row.acilis-row{background:#fbf9df;margin:0 -16px;padding:14px 16px;}
   .tx-left{min-width:0;}
@@ -3140,11 +3141,26 @@ function renderRapor(){
     ['Alışlar Toplamı', alisToplam],
     ['Masraflar Toplamı', sum('masraflar')],
   ];
-  document.getElementById('raporList').innerHTML = rows.map(([lbl, val])=>`
+  let html = rows.map(([lbl, val])=>`
     <div class="tx-row">
       <div class="tx-left"><div class="tx-type pos">${lbl}</div></div>
       <div class="tx-amount ${val<0?'neg':''}">${fmt2(val)}₺</div>
     </div>`).join('');
+
+  const tedarikciDetay = state.tedarikci
+    .map(c=> [c.name, cariBalance(c)])
+    .filter(([,val])=> Math.abs(val) > 0.004)
+    .sort((a,b)=> a[1] - b[1]);
+  if(tedarikciDetay.length){
+    html += `<div class="rapor-section-title">Tedarikçi Bazında Borç / Alacak</div>`;
+    html += tedarikciDetay.map(([name, val])=> `
+      <div class="tx-row">
+        <div class="tx-left"><div class="tx-type pos">${name}</div></div>
+        <div class="tx-amount ${val<0?'neg':''}">${fmt2(val)}₺</div>
+      </div>`).join('');
+  }
+
+  document.getElementById('raporList').innerHTML = html;
 }
 
 // =====================================================================
