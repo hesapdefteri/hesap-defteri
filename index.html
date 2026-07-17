@@ -3051,12 +3051,21 @@ function renderRapor(){
   const musteriToplam = state.cari.reduce((s,c)=> s + cariBalance(c), 0);
   const tedarikciToplam = state.tedarikci.reduce((s,c)=> s + cariBalance(c), 0);
   const sum = (mod) => (state.modules[mod]||[]).reduce((s,it)=> s + it.amount, 0);
+  let satisToplam = 0, alisToplam = 0;
+  [...state.cari, ...state.tedarikci].forEach(c=>{
+    (c.transactions||[]).forEach(t=>{
+      if(t.type === 'SATIŞ') satisToplam += Math.abs(t.amount);
+      else if(t.type === 'SATIŞ İADE') satisToplam -= Math.abs(t.amount);
+      else if(t.type === 'ALIŞ') alisToplam += Math.abs(t.amount);
+      else if(t.type === 'ALIŞ İADE') alisToplam -= Math.abs(t.amount);
+    });
+  });
   const rows = [
     ['Nakit (Kasa)', state.cash],
     ['Müşteri (Borç / Alacak)', musteriToplam],
     ['Tedarikçi (Borç / Alacak)', tedarikciToplam],
-    ['Satışlar Toplamı', sum('satislar')],
-    ['Alışlar Toplamı', sum('alislar')],
+    ['Satışlar Toplamı', satisToplam],
+    ['Alışlar Toplamı', alisToplam],
     ['Masraflar Toplamı', sum('masraflar')],
   ];
   document.getElementById('raporList').innerHTML = rows.map(([lbl, val])=>`
