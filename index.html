@@ -5047,6 +5047,30 @@ function ensureTitizKuruTemizleme(){
 }
 if(ensureTitizKuruTemizleme()) save();
 
+// Kullanıcının gönderdiği rapor ekran görüntüsünden (Özcan Askı, tedarikçi,
+// Şubat-Ekim 2024 arası) elle işlendi. Rapor toplamı -38.300,00 alış /
+// 38.300,00 ödeme = 0 net bakiye ile birebir eşleşiyor.
+function ensureOzcanAski(){
+  const itemizedTx = [
+    {type:'ALIŞ', desc:'400 normal x 27', amount:-10800.00, date:'2024-02-14T15:22:00'},
+    {type:'ALIŞ', desc:'400 mandallı x 35', amount:-14000.00, date:'2024-02-14T15:22:01'},
+    {type:'ÖDEME', desc:'', amount:24800.00, date:'2024-02-16T01:21:00'},
+    {type:'ALIŞ', desc:'500 natürel askı x 27', amount:-13500.00, date:'2024-10-16T14:11:00'},
+    {type:'ÖDEME', desc:'', amount:13500.00, date:'2024-10-16T14:12:00'}
+  ];
+  const existing = state.tedarikci.find(c => normAd(c.name) === normAd('Özcan Askı'));
+  if(!existing){
+    state.tedarikci.push({ id:'ozcanaski', name:'Özcan Askı', transactions: itemizedTx });
+    return true;
+  }
+  if(!existing.transactions || existing.transactions.length === 0){
+    existing.transactions = itemizedTx;
+    return true;
+  }
+  return false;
+}
+if(ensureOzcanAski()) save();
+
 render();
 </script>
 </body>
