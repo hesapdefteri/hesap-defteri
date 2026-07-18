@@ -5008,6 +5008,37 @@ function ensureNisantasiKuruTemizleme(){
 }
 if(ensureNisantasiKuruTemizleme()) save();
 
+// Kullanıcının gönderdiği rapor ekran görüntüsünden (Titiz Kuru Temizleme, Haziran 2021
+// - Aralık 2025 arası) elle işlendi. Rapor toplamı 64.367,00 satış / -64.367,00
+// tahsilat-ödeme = 0 net bakiye ile birebir eşleşiyor. Ekran görüntüsündeki tip
+// etiketleri (SATIŞ/ALIŞ/TAHSİLAT) aynen korundu, yorumlanmadı.
+function ensureTitizKuruTemizleme(){
+  const itemizedTx = [
+    {type:'SATIŞ', desc:'', amount:1342.00, date:'2021-06-16T19:39:00'},
+    {type:'ALIŞ', desc:'', amount:-1342.00, date:'2021-08-13T14:13:00'},
+    {type:'SATIŞ', desc:'', amount:1890.00, date:'2021-11-03T15:00:00'},
+    {type:'SATIŞ', desc:'', amount:1260.00, date:'2021-11-03T15:02:00'},
+    {type:'ALIŞ', desc:'Süleyman kart çektik', amount:-3150.00, date:'2021-11-09T15:46:00'},
+    {type:'SATIŞ', desc:'1500 süngerli x 1.65', amount:2475.00, date:'2022-04-23T21:10:00'},
+    {type:'SATIŞ', desc:'1500 x 1.5', amount:2250.00, date:'2022-04-23T21:11:00'},
+    {type:'TAHSİLAT', desc:'', amount:-4725.00, date:'2022-04-27T17:37:00'},
+    {type:'SATIŞ', desc:'3000 normal x 3.7', amount:11100.00, date:'2024-03-23T17:22:00'},
+    {type:'SATIŞ', desc:'1000 adet süngerli x 4.1', amount:4100.00, date:'2024-03-23T17:23:00'},
+    {type:'TAHSİLAT', desc:'', amount:-15200.00, date:'2024-04-08T20:55:00'},
+    {type:'SATIŞ', desc:'1500 süngerli x 4.9', amount:7350.00, date:'2025-02-05T19:47:00'},
+    {type:'SATIŞ', desc:'3000 normal x 4.4', amount:13200.00, date:'2025-02-05T19:48:00'},
+    {type:'TAHSİLAT', desc:'', amount:-20550.00, date:'2025-02-14T18:57:00'},
+    {type:'SATIŞ', desc:'2500 adet normal kuru tem x5.4', amount:13500.00, date:'2025-12-07T15:13:00'},
+    {type:'SATIŞ', desc:'1000 ad süngerli x 5.9', amount:5900.00, date:'2025-12-07T15:13:01'},
+    {type:'TAHSİLAT', desc:'', amount:-19400.00, date:'2025-12-27T12:52:00'}
+  ];
+  const existing = state.cari.find(c => normAd(c.name) === normAd('Titiz Kuru Temizleme'));
+  if(existing) return false;
+  state.cari.push({ id:'titizkuru', name:'Titiz Kuru Temizleme', transactions: itemizedTx });
+  return true;
+}
+if(ensureTitizKuruTemizleme()) save();
+
 render();
 </script>
 </body>
