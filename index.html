@@ -485,13 +485,7 @@
 </div>
 
 <div id="musteriScreen" style="display:none;">
-<div class="fixed-header">
-<div class="topbar" style="justify-content:flex-end;">
-  <div class="top-actions">
-    <button id="openAdd" title="Ekle">＋</button>
-  </div>
-</div>
-</div>
+<div style="height:calc(env(safe-area-inset-top, 20px) + 14px);flex-shrink:0;"></div>
 
 <div class="sheet">
   <div class="grabber"></div>
@@ -527,6 +521,7 @@
     </div>
   </div>
 </div>
+<button id="openAdd" title="Ekle" style="position:fixed;right:20px;top:50%;transform:translateY(-50%);width:56px;height:56px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:26px;box-shadow:0 6px 16px rgba(20,40,50,.3);cursor:pointer;z-index:50;-webkit-tap-highlight-color:transparent;">＋</button>
 </div>
 
 <div class="overlay" id="overlay">
