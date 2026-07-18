@@ -527,7 +527,6 @@
     </div>
   </div>
 </div>
-<button id="cariFilterFab" class="glass-fab" style="right:20px;bottom:24px;width:56px;height:56px;border-radius:50%;z-index:400;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;letter-spacing:.2px;color:#1c3566;text-align:center;line-height:1.15;padding:2px;"></button>
 </div>
 
 <div class="overlay" id="overlay">
@@ -1380,7 +1379,6 @@ if(state.sayaclar.siparis === undefined) state.sayaclar.siparis = 0;
 if(!state.alisFisleri) state.alisFisleri = [];
 if(!state.satisFisleri) state.satisFisleri = [];
 if(!state.siparisFisleri) state.siparisFisleri = [];
-if(!state.cariFilter) state.cariFilter = 'tumu';
 
 let activeLedger = 'cari';
 function getLedger(){ return state[activeLedger]; }
@@ -1668,19 +1666,8 @@ function renderCariHesaplar(){
   document.getElementById('cariToplamBorc').textContent = fmt(Math.abs(toplamBorc));
   document.getElementById('cariToplamAlacak').textContent = fmt(toplamAlacak);
 
-  const filterBtn = document.getElementById('cariFilterFab');
-  if(filterBtn){
-    filterBtn.innerHTML = state.cariFilter === 'hareket' ? 'B/A' : 'TÜMÜ';
-    filterBtn.title = state.cariFilter === 'hareket'
-      ? 'Sadece borç/alacaklı hesaplar gösteriliyor — Tümünü göstermek için dokun'
-      : 'Tüm hesaplar gösteriliyor — Sadece borç/alacaklı olanları göstermek için dokun';
-  }
-  const visibleList = state.cariFilter === 'hareket'
-    ? combined.filter(({c}) => Math.abs(cariBalance(c)) > 0.005)
-    : combined;
-
   const cariList = document.getElementById('cariList');
-  cariList.innerHTML = visibleList.map(({c, tur})=>{
+  cariList.innerHTML = combined.map(({c, tur})=>{
     const bal = cariBalance(c);
     const ledgerKey = tur === 'tedarikci' ? 'tedarikci' : 'cari';
     const siparisForCari = state.siparisFisleri.filter(f=>f.cariId===c.id && !f.tamamlandi).sort((a,b)=> new Date(b.tarih)-new Date(a.tarih))[0];
@@ -1709,9 +1696,7 @@ function renderCariHesaplar(){
         <span class="amount ${bal < 0 ? 'neg' : ''}">${fmt(bal)}</span>
       </div>
     </div>`;
-  }).join('') || (state.cariFilter === 'hareket'
-    ? '<div class="sk-empty">Borç/alacaklı hesap yok</div>'
-    : '<div class="sk-empty">Henüz cari hesap yok</div>');
+  }).join('') || '<div class="sk-empty">Henüz cari hesap yok</div>';
 
   cariList.querySelectorAll('.acct-row[data-id]').forEach(row=>{
     row.onclick = () => {
@@ -1745,11 +1730,6 @@ function closeModal(){
   document.getElementById('fAmount').value = '';
 }
 document.getElementById('openAdd').onclick = openYeniCari;
-document.getElementById('cariFilterFab').onclick = () => {
-  state.cariFilter = state.cariFilter === 'hareket' ? 'tumu' : 'hareket';
-  save();
-  renderCariHesaplar();
-};
 
 let ncTur = 'cari';
 function openYeniCari(){
