@@ -2515,13 +2515,18 @@ function renderDetail(){
   let running = 0;
   currentDetailTx = [];
 
-  dList.innerHTML = sorted.length ? sorted.map((t, idx)=>{
+  if(!sorted.length){
+    dList.innerHTML = '<div class="empty-tx">Henüz hareket yok</div>';
+    document.getElementById('dToplam').textContent = fmtPlain(cariBalance(c));
+    render();
+    return;
+  }
+
+  const rowHtml = (t, idx) => {
     const amt = signedAmount(t);
     const neg = amt < 0;
-    running += amt;
     const dateStr = new Date(t.date).toLocaleDateString('tr-TR', {day:'numeric', month:'long'}).toUpperCase()
       + ', ' + new Date(t.date).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
-    currentDetailTx.push({ t, amt, running, dateStr });
     const isAcilis = t.type === 'AÇILIŞ';
     const showsCashArrow = (t.type === 'ÖDEME' || t.type === 'TAHSİLAT');
     const arrow = t.type === 'ÖDEME' ? '←' : '→';
@@ -2559,7 +2564,48 @@ function renderDetail(){
           <div class="tx-amount ${neg ? 'neg' : ''}">${main}<span class="cents">,${cents}</span></div>
         </div>
       </div>`;
-  }).join('') : '<div class="empty-tx">Henüz hareket yok</div>';
+  };
+
+  const keyOf = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+  const groups = new Map();
+  sorted.forEach((t, idx)=>{
+    const amt = signedAmount(t);
+    running += amt;
+    const dateStr = new Date(t.date).toLocaleDateString('tr-TR', {day:'numeric', month:'long'}).toUpperCase()
+      + ', ' + new Date(t.date).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+    currentDetailTx.push({ t, amt, running, dateStr });
+    const d = new Date(t.date);
+    const key = keyOf(d);
+    if(!groups.has(key)) groups.set(key, { label: d.toLocaleDateString('tr-TR', {month:'long', year:'numeric'}), rows: [], total: 0 });
+    const g = groups.get(key);
+    g.total += amt;
+    g.rows.push({ t, idx });
+  });
+
+  const sortedKeys = [...groups.keys()].sort((a,b)=> b.localeCompare(a));
+
+  dList.innerHTML = sortedKeys.map(key=>{
+    const g = groups.get(key);
+    const rowsHtml = g.rows.map(({t, idx})=> rowHtml(t, idx)).join('');
+    const [gMain, gCents] = fmtPlain(g.total).split(',');
+    return `
+      <div class="kasa-ay-group">
+        <div class="kasa-ay-header" data-key="${key}">
+          <div class="kasa-ay-label"><span class="kasa-ay-chevron">▾</span> ${g.label}</div>
+          <div class="kasa-ay-toplam ${g.total<0?'neg':''}">${gMain}<span class="cents">,${gCents}</span></div>
+        </div>
+        <div class="kasa-ay-body hidden" id="dAy-${key}">${rowsHtml}</div>
+      </div>`;
+  }).join('');
+
+  dList.querySelectorAll('.kasa-ay-header').forEach(header=>{
+    header.onclick = () => {
+      const key = header.dataset.key;
+      const body = document.getElementById('dAy-' + key);
+      body.classList.toggle('hidden');
+      header.querySelector('.kasa-ay-chevron').textContent = body.classList.contains('hidden') ? '▾' : '▴';
+    };
+  });
 
   dList.querySelectorAll('.tx-row[data-idx]').forEach(row=>{
     row.onclick = () => {
