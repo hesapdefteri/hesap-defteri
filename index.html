@@ -4697,15 +4697,31 @@ function showYedekMetinKutusu(dataStr){
   const ta = document.getElementById('yedekMetinAlani');
   ta.value = dataStr;
   document.getElementById('yedekKopyaDurum').textContent = '';
-  document.getElementById('yedekIndirBtn').onclick = () => {
+  document.getElementById('yedekIndirBtn').onclick = async () => {
     const durum = document.getElementById('yedekKopyaDurum');
+    const tarih = new Date().toISOString().slice(0,10);
+    const filename = `hesap-defteri-yedek-${tarih}.json`;
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    let shared = false;
     try {
-      const blob = new Blob([dataStr], { type: 'application/json' });
+      const file = new File([blob], filename, { type: 'application/json' });
+      if(navigator.canShare && navigator.canShare({ files: [file] })){
+        await navigator.share({ files: [file] });
+        shared = true;
+      }
+    } catch(err){
+      if(err && err.name === 'AbortError') return; // kullanıcı paylaşımı iptal etti, bir şey yapma
+    }
+    if(shared){
+      durum.textContent = '✓ Paylaşıldı';
+      durum.style.color = '#1f7a4d';
+      return;
+    }
+    try {
       const url = URL.createObjectURL(blob);
-      const tarih = new Date().toISOString().slice(0,10);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `hesap-defteri-yedek-${tarih}.json`;
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       a.remove();
