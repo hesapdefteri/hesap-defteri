@@ -221,14 +221,6 @@
     border: 2px solid rgba(28,53,102,.35);
     box-shadow: 0 4px 12px rgba(10,20,45,.15);
   }
-  .cari-filter-fab{position:fixed;right:20px;bottom:24px;width:60px;height:40px;background:none;border:none;padding:0;cursor:pointer;z-index:400;-webkit-tap-highlight-color:transparent;}
-  .cff-circle{position:absolute;top:3px;width:34px;height:34px;border-radius:50%;box-shadow:0 4px 10px rgba(20,20,20,.25);transition:opacity .2s ease, transform .2s ease;}
-  .cff-left{left:0;background:#d6392f;}
-  .cff-right{left:22px;background:#f0a63e;}
-  .cari-filter-fab.mode-tumu .cff-left{opacity:1;z-index:2;transform:scale(1);}
-  .cari-filter-fab.mode-tumu .cff-right{opacity:.5;z-index:1;transform:scale(.94);}
-  .cari-filter-fab.mode-ba .cff-right{opacity:1;z-index:2;transform:scale(1);}
-  .cari-filter-fab.mode-ba .cff-left{opacity:.5;z-index:1;transform:scale(.94);}
   .tx-row.selected{background:var(--accent-soft);margin:0 -16px;padding:14px 16px;}
   .tx-row.acilis-row{background:#fbf9df;margin:0 -16px;padding:14px 16px;}
   .tx-left{min-width:0;}
@@ -508,7 +500,7 @@
     <div class="cari-card" id="cariSummaryCard">
       <div class="cari-card-top">
         <span class="cari-card-label" id="cariTotalLbl">FİNANSAL DURUM</span>
-        <span class="cari-card-logo"><i class="c1"></i><i class="c2"></i></span>
+        <button id="cariFilterFab" class="cari-card-logo" title="Tümü" style="background:none;border:none;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;"><i class="c1"></i><i class="c2"></i></button>
       </div>
       <div class="cari-card-balance" id="cariTotal">0,00₺</div>
       <div class="cari-card-name">Net Bakiye</div>
@@ -535,10 +527,6 @@
     </div>
   </div>
 </div>
-<button id="cariFilterFab" class="cari-filter-fab mode-tumu" title="Tümü">
-  <span class="cff-circle cff-left"></span>
-  <span class="cff-circle cff-right"></span>
-</button>
 </div>
 
 <div class="overlay" id="overlay">
@@ -1681,8 +1669,6 @@ function renderCariHesaplar(){
 
   const filterFab = document.getElementById('cariFilterFab');
   if(filterFab){
-    filterFab.classList.toggle('mode-tumu', state.cariFilter !== 'hareket');
-    filterFab.classList.toggle('mode-ba', state.cariFilter === 'hareket');
     filterFab.title = state.cariFilter === 'hareket' ? 'Borç/Alacak' : 'Tümü';
   }
   const visibleList = state.cariFilter === 'hareket'
