@@ -4819,6 +4819,70 @@ function ensureIrmakPlastik(){
 }
 if(ensureIrmakPlastik()) save();
 
+// Kullanıcının gönderdiği ekran görüntülerinden (rapor dışa aktarımı) elle işlendi.
+// Ekran görüntüsü 25.05.2024'ten başlıyor ama ilk satırın toplamı (14.175,00) o tarihten
+// önce de hareket olduğunu gösteriyor; bu yüzden 12.375,00 TL'lik bir AÇILIŞ bakiyesi
+// eklendi ki toplamlar (332.617,50 satış / 311.467,50 tahsilat / 21.150,00 net) tam tutsun.
+// Zaten varsa dokunulmuyor, tekrar eklenmiyor (idempotent, ekleme-amaçlı, üzerine yazmıyor).
+function ensureNisantasiKuruTemizleme(){
+  if(state.cari.some(c => normAd(c.name) === normAd('Nişantaşı Kuru Temizleme'))) return false;
+  state.cari.push({ id:'nisantasikuru', name:'Nişantaşı Kuru Temizleme', transactions: [
+    {type:'AÇILIŞ', desc:'Açılış bakiyesi (25.05.2024 öncesi devreden)', amount:12375.00, date:'2024-05-01T00:00:00'},
+    {type:'SATIŞ', desc:'300 adet mandallı x 6', amount:1800.00, date:'2024-05-25T14:04:00'},
+    {type:'TAHSİLAT', desc:'', amount:10000.00, date:'2024-06-15T12:45:00'},
+    {type:'SATIŞ', desc:'1000 adet süngerli x 4.3', amount:4300.00, date:'2024-07-17T11:18:00'},
+    {type:'TAHSİLAT', desc:'', amount:8475.00, date:'2024-07-25T01:10:00'},
+    {type:'SATIŞ', desc:'Mandallı 300 adet x 7', amount:2100.00, date:'2024-08-12T17:31:00'},
+    {type:'SATIŞ', desc:'2500 Adet gömlek x 3', amount:7500.00, date:'2024-08-28T16:21:00'},
+    {type:'SATIŞ', desc:'1000 adet süngerli x 4,3', amount:4300.00, date:'2024-08-28T16:24:00'},
+    {type:'SATIŞ', desc:'Mandallı 300 adet x 7', amount:2100.00, date:'2024-08-28T16:24:01'},
+    {type:'TAHSİLAT', desc:'', amount:10000.00, date:'2024-09-18T18:54:00'},
+    {type:'TAHSİLAT', desc:'', amount:6000.00, date:'2024-10-09T17:07:00'},
+    {type:'SATIŞ', desc:'1500 süngerli x 4.3', amount:6450.00, date:'2024-10-14T21:41:00'},
+    {type:'SATIŞ', desc:'2500 adet gömlek x 3', amount:7500.00, date:'2024-10-14T21:42:00'},
+    {type:'TAHSİLAT', desc:'', amount:7500.00, date:'2024-10-29T17:17:00'},
+    {type:'TAHSİLAT', desc:'', amount:6450.00, date:'2024-11-22T19:29:00'},
+    {type:'SATIŞ', desc:'Süngerli 1250 x 4.3=5,375', amount:5375.00, date:'2024-12-20T19:50:00'},
+    {type:'SATIŞ', desc:'2000 adet gömlek x 3', amount:6000.00, date:'2024-12-20T19:52:00'},
+    {type:'TAHSİLAT', desc:'', amount:11375.00, date:'2024-12-30T19:36:00'},
+    {type:'SATIŞ', desc:'1500 t43 x 3.4', amount:5100.00, date:'2025-02-17T21:35:00'},
+    {type:'SATIŞ', desc:'1500 süngerli x 5', amount:7500.00, date:'2025-02-17T21:37:00'},
+    {type:'SATIŞ', desc:'300 adet mandallı x 8', amount:2400.00, date:'2025-02-27T16:56:00'},
+    {type:'TAHSİLAT', desc:'', amount:15000.00, date:'2025-03-07T19:48:00'},
+    {type:'SATIŞ', desc:'1500 t43 x 3.4', amount:5100.00, date:'2025-04-22T21:17:00'},
+    {type:'SATIŞ', desc:'1500 süngerli x 5', amount:7500.00, date:'2025-04-22T21:18:00'},
+    {type:'TAHSİLAT', desc:'', amount:12600.00, date:'2025-05-09T23:38:00'},
+    {type:'SATIŞ', desc:'1500 süngerli x 5.2', amount:7800.00, date:'2025-06-11T16:40:00'},
+    {type:'SATIŞ', desc:'1500 t43 x 3.7', amount:5550.00, date:'2025-06-11T16:42:00'},
+    {type:'SATIŞ', desc:'Mandallı 300 adet x 7', amount:2100.00, date:'2025-06-24T10:47:00'},
+    {type:'TAHSİLAT', desc:'', amount:15450.00, date:'2025-06-29T22:09:00'},
+    {type:'SATIŞ', desc:'Mandallı 300 adet x 8', amount:2400.00, date:'2025-08-14T10:53:00'},
+    {type:'SATIŞ', desc:'1500 süngerli x 5.3', amount:7950.00, date:'2025-08-14T10:55:00'},
+    {type:'SATIŞ', desc:'2000 adet gömlek askısı x 3.5', amount:7000.00, date:'2025-08-21T10:54:00'},
+    {type:'TAHSİLAT', desc:'', amount:10000.00, date:'2025-08-29T01:51:00'},
+    {type:'TAHSİLAT', desc:'', amount:7350.00, date:'2025-09-08T12:08:00'},
+    {type:'SATIŞ', desc:'1500 adet süngerli x5.9', amount:8850.00, date:'2025-10-27T15:13:00'},
+    {type:'SATIŞ', desc:'2000 adet gömlek x 4', amount:8000.00, date:'2025-10-27T15:14:00'},
+    {type:'SATIŞ', desc:'Mandalı 300 ad x 7', amount:2100.00, date:'2025-10-27T15:15:00'},
+    {type:'TAHSİLAT', desc:'', amount:10950.00, date:'2025-11-08T01:35:00'},
+    {type:'TAHSİLAT', desc:'', amount:8000.00, date:'2025-11-25T21:53:00'},
+    {type:'SATIŞ', desc:'1500 adet süngerli x 6.9', amount:10350.00, date:'2026-03-13T15:40:00'},
+    {type:'SATIŞ', desc:'2000 adet 43x4', amount:8000.00, date:'2026-03-13T15:43:00'},
+    {type:'TAHSİLAT', desc:'', amount:10000.00, date:'2026-03-19T13:10:00'},
+    {type:'TAHSİLAT', desc:'', amount:8350.00, date:'2026-05-08T19:39:00'},
+    {type:'SATIŞ', desc:'1250 x 7.8', amount:9750.00, date:'2026-05-14T21:23:00'},
+    {type:'SATIŞ', desc:'2500 x 4.5', amount:11250.00, date:'2026-05-14T21:24:00'},
+    {type:'SATIŞ', desc:'300 adet mandallı x8', amount:2400.00, date:'2026-05-14T21:24:01'},
+    {type:'TAHSİLAT', desc:'', amount:10000.00, date:'2026-05-24T20:39:00'},
+    {type:'TAHSİLAT', desc:'', amount:13400.00, date:'2026-06-13T17:20:00'},
+    {type:'SATIŞ', desc:'300 adet mandallı x8', amount:2400.00, date:'2026-07-07T15:39:00'},
+    {type:'SATIŞ', desc:'2000 x t43 4.5', amount:9000.00, date:'2026-07-07T15:40:00'},
+    {type:'SATIŞ', desc:'1250 x 7.8', amount:9750.00, date:'2026-07-07T15:40:01'}
+  ] });
+  return true;
+}
+if(ensureNisantasiKuruTemizleme()) save();
+
 render();
 </script>
 </body>
