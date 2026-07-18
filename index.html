@@ -4701,18 +4701,28 @@ function showYedekMetinKutusu(dataStr){
     const durum = document.getElementById('yedekKopyaDurum');
     const tarih = new Date().toISOString().slice(0,10);
     const filename = `hesap-defteri-yedek-${tarih}.json`;
-    if(navigator.share){
+    const shareBlob = new Blob([dataStr], { type: 'application/json' });
+    let file;
+    try {
+      file = new File([shareBlob], filename, { type: 'application/json' });
+    } catch(err){
+      file = null;
+    }
+    const canShareFiles = !!(file && navigator.canShare && navigator.canShare({ files: [file] }));
+    if(navigator.share && file){
       try {
-        const shareBlob = new Blob([dataStr], { type: 'application/json' });
-        const file = new File([shareBlob], filename, { type: 'application/json' });
         await navigator.share({ files: [file] });
         durum.textContent = '✓ Paylaşıldı';
         durum.style.color = '#1f7a4d';
         return;
       } catch(err){
         if(err && err.name === 'AbortError') return; // kullanıcı paylaşımı iptal etti
-        // paylaşım desteklenmedi/başarısız oldu, aşağıdaki indirmeye düş
+        durum.textContent = `Paylaşım açılmadı (${err && err.name ? err.name : 'bilinmeyen hata'}${canShareFiles ? '' : ', canShare:false'}) — otomatik indirmeye geçiliyor`;
+        durum.style.color = '#c0392b';
       }
+    } else {
+      durum.textContent = `Bu tarayıcıda dosya paylaşımı yok (share:${!!navigator.share}, canShare:${canShareFiles}) — otomatik indirmeye geçiliyor`;
+      durum.style.color = '#c0392b';
     }
     try {
       // application/octet-stream: Safari bazı JSON/metin türlerini indirmek yerine
@@ -4726,8 +4736,10 @@ function showYedekMetinKutusu(dataStr){
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 3000);
-      durum.textContent = '✓ İndirildi — Dosyalar uygulamasında "İndirilenler" klasörüne kaydedildi';
-      durum.style.color = '#1f7a4d';
+      setTimeout(() => {
+        durum.textContent = '✓ İndirildi — Dosyalar uygulamasında "İndirilenler" klasörüne kaydedildi';
+        durum.style.color = '#1f7a4d';
+      }, 1500);
     } catch(err){
       durum.textContent = 'İndirilemedi — Panoya Kopyala\'yı deneyin';
       durum.style.color = '#c0392b';
