@@ -5416,6 +5416,72 @@ function ensureOzcanAskiAralik2025(){
 }
 if(ensureOzcanAskiAralik2025()) save();
 
+// Kullanıcının gönderdiği rapor ekran görüntülerinden (Best Kuru Temizleme, Nisan 2022
+// - Haziran 2026 arası) elle işlendi. Rapor toplamı 153.325,00 satış / -153.325,00
+// tahsilat = 0 net bakiye ile birebir eşleşiyor.
+function ensureBestKuruTemizleme(){
+  const itemizedTx = [
+    {type:'SATIŞ', desc:'900 normal x 1.50', amount:1350.00, date:'2022-04-17T19:21:00'},
+    {type:'SATIŞ', desc:'900 süngerli x 1.65', amount:1485.00, date:'2022-04-17T19:22:00'},
+    {type:'TAHSİLAT', desc:'', amount:-2835.00, date:'2022-04-21T00:12:00'},
+    {type:'SATIŞ', desc:'1200 normal x 1.70', amount:2040.00, date:'2022-06-24T14:52:00'},
+    {type:'SATIŞ', desc:'900 adet süngerli', amount:1665.00, date:'2022-06-24T14:53:00'},
+    {type:'TAHSİLAT', desc:'', amount:-3705.00, date:'2022-06-29T08:59:00'},
+    {type:'SATIŞ', desc:'1500 x 2.4', amount:3600.00, date:'2022-10-11T10:03:00'},
+    {type:'SATIŞ', desc:'1500 süngerli x 2.6', amount:3900.00, date:'2022-10-11T10:04:00'},
+    {type:'TAHSİLAT', desc:'', amount:-7500.00, date:'2022-10-20T13:44:00'},
+    {type:'SATIŞ', desc:'750 süngerli x 2.8', amount:2100.00, date:'2023-03-27T15:26:00'},
+    {type:'SATIŞ', desc:'1000 normal x 2.6', amount:2600.00, date:'2023-03-27T15:51:00'},
+    {type:'TAHSİLAT', desc:'', amount:-4700.00, date:'2023-03-28T09:08:00'},
+    {type:'SATIŞ', desc:'1500 adet normal x 2.70', amount:4050.00, date:'2023-05-26T17:53:00'},
+    {type:'SATIŞ', desc:'750 adet süngerli x 2.90', amount:2175.00, date:'2023-05-26T17:54:00'},
+    {type:'TAHSİLAT', desc:'', amount:-6225.00, date:'2023-05-31T12:43:00'},
+    {type:'SATIŞ', desc:'1500 normal x 3.2', amount:4800.00, date:'2023-09-01T11:22:00'},
+    {type:'SATIŞ', desc:'1250 adet süngerli x 3.6', amount:4500.00, date:'2023-09-01T11:22:01'},
+    {type:'TAHSİLAT', desc:'', amount:-9300.00, date:'2023-09-11T12:34:00'},
+    {type:'SATIŞ', desc:'1500 Normal x 3.5', amount:5250.00, date:'2023-12-22T22:06:00'},
+    {type:'SATIŞ', desc:'1250 adet süng x 3.8', amount:4750.00, date:'2023-12-22T22:06:01'},
+    {type:'TAHSİLAT', desc:'', amount:-10000.00, date:'2023-12-28T10:40:00'},
+    {type:'SATIŞ', desc:'Normal 1500 x 3.6', amount:5400.00, date:'2024-05-10T17:38:00'},
+    {type:'SATIŞ', desc:'Süngerli 1250 x 4', amount:5000.00, date:'2024-05-10T17:39:00'},
+    {type:'TAHSİLAT', desc:'', amount:-10400.00, date:'2024-05-20T12:10:00'},
+    {type:'SATIŞ', desc:'1500 ad süngerli x 4', amount:6000.00, date:'2024-08-09T12:18:00'},
+    {type:'SATIŞ', desc:'1000 adet normal x 3.6', amount:3600.00, date:'2024-08-09T12:20:00'},
+    {type:'TAHSİLAT', desc:'', amount:-9600.00, date:'2024-08-12T17:30:00'},
+    {type:'SATIŞ', desc:'1250x4.1=5125, 900x3.7=3330', amount:8455.00, date:'2024-11-14T17:44:00'},
+    {type:'TAHSİLAT', desc:'', amount:-8455.00, date:'2024-11-22T18:43:00'},
+    {type:'SATIŞ', desc:'1500 adet normal x 4.5', amount:6750.00, date:'2025-03-12T16:10:00'},
+    {type:'SATIŞ', desc:'1500 süngerli x 5', amount:7500.00, date:'2025-03-12T16:11:00'},
+    {type:'TAHSİLAT', desc:'', amount:-14250.00, date:'2025-03-21T11:07:00'},
+    {type:'SATIŞ', desc:'1200 adet normal x 4.6', amount:5520.00, date:'2025-07-05T01:43:00'},
+    {type:'SATIŞ', desc:'1250 adet süngerli x 5.2', amount:6500.00, date:'2025-07-05T01:46:00'},
+    {type:'TAHSİLAT', desc:'', amount:-12020.00, date:'2025-07-18T23:05:00'},
+    {type:'SATIŞ', desc:'Normal 1500 x 4.6', amount:6900.00, date:'2025-09-08T22:26:00'},
+    {type:'SATIŞ', desc:'Süngerli 1250 x 5.2', amount:6500.00, date:'2025-09-08T22:27:00'},
+    {type:'TAHSİLAT', desc:'', amount:-13400.00, date:'2025-10-03T19:57:00'},
+    {type:'SATIŞ', desc:'900 normal x 5.4', amount:4860.00, date:'2025-11-28T15:05:00'},
+    {type:'SATIŞ', desc:'1250 süngerli x 5.9', amount:7375.00, date:'2025-11-28T15:05:01'},
+    {type:'TAHSİLAT', desc:'', amount:-12235.00, date:'2025-12-03T12:46:00'},
+    {type:'SATIŞ', desc:'1000 adet normal', amount:6400.00, date:'2026-04-13T18:06:00'},
+    {type:'SATIŞ', desc:'750 adet süngerli x 6.9', amount:5175.00, date:'2026-04-13T18:07:00'},
+    {type:'TAHSİLAT', desc:'', amount:-11575.00, date:'2026-04-18T14:58:00'},
+    {type:'SATIŞ', desc:'1250 ad normal x 6.5', amount:8125.00, date:'2026-06-08T18:55:00'},
+    {type:'SATIŞ', desc:'1250 adet süngerli x 7.2', amount:9000.00, date:'2026-06-08T18:58:00'},
+    {type:'TAHSİLAT', desc:'', amount:-17125.00, date:'2026-06-23T13:31:00'}
+  ];
+  const existing = state.cari.find(c => normAd(c.name) === normAd('Best Kuru Temizleme'));
+  if(!existing){
+    state.cari.push({ id:'bestkuru', name:'Best Kuru Temizleme', transactions: itemizedTx });
+    return true;
+  }
+  if(!existing.transactions || existing.transactions.length === 0){
+    existing.transactions = itemizedTx;
+    return true;
+  }
+  return false;
+}
+if(ensureBestKuruTemizleme()) save();
+
 render();
 </script>
 </body>
