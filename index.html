@@ -630,6 +630,10 @@
         </div>
       </div>
     </div>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button id="dBorcEkleBtn" style="flex:1;padding:11px 0;border:none;border-radius:10px;background:#fdeceb;color:#c0392b;font-weight:700;font-size:13.5px;cursor:pointer;">Borç Ekle</button>
+      <button id="dAlacakEkleBtn" style="flex:1;padding:11px 0;border:none;border-radius:10px;background:#e8f6ee;color:#1f9d64;font-weight:700;font-size:13.5px;cursor:pointer;">Alacak Ekle</button>
+    </div>
     <div class="d-list" id="dList" style="flex:1;overflow-y:auto;min-height:0;margin-top:10px;"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 4px;border-top:1px solid var(--line);margin-top:4px;">
       <span style="font-size:13px;font-weight:700;color:var(--muted);">TOPLAM ₺</span>
@@ -2569,6 +2573,22 @@ document.getElementById('quickTxSave').onclick = () => {
   activeLedger = quickTxLedger;
   render();
   renderCariHesaplar();
+};
+
+// Borç/Alacak — mevcut Satış/Tahsilat (alıcı) veya Alış/Ödeme (tedarikçi) mantığını
+// aynen kullanır, sadece hesabın ekstre kartından erişilen, daha genel adlı (açılış/manuel
+// düzeltme gibi durumlar için) bir kısayoldur. Raporlar ve toplamlar hiç etkilenmez.
+document.getElementById('dBorcEkleBtn').onclick = () => {
+  const type = activeLedger === 'tedarikci' ? 'ALIŞ' : 'SATIŞ';
+  openQuickTx(activeCariId, activeLedger, type);
+  const c = state[activeLedger].find(x=>x.id===activeCariId);
+  document.getElementById('quickTxTitle').textContent = 'Borç' + (c ? ' — ' + c.name : '');
+};
+document.getElementById('dAlacakEkleBtn').onclick = () => {
+  const type = activeLedger === 'tedarikci' ? 'ÖDEME' : 'TAHSİLAT';
+  openQuickTx(activeCariId, activeLedger, type);
+  const c = state[activeLedger].find(x=>x.id===activeCariId);
+  document.getElementById('quickTxTitle').textContent = 'Alacak' + (c ? ' — ' + c.name : '');
 };
 
 function parseUnitInfo(desc){
