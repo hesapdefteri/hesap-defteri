@@ -1168,6 +1168,67 @@
   </div>
 </div>
 
+<div class="detail-screen" id="masrafScreen">
+  <div class="d-header">
+    <div class="d-title">MASRAFLAR</div>
+    <button class="d-share" id="masrafAddBtn" title="Yeni Masraf Kalemi" style="visibility:visible;">＋</button>
+  </div>
+  <div style="padding:16px 16px 0 16px;">
+    <div class="cari-card">
+      <div class="cari-card-top">
+        <span class="cari-card-label">TOPLAM GİDER</span>
+        <span class="cari-card-logo"><i class="c1"></i><i class="c2"></i></span>
+      </div>
+      <div class="cari-card-balance" id="masrafToplamEl">0,00₺</div>
+      <div class="cari-card-name">Tüm Masraf Kalemleri</div>
+    </div>
+  </div>
+  <div class="d-list acct-card" id="masrafList" style="padding:0 0 100px 0;margin:0 16px;width:auto;"></div>
+</div>
+
+<div class="detail-screen" id="masrafDetayScreen">
+  <div class="d-header">
+    <button class="d-back" id="masrafDetayBack">‹</button>
+    <div class="d-title" id="masrafDetayTitle">Kalem</div>
+    <button class="d-share" id="masrafDetayAddBtn" title="Ekle">＋</button>
+  </div>
+  <div style="padding:16px 16px 0 16px;">
+    <div class="cari-card">
+      <div class="cari-card-top">
+        <span class="cari-card-label">TOPLAM</span>
+      </div>
+      <div class="cari-card-balance" id="masrafDetayToplam">0,00₺</div>
+    </div>
+  </div>
+  <div class="d-list" id="masrafDetayList" style="padding:16px 16px 100px 16px;"></div>
+</div>
+
+<div class="overlay" id="masrafYeniKalemOverlay" style="z-index:90;">
+  <div class="modal">
+    <h3 style="margin-bottom:12px;">Yeni Masraf Kalemi</h3>
+    <input id="mkAd" placeholder="Kalem Adı (örn. İnternet Gideri)" class="ci-input">
+    <button id="mkSave" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;cursor:pointer;margin-top:6px;">Kaydet</button>
+    <button id="mkCancel" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
+  </div>
+</div>
+
+<div class="overlay" id="masrafEkleOverlay" style="z-index:92;">
+  <div class="modal" style="padding-bottom:14px;">
+    <h3 style="margin-bottom:6px;" id="masrafEkleTitle">Kalem</h3>
+    <div style="text-align:center;padding:10px 0;">
+      <input type="text" id="masrafEkleTutar" placeholder="0" readonly style="border:none;background:transparent;text-align:center;font-size:34px;font-weight:800;width:100%;color:var(--ink);">
+    </div>
+    <div class="keypad" id="masrafEkleKeypad">
+      <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+      <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+      <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+      <button data-k=",">,</button><button data-k="0">0</button><button data-k="back" class="kback">⌫</button>
+    </div>
+    <button id="masrafEkleSave" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;cursor:pointer;margin-top:10px;">Kaydet</button>
+    <button id="masrafEkleCancel" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
+  </div>
+</div>
+
 <div class="detail-screen" id="raporScreen">
   <div class="d-header">
     <div class="d-title">Finansal Rapor</div>
@@ -1399,6 +1460,7 @@ if(!state.satisFisleri) state.satisFisleri = [];
 if(!state.siparisFisleri) state.siparisFisleri = [];
 if(!state.cariFilter) state.cariFilter = 'tumu';
 if(!state.masrafKategorileri) state.masrafKategorileri = [];
+if(!state.masrafHesaplari) state.masrafHesaplari = [];
 
 let activeLedger = 'cari';
 function getLedger(){ return state[activeLedger]; }
@@ -2998,6 +3060,8 @@ function hideAllScreens(){
   document.getElementById('siparisDetayScreen').classList.remove('show');
   document.getElementById('ayarlarScreen').classList.remove('show');
   kasaScreen.classList.remove('show');
+  document.getElementById('masrafScreen').classList.remove('show');
+  document.getElementById('masrafDetayScreen').classList.remove('show');
   document.getElementById('anaMenuFloatBtn').style.display = 'flex';
   nudge();
 }
@@ -3072,6 +3136,8 @@ document.getElementById('anaMenu').querySelectorAll('.am-tile').forEach(tile=>{
       hideAllScreens();
       document.getElementById('fisListScreen').classList.add('show');
       nudge();
+    } else if(mod === 'masraflar'){
+      openMasrafScreen();
     } else {
       openGenModule(mod);
     }
@@ -3172,6 +3238,169 @@ function renderKasa(){
     };
   });
 }
+
+// ---------- Masraflar (Cari Hesap mantığıyla: kalem = kart, kalemin kendi hareket geçmişi) ----------
+// Eski düz "Kalem Seç + Tutar" akışından kalan kayıtlar varsa (state.modules.masraflar),
+// bir kereliğine kalem adına göre gruplanıp yeni yapıya (state.masrafHesaplari) taşınır.
+(function migrateEskiMasraflar(){
+  const eski = state.modules && state.modules.masraflar;
+  if(eski && eski.length && (!state.masrafHesaplari || state.masrafHesaplari.length === 0)){
+    const gruplar = {};
+    eski.forEach(e=>{
+      const ad = (e.desc && e.desc.trim()) ? e.desc.trim() : 'Diğer';
+      if(!gruplar[ad]) gruplar[ad] = [];
+      gruplar[ad].push({ desc:'', amount: e.amount, date: e.date });
+    });
+    Object.keys(gruplar).forEach(ad=>{
+      state.masrafHesaplari.push({ id: 'mk_' + Math.random().toString(36).slice(2,9), name: ad, transactions: gruplar[ad] });
+    });
+    save();
+  }
+})();
+
+function masrafToplam(k){ return (k.transactions||[]).reduce((s,t)=> s + t.amount, 0); }
+
+function openMasrafScreen(){
+  hideAllScreens();
+  document.getElementById('masrafScreen').classList.add('show');
+  renderMasrafScreen();
+  nudge();
+}
+
+function renderMasrafScreen(){
+  const list = state.masrafHesaplari || [];
+  const genelToplam = list.reduce((s,k)=> s + masrafToplam(k), 0);
+  document.getElementById('masrafToplamEl').textContent = fmt(genelToplam);
+
+  const wrap = document.getElementById('masrafList');
+  wrap.innerHTML = list.length ? list.map(k=>{
+    return `
+    <div class="swipe-wrap">
+      <div class="swipe-actions">
+        <button class="swipe-btn act-tahsilat masraf-ekle-btn" data-id="${k.id}">Ekle</button>
+      </div>
+      <div class="acct-row swipe-content" data-id="${k.id}">
+        <div class="name-wrap"><span class="name">${k.name}</span></div>
+        <span class="amount">${fmt(masrafToplam(k))}</span>
+      </div>
+    </div>`;
+  }).join('') : '<div class="empty-tx">Henüz masraf kalemi yok. Sağ üstteki ＋ ile ekleyebilirsin.</div>';
+
+  enableSwipeRows(wrap);
+  wrap.querySelectorAll('.masraf-ekle-btn').forEach(btn=>{
+    btn.onclick = (e) => { e.stopPropagation(); openMasrafEkle(btn.dataset.id); };
+  });
+  wrap.querySelectorAll('.acct-row.swipe-content').forEach(row=>{
+    row.onclick = () => {
+      if(row.__isSwipeMoved && row.__isSwipeMoved()) return;
+      openMasrafDetay(row.dataset.id);
+    };
+  });
+}
+
+let masrafDetayId = null;
+function openMasrafDetay(id){
+  masrafDetayId = id;
+  const k = state.masrafHesaplari.find(x=>x.id===id);
+  if(!k) return;
+  document.getElementById('masrafDetayTitle').textContent = k.name;
+  renderMasrafDetay();
+  document.getElementById('masrafScreen').classList.remove('show');
+  document.getElementById('masrafDetayScreen').classList.add('show');
+  nudge();
+}
+
+function renderMasrafDetay(){
+  const k = state.masrafHesaplari.find(x=>x.id===masrafDetayId);
+  if(!k) return;
+  const sorted = [...(k.transactions||[])].sort((a,b)=> new Date(b.date) - new Date(a.date));
+  document.getElementById('masrafDetayToplam').textContent = fmt(masrafToplam(k));
+  const list = document.getElementById('masrafDetayList');
+  list.innerHTML = sorted.length ? sorted.map((t, idx)=>{
+    const dateStr = new Date(t.date).toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'})
+      + ', ' + new Date(t.date).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+    return `
+      <div class="tx-row" data-idx="${idx}">
+        <div class="tx-left"><div class="tx-type pos">${dateStr}</div></div>
+        <div class="tx-amount">${fmtPlain(t.amount)}</div>
+      </div>`;
+  }).join('') : '<div class="empty-tx">Henüz hareket yok</div>';
+
+  list.querySelectorAll('.tx-row[data-idx]').forEach(row=>{
+    row.onclick = () => {
+      const idx = parseInt(row.dataset.idx, 10);
+      openConfirm('Bu kaydı sil', 'Bu işlem geri alınamaz. Emin misin?', () => {
+        const target = sorted[idx];
+        const realIdx = k.transactions.indexOf(target);
+        if(realIdx !== -1) k.transactions.splice(realIdx, 1);
+        save();
+        renderMasrafDetay();
+        renderMasrafScreen();
+      });
+    };
+  });
+}
+
+document.getElementById('masrafDetayBack').onclick = () => {
+  document.getElementById('masrafDetayScreen').classList.remove('show');
+  document.getElementById('masrafScreen').classList.add('show');
+  renderMasrafScreen();
+  nudge();
+};
+document.getElementById('masrafDetayAddBtn').onclick = () => openMasrafEkle(masrafDetayId);
+
+// Yeni masraf kalemi ekleme
+document.getElementById('masrafAddBtn').onclick = () => {
+  document.getElementById('mkAd').value = '';
+  document.getElementById('masrafYeniKalemOverlay').classList.add('show');
+};
+document.getElementById('mkCancel').onclick = () => document.getElementById('masrafYeniKalemOverlay').classList.remove('show');
+document.getElementById('masrafYeniKalemOverlay').onclick = (e) => {
+  if(e.target === document.getElementById('masrafYeniKalemOverlay')) document.getElementById('masrafYeniKalemOverlay').classList.remove('show');
+};
+document.getElementById('mkSave').onclick = () => {
+  const ad = document.getElementById('mkAd').value.trim();
+  if(!ad) return;
+  state.masrafHesaplari.push({ id: 'mk_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6), name: ad, transactions: [] });
+  save();
+  document.getElementById('masrafYeniKalemOverlay').classList.remove('show');
+  renderMasrafScreen();
+};
+
+// Bir kaleme hızlı hareket (masraf) ekleme
+let masrafEkleId = null;
+function openMasrafEkle(id){
+  masrafEkleId = id;
+  const k = state.masrafHesaplari.find(x=>x.id===id);
+  document.getElementById('masrafEkleTitle').textContent = k ? k.name : 'Masraf Ekle';
+  document.getElementById('masrafEkleTutar').value = '';
+  document.getElementById('masrafEkleOverlay').classList.add('show');
+}
+document.getElementById('masrafEkleCancel').onclick = () => document.getElementById('masrafEkleOverlay').classList.remove('show');
+document.getElementById('masrafEkleOverlay').onclick = (e) => {
+  if(e.target === document.getElementById('masrafEkleOverlay')) document.getElementById('masrafEkleOverlay').classList.remove('show');
+};
+document.getElementById('masrafEkleKeypad').querySelectorAll('button').forEach(btn=>{
+  btn.onclick = () => {
+    const field = document.getElementById('masrafEkleTutar');
+    const k = btn.dataset.k;
+    if(k === 'back'){ field.value = field.value.slice(0, -1); }
+    else if(k === ','){ if(!field.value.includes(',')) field.value += ','; }
+    else { field.value += k; }
+  };
+});
+document.getElementById('masrafEkleSave').onclick = () => {
+  const amount = parseFloat(document.getElementById('masrafEkleTutar').value.replace(',', '.')) || 0;
+  if(!amount) return;
+  const k = state.masrafHesaplari.find(x=>x.id===masrafEkleId);
+  if(!k) return;
+  if(!k.transactions) k.transactions = [];
+  k.transactions.push({ desc:'', amount, date: new Date().toISOString() });
+  save();
+  document.getElementById('masrafEkleOverlay').classList.remove('show');
+  renderMasrafScreen();
+  if(document.getElementById('masrafDetayScreen').classList.contains('show')) renderMasrafDetay();
+};
 
 // ---------- Jenerik Modül Ekranı (Ürünler / Satışlar / Alışlar / Masraflar / Stoklar / Kataloglar / Takvim) ----------
 const MOD_LABELS = { urunler:'ÜRÜNLER', satislar:'SATIŞLAR', alislar:'ALIŞLAR', masraflar:'MASRAFLAR', stoklar:'STOKLAR', kataloglar:'KATALOGLAR', takvim:'TAKVİM' };
