@@ -1686,7 +1686,9 @@ function render(){
       if(sh){
         const gun = sh.getDate();
         const ay = sh.toLocaleDateString('tr-TR', {month:'short'}).toUpperCase().replace('.', '');
+        const tamTarih = sh.toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'});
         circleHtml = `<span class="siparis-date-circle son-hareket"><b>${gun}</b>${ay}</span>`;
+        ozetHtml = `<div class="siparis-teslimat-row">Son hareket: ${tamTarih}</div>`;
       }
     }
     return `
@@ -1803,7 +1805,9 @@ function renderCariHesaplar(){
       if(sh){
         const gun = sh.getDate();
         const ay = sh.toLocaleDateString('tr-TR', {month:'short'}).toUpperCase().replace('.', '');
+        const tamTarih = sh.toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'});
         circleHtml = `<span class="siparis-date-circle son-hareket"><b>${gun}</b>${ay}</span>`;
+        ozetHtml = `<div class="siparis-teslimat-row">Son hareket: ${tamTarih}</div>`;
       }
     }
     return `
