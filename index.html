@@ -1541,6 +1541,18 @@ function sonHareketTarihi(c){
     return (!latest || d > latest) ? d : latest;
   }, null);
 }
+function relativeZaman(d){
+  const now = new Date();
+  const gunFarki = Math.floor((now - d) / (1000*60*60*24));
+  if(gunFarki <= 0) return 'bugün';
+  if(gunFarki === 1) return 'dün';
+  if(gunFarki < 30) return gunFarki + ' gün önce';
+  const ayFarki = Math.floor(gunFarki / 30);
+  if(ayFarki < 12) return ayFarki + ' ay önce';
+  const yilFarki = Math.floor(ayFarki / 12);
+  const kalanAy = ayFarki % 12;
+  return yilFarki + ' yıl' + (kalanAy > 0 ? ' ' + kalanAy + ' ay' : '') + ' önce';
+}
 
 function swipeActionsHtml(id, ledgerKey){
   if(ledgerKey === 'tedarikci'){
@@ -1701,9 +1713,9 @@ function render(){
       if(sh){
         const gun = sh.getDate();
         const ay = sh.toLocaleDateString('tr-TR', {month:'short'}).toUpperCase().replace('.', '');
-        const tamTarih = sh.toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'});
+        const gorecelZaman = relativeZaman(sh);
         circleHtml = `<span class="siparis-date-circle son-hareket"><b>${gun}</b>${ay}</span>`;
-        ozetHtml = `<div class="siparis-teslimat-row">Son hareket: ${tamTarih}</div>`;
+        ozetHtml = `<div class="siparis-teslimat-row">Son hareket: ${gorecelZaman}</div>`;
       }
     }
     return `
@@ -1820,9 +1832,9 @@ function renderCariHesaplar(){
       if(sh){
         const gun = sh.getDate();
         const ay = sh.toLocaleDateString('tr-TR', {month:'short'}).toUpperCase().replace('.', '');
-        const tamTarih = sh.toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'});
+        const gorecelZaman = relativeZaman(sh);
         circleHtml = `<span class="siparis-date-circle son-hareket"><b>${gun}</b>${ay}</span>`;
-        ozetHtml = `<div class="siparis-teslimat-row">Son hareket: ${tamTarih}</div>`;
+        ozetHtml = `<div class="siparis-teslimat-row">Son hareket: ${gorecelZaman}</div>`;
       }
     }
     return `
