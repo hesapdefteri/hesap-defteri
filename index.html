@@ -607,6 +607,7 @@
   <div class="entry-bar">
     <div class="entry-row">
       <input type="text" class="entry-desc" id="txDesc" placeholder="Açıklama">
+      <input type="date" id="txAcilisTarih" class="entry-desc hidden" style="flex:0 0 130px;color:var(--ink);">
       <input type="text" class="entry-amt" id="txAmount" placeholder="0" readonly>
       <button class="entry-save" id="txSave">KAYDET</button>
     </div>
@@ -833,7 +834,8 @@
 <div class="overlay" id="quickTxOverlay">
   <div class="modal" style="padding-bottom:16px;padding-top:4px;">
     <h3 id="quickTxTitle" style="margin-bottom:14px;">Tahsilat</h3>
-    <input type="text" inputmode="decimal" id="quickTxAmount" placeholder="0,00" style="width:100%;box-sizing:border-box;margin:14px 0 22px 0;padding:18px 12px;font-size:24px;font-weight:700;text-align:center;border:1px solid var(--line);border-radius:12px;color:var(--ink);">
+    <input type="text" inputmode="decimal" id="quickTxAmount" placeholder="0,00" style="width:100%;box-sizing:border-box;margin:14px 0 10px 0;padding:18px 12px;font-size:24px;font-weight:700;text-align:center;border:1px solid var(--line);border-radius:12px;color:var(--ink);">
+    <div class="field" style="margin-bottom:12px;"><label>Tarih</label><input type="date" id="quickTxTarih" style="width:100%;box-sizing:border-box;padding:12px 12px;border:1px solid var(--line);border-radius:10px;font-size:15px;color:var(--ink);"></div>
     <button id="quickTxSave" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;cursor:pointer;">Kaydet</button>
     <button id="quickTxCancel" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
   </div>
@@ -2612,6 +2614,7 @@ function openQuickTx(id, ledgerKey, type){
   const c = state[ledgerKey].find(x=>x.id===id);
   document.getElementById('quickTxTitle').textContent = type + (c ? ' — ' + c.name : '');
   document.getElementById('quickTxAmount').value = '';
+  document.getElementById('quickTxTarih').value = new Date().toISOString().slice(0,10);
   document.getElementById('quickTxOverlay').classList.add('show');
   setTimeout(()=>document.getElementById('quickTxAmount').focus(), 50);
 }
@@ -2624,8 +2627,16 @@ document.getElementById('quickTxSave').onclick = () => {
   if(!c) return;
   const amount = parseFloat(document.getElementById('quickTxAmount').value.replace(',', '.'));
   if(!amount || amount <= 0) return;
+  const secilenTarih = document.getElementById('quickTxTarih').value;
+  let tarihIso;
+  if(secilenTarih){
+    const saatKismi = quickTxEditDate ? new Date(quickTxEditDate).toISOString().slice(11) : new Date().toISOString().slice(11);
+    tarihIso = new Date(secilenTarih + 'T' + saatKismi).toISOString();
+  } else {
+    tarihIso = quickTxEditDate || new Date().toISOString();
+  }
 
-  const tx = { type: quickTxType, desc: '', amount, date: quickTxEditDate || new Date().toISOString() };
+  const tx = { type: quickTxType, desc: '', amount, date: tarihIso };
   c.transactions.push(tx);
 
   if(quickTxType === 'ÖDEME') state.cash -= amount;
@@ -2839,6 +2850,13 @@ document.getElementById('txTabs').querySelectorAll('button').forEach(btn=>{
     activeTxType = btn.dataset.type;
     document.getElementById('txTabs').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
+    const tarihEl = document.getElementById('txAcilisTarih');
+    if(activeTxType === 'AÇILIŞ'){
+      tarihEl.classList.remove('hidden');
+      if(!tarihEl.value) tarihEl.value = new Date().toISOString().slice(0,10);
+    } else {
+      tarihEl.classList.add('hidden');
+    }
   };
 });
 
@@ -2870,8 +2888,11 @@ document.getElementById('txSave').onclick = () => {
   if(activeTxType === 'AÇILIŞ'){
     c.transactions = c.transactions.filter(t => t.type !== 'AÇILIŞ');
     const others = c.transactions.filter(t => t.type !== 'AÇILIŞ');
+    const secilenTarih = document.getElementById('txAcilisTarih').value;
     let acilisDate;
-    if(others.length){
+    if(secilenTarih){
+      acilisDate = new Date(secilenTarih + 'T00:00:00');
+    } else if(others.length){
       const earliest = others.reduce((min,t)=> new Date(t.date) < new Date(min.date) ? t : min);
       acilisDate = new Date(new Date(earliest.date).getTime() - 24*60*60*1000);
     } else {
@@ -3101,6 +3122,7 @@ document.getElementById('rcEdit').onclick = () => {
   openQuickTx(editId, editLedger, editType);
   quickTxEditDate = editDate;
   document.getElementById('quickTxAmount').value = fmtPlain(editAmount);
+  document.getElementById('quickTxTarih').value = new Date(editDate).toISOString().slice(0,10);
 };
 
 document.getElementById('rcClose').onclick = () => receiptOverlay.classList.remove('show');
