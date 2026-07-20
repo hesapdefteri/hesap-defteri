@@ -1,6 +1,21 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+<script>
+  // Ana ekrana eklenmiş kısayoldan (standalone) her açılışta, sayfayı benzersiz
+  // bir sürüm parametresiyle bir kerelik yeniden yükleyip iOS'un webclip
+  // önbelleğini atlıyoruz. Kullanıcı hiçbir şey yapmadan, sadece dokununca çalışır.
+  (function(){
+    try {
+      var isStandalone = window.navigator.standalone === true;
+      var url = new URL(window.location.href);
+      if(isStandalone && !url.searchParams.has('_fresh')){
+        url.searchParams.set('_fresh', Date.now().toString());
+        window.location.replace(url.toString());
+      }
+    } catch(e){}
+  })();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
