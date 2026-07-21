@@ -420,7 +420,6 @@
   .sk-form-card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(20,40,50,.05);margin-bottom:14px;}
   .sk-form-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .sk-toggle{display:flex;align-items:center;gap:10px;padding:6px 0;}
-  .tah-yontem-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
   .sk-toggle.hidden{display:none;}
   .sk-toggle-switch{width:44px;height:26px;border-radius:14px;background:#dfe5e7;position:relative;cursor:pointer;flex-shrink:0;transition:background .2s;}
   .sk-toggle-switch.on{background:var(--green);}
@@ -883,10 +882,9 @@
 
     <div id="tahsilatYontemRow" class="hidden" style="margin-bottom:14px;">
       <label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;">ÖDEME YÖNTEMİ</label>
-      <div style="display:flex;gap:8px;">
-        <button type="button" id="tahsilatNakitBtn" class="tah-yontem-btn active" style="flex:1;padding:13px 0;border:1px solid var(--line);border-radius:10px;background:#fff;font-weight:700;font-size:14px;cursor:pointer;">Nakit Ödemesi</button>
-        <button type="button" id="tahsilatCekBtn" class="tah-yontem-btn" style="flex:1;padding:13px 0;border:1px solid var(--line);border-radius:10px;background:#fff;font-weight:700;font-size:14px;cursor:pointer;">Çek Ödemesi</button>
-      </div>
+      <button type="button" id="tahYontemSecBtn" style="width:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;font-weight:700;font-size:14px;cursor:pointer;color:var(--ink);">
+        <span id="tahYontemSecLabel">Nakit Ödemesi</span><span style="color:var(--muted);">›</span>
+      </button>
     </div>
 
     <div class="sk-toggle hidden" id="quickTxCekToggleRow">
@@ -921,6 +919,14 @@
 
     <button id="quickTxSave" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;cursor:pointer;margin-top:6px;">Kaydet</button>
     <button id="quickTxCancel" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
+  </div>
+</div>
+
+<div class="overlay" id="tahYontemOverlay" style="z-index:95;">
+  <div class="modal" style="padding-bottom:14px;text-align:center;">
+    <h3 style="margin-bottom:14px;">Ödeme Yöntemi</h3>
+    <button type="button" id="tahYontemNakitSecBtn" style="width:100%;padding:16px 0;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;margin-bottom:10px;">Nakit Ödemesi</button>
+    <button type="button" id="tahYontemCekSecBtn" style="width:100%;padding:16px 0;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Çek Ödemesi</button>
   </div>
 </div>
 
@@ -2657,12 +2663,15 @@ let quickTxLedger = null, quickTxId = null, quickTxType = null, quickTxEditDate 
 let quickTxCekOn = false, quickTxCiroOn = false, tahsilatYontem = 'nakit', editingTx = null, quickTxPrevCiro = false;
 function tahYontemSec(yontem){
   tahsilatYontem = yontem;
-  document.getElementById('tahsilatNakitBtn').classList.toggle('active', yontem === 'nakit');
-  document.getElementById('tahsilatCekBtn').classList.toggle('active', yontem === 'cek');
+  document.getElementById('tahYontemSecLabel').textContent = yontem === 'cek' ? 'Çek Ödemesi' : 'Nakit Ödemesi';
   document.getElementById('cekDetayForm').classList.toggle('hidden', yontem !== 'cek');
 }
-document.getElementById('tahsilatNakitBtn').onclick = () => tahYontemSec('nakit');
-document.getElementById('tahsilatCekBtn').onclick = () => tahYontemSec('cek');
+document.getElementById('tahYontemSecBtn').onclick = () => { document.getElementById('tahYontemOverlay').classList.add('show'); };
+document.getElementById('tahYontemNakitSecBtn').onclick = () => { tahYontemSec('nakit'); document.getElementById('tahYontemOverlay').classList.remove('show'); };
+document.getElementById('tahYontemCekSecBtn').onclick = () => { tahYontemSec('cek'); document.getElementById('tahYontemOverlay').classList.remove('show'); };
+document.getElementById('tahYontemOverlay').onclick = (e) => {
+  if(e.target === document.getElementById('tahYontemOverlay')) document.getElementById('tahYontemOverlay').classList.remove('show');
+};
 document.getElementById('cekDurumBtn').onclick = function(){
   if(!editingTx) return;
   editingTx.ciro = !editingTx.ciro;
