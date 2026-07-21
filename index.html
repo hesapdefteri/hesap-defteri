@@ -202,8 +202,8 @@
   .dcek-dots{display:flex;justify-content:center;gap:6px;margin-top:8px;}
   .dcek-dot{width:6px;height:6px;border-radius:50%;background:#d5dade;transition:background .2s,width .2s;}
   .dcard-pager{overflow:hidden;position:relative;}
-  .dcard-track{display:flex;width:500%;}
-  .dcard-page{flex:0 0 20%;min-width:20%;box-sizing:border-box;}
+  .dcard-track{display:flex;width:600%;}
+  .dcard-page{flex:0 0 16.6667%;min-width:16.6667%;box-sizing:border-box;}
   .dcek-dot.active{background:var(--accent);width:16px;border-radius:3px;}
   .overlay.show{display:flex;}
   .modal{background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:20px 20px 26px 20px;}
@@ -680,10 +680,10 @@
             <div class="cari-card-name" style="font-size:11px;letter-spacing:.4px;opacity:.7;margin-top:10px;">CİRO EDİLEN ÇEKLER</div>
             <div class="cari-card-balance" id="dCardCekCiro" style="margin-top:4px;">0,00₺</div>
           </div>
+          <div class="dcard-page" data-page="5">
+            <div id="dEkstreInfoBody" class="cari-card-info" style="margin-top:10px;"></div>
           </div>
-        </div>
-        <div class="cari-card-bottom">
-          <div id="dEkstreInfoBody" class="cari-card-info"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -693,6 +693,7 @@
       <span class="dcek-dot" data-i="2"></span>
       <span class="dcek-dot" data-i="3"></span>
       <span class="dcek-dot" data-i="4"></span>
+      <span class="dcek-dot" data-i="5"></span>
     </div>
     <div style="display:flex;gap:8px;margin-top:10px;">
       <button id="dBorcEkleBtn" style="flex:1;padding:11px 0;border:none;border-radius:10px;background:#fdeceb;color:#c0392b;font-weight:700;font-size:13.5px;cursor:pointer;">Borç Ekle</button>
@@ -2924,9 +2925,9 @@ function applyEkstreListFilter(pageIdx){
 function goToCardPage(idx, animate){
   const track = document.getElementById('dCardTrack');
   track.style.transition = animate === false ? 'none' : 'transform .25s ease';
-  track.style.transform = `translateX(-${idx * 20}%)`;
+  track.style.transform = `translateX(-${idx * (100/6)}%)`;
   document.querySelectorAll('#dDots .dcek-dot').forEach((d,i)=> d.classList.toggle('active', i===idx));
-  applyEkstreListFilter(idx);
+  if(idx <= 4) applyEkstreListFilter(idx);
 }
 
 (function(){
@@ -2946,9 +2947,9 @@ function goToCardPage(idx, animate){
     lastX = e.clientX;
     const delta = lastX - startX;
     if(Math.abs(delta) > 6) moved = true;
-    const pct = (delta / pager.clientWidth) * 20;
-    let x = -(baseIdx * 20) + pct;
-    x = Math.max(-80, Math.min(0, x));
+    const pct = (delta / pager.clientWidth) * (100/6);
+    let x = -(baseIdx * (100/6)) + pct;
+    x = Math.max(-(5 * (100/6)), Math.min(0, x));
     track.style.transform = `translateX(${x}%)`;
   });
   function finish(){
@@ -2959,7 +2960,7 @@ function goToCardPage(idx, animate){
     if(Math.abs(delta) > pager.clientWidth * 0.18){
       newIdx = delta < 0 ? baseIdx + 1 : baseIdx - 1;
     }
-    newIdx = Math.max(0, Math.min(4, newIdx));
+    newIdx = Math.max(0, Math.min(5, newIdx));
     goToCardPage(newIdx, true);
   }
   pager.addEventListener('pointerup', finish);
