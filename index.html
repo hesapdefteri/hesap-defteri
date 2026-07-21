@@ -1405,12 +1405,13 @@
   <div class="d-list" id="cekSenetList" style="padding:16px 16px 100px 16px;"></div>
 </div>
 
-<div class="overlay" id="cekCikisOverlay" style="z-index:95;">
-  <div class="modal" style="padding-bottom:14px;">
-    <h3 style="margin-bottom:6px;">Çeki Çıkışa Ver</h3>
+<div class="overlay" id="cekCikisOverlay" style="z-index:95;align-items:center;">
+  <div class="modal" style="padding-bottom:14px;border-radius:20px;max-height:80vh;overflow-y:auto;">
+    <h3 style="margin-bottom:4px;">Çeki Ciro Et</h3>
     <p style="color:var(--muted);font-size:13px;margin:0 0 14px 0;" id="cekCikisAciklama"></p>
-    <div id="cekCikisTedarikciList" style="max-height:50vh;overflow-y:auto;"></div>
-    <button id="cekCikisIptal" style="margin-top:10px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
+    <div id="cekCikisTedarikciList" style="max-height:48vh;overflow-y:auto;"></div>
+    <button type="button" id="cekCikisYeniTedarikciBtn" style="width:100%;text-align:center;padding:13px 12px;border:1.5px dashed var(--accent);border-radius:12px;background:none;font-weight:700;font-size:14px;color:var(--accent);cursor:pointer;margin-top:4px;">＋ Yeni Tedarikçi Ekle</button>
+    <button id="cekCikisIptal" style="margin-top:12px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
   </div>
 </div>
 
@@ -2073,6 +2074,10 @@ document.getElementById('ncSave').onclick = () => {
   document.getElementById('yeniCariOverlay').classList.remove('show');
   render();
   renderCariHesaplar();
+  if(ncFromCekCikis){
+    ncFromCekCikis = false;
+    openCekCikis(cekCikisIdx);
+  }
 };
 
 // ===== Sipariş Fişi (çoklu kalem) =====
@@ -3674,27 +3679,35 @@ function renderCekSenet(){
     const durumBg = t.ciro ? '#e8f5ee' : '#fdf3e3';
     const durumColor = t.ciro ? '#1f9d64' : '#b9770e';
     const vade = d.vadeTarihi ? new Date(d.vadeTarihi).toLocaleDateString('tr-TR') : '—';
-    const cikisBtn = !t.ciro
-      ? `<button type="button" class="cek-cikis-btn" data-idx="${i}" style="margin-top:8px;border:none;border-radius:8px;padding:9px 12px;font-weight:700;font-size:13px;cursor:pointer;background:var(--accent);color:#fff;">Çıkışa Ver</button>`
-      : (d.kimeCiroEdildi ? `<div style="margin-top:6px;font-size:12px;color:var(--muted);">Çıkış: ${d.kimeCiroEdildi}</div>` : '');
+    const harf = (r.cari.name || '?').trim().charAt(0).toUpperCase();
+    const altBilgi = (!t.ciro)
+      ? ''
+      : (d.kimeCiroEdildi ? `<div style="font-size:11.5px;color:var(--muted);margin-top:4px;">Ciro: ${d.kimeCiroEdildi}</div>` : '');
+    const swipeActions = !t.ciro
+      ? `<div class="swipe-actions" style="width:168px;">
+          <button type="button" class="cek-ciro-swipe-btn" data-idx="${i}" style="width:168px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:13px;cursor:pointer;">Ciro Et</button>
+        </div>`
+      : '';
     return `
-      <div class="tx-row" style="flex-direction:column;align-items:stretch;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div>
-            <div style="font-weight:700;font-size:14.5px;">${r.cari.name}</div>
-            <div style="font-size:12px;color:var(--muted);margin-top:2px;">${d.banka || '—'}${d.no ? ' · '+d.no : ''}</div>
-            <div style="font-size:12px;color:var(--muted);margin-top:2px;">Vade: ${vade}</div>
+      <div class="swipe-wrap" style="border-radius:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(20,30,40,.06);">
+        ${swipeActions}
+        <div class="swipe-content" data-idx="${i}" style="background:#fff;border-radius:14px;padding:13px 14px;display:flex;align-items:center;gap:12px;">
+          <div style="width:38px;height:38px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;background:linear-gradient(135deg,#1e2a4a,#0d1526);">${harf}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;font-size:14.5px;color:var(--ink);">${r.cari.name}</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px;">${d.banka || '—'}${d.no ? ' · '+d.no : ''} · Vade ${vade}</div>
+            ${altBilgi}
           </div>
-          <div style="text-align:right;">
-            <div style="font-weight:800;font-size:15px;">${fmtPlain(Math.abs(t.amount))}₺</div>
-            <div style="margin-top:6px;border:none;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;display:inline-block;background:${durumBg};color:${durumColor};">${durum}</div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-weight:800;font-size:15px;color:var(--ink);">${fmtPlain(Math.abs(t.amount))}₺</div>
+            <div style="margin-top:6px;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;display:inline-block;background:${durumBg};color:${durumColor};">${durum}</div>
           </div>
         </div>
-        ${cikisBtn}
       </div>`;
   }).join('');
-  list.querySelectorAll('.cek-cikis-btn').forEach(btn=>{
-    btn.onclick = () => openCekCikis(parseInt(btn.dataset.idx, 10));
+  enableSwipeRows(list);
+  list.querySelectorAll('.cek-ciro-swipe-btn').forEach(btn=>{
+    btn.onclick = (e) => { e.stopPropagation(); openCekCikis(parseInt(btn.dataset.idx, 10)); };
   });
 }
 
@@ -3703,18 +3716,31 @@ function openCekCikis(idx){
   const r = cekSenetListData[idx];
   if(!r) return;
   cekCikisIdx = idx;
-  document.getElementById('cekCikisAciklama').textContent = r.cari.name + ' çekini (' + fmtPlain(Math.abs(r.tx.amount)) + '₺) hangi tedarikçiye ödeme olarak vereceksin?';
+  document.getElementById('cekCikisAciklama').textContent = r.cari.name + ' çekini (' + fmtPlain(Math.abs(r.tx.amount)) + '₺) hangi tedarikçiye ciro edeceksin?';
   const listEl = document.getElementById('cekCikisTedarikciList');
   if(!state.tedarikci.length){
     listEl.innerHTML = '<div class="empty-tx">Tedarikçi kaydı yok</div>';
   } else {
-    listEl.innerHTML = state.tedarikci.map(td=>`<button type="button" class="cek-cikis-tedarikci-btn" data-id="${td.id}" style="width:100%;text-align:left;padding:13px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;font-weight:600;font-size:14px;cursor:pointer;margin-bottom:8px;">${td.name}</button>`).join('');
+    listEl.innerHTML = state.tedarikci.map(td=>{
+      const harf = (td.name || '?').trim().charAt(0).toUpperCase();
+      return `<button type="button" class="cek-cikis-tedarikci-btn" data-id="${td.id}" style="width:100%;display:flex;align-items:center;gap:10px;text-align:left;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;font-weight:600;font-size:14px;color:var(--ink);cursor:pointer;margin-bottom:8px;">
+        <span style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;background:linear-gradient(135deg,#5b6b73,#38454b);">${harf}</span>
+        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${td.name}</span>
+      </button>`;
+    }).join('');
     listEl.querySelectorAll('.cek-cikis-tedarikci-btn').forEach(btn=>{
       btn.onclick = () => cekCikisiUygula(btn.dataset.id);
     });
   }
   document.getElementById('cekCikisOverlay').classList.add('show');
 }
+let ncFromCekCikis = false;
+document.getElementById('cekCikisYeniTedarikciBtn').onclick = () => {
+  ncFromCekCikis = true;
+  document.getElementById('cekCikisOverlay').classList.remove('show');
+  openYeniCari();
+  document.getElementById('ncTurTedarikci').click();
+};
 function cekCikisiUygula(tedarikciId){
   const r = cekSenetListData[cekCikisIdx];
   if(!r) return;
