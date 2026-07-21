@@ -932,7 +932,7 @@
   </div>
 </div>
 
-<div class="overlay" id="confirmDeleteOverlay" style="z-index:90;">
+<div class="overlay" id="confirmDeleteOverlay" style="z-index:99;">
   <div class="modal" style="padding-bottom:14px;text-align:center;">
     <h3 id="confirmDeleteTitle" style="margin-bottom:6px;">Bu hareketi sil</h3>
     <p id="confirmDeleteText" style="color:var(--muted);font-size:14px;margin:0 0 16px 0;">Bu işlem geri alınamaz. Emin misin?</p>
@@ -3373,9 +3373,10 @@ function removeCurrentReceiptTx(){
 }
 
 let confirmDeleteAction = null;
-function openConfirm(title, text, action){
+function openConfirm(title, text, action, yesLabel){
   document.getElementById('confirmDeleteTitle').textContent = title;
   document.getElementById('confirmDeleteText').textContent = text;
+  document.getElementById('confirmDeleteYes').textContent = yesLabel || 'Evet, Sil';
   document.getElementById('confirmDeleteYes').style.display = '';
   confirmDeleteAction = action;
   document.getElementById('confirmDeleteOverlay').classList.add('show');
@@ -3734,7 +3735,7 @@ function openCekCikis(idx){
         const adi = td ? td.name : '';
         openConfirm('Ciro Onayı', 'Seçtiğiniz çek ' + adi + '\'e ciro edilecektir. Onaylıyor musunuz?', () => {
           cekCikisiUygula(btn.dataset.id);
-        });
+        }, 'Evet, Ciro Et');
       };
     });
   }
