@@ -420,6 +420,7 @@
   .sk-form-card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(20,40,50,.05);margin-bottom:14px;}
   .sk-form-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .sk-toggle{display:flex;align-items:center;gap:10px;padding:6px 0;}
+  .tah-yontem-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
   .sk-toggle.hidden{display:none;}
   .sk-toggle-switch{width:44px;height:26px;border-radius:14px;background:#dfe5e7;position:relative;cursor:pointer;flex-shrink:0;transition:background .2s;}
   .sk-toggle-switch.on{background:var(--green);}
@@ -875,11 +876,20 @@
 </div>
 
 <div class="overlay" id="quickTxOverlay">
-  <div class="modal" style="padding-bottom:16px;padding-top:4px;">
+  <div class="modal" id="quickTxModal" style="padding-bottom:16px;padding-top:4px;max-height:92vh;overflow-y:auto;">
     <h3 id="quickTxTitle" style="margin-bottom:14px;">Tahsilat</h3>
     <input type="text" inputmode="decimal" id="quickTxAmount" placeholder="0,00" style="width:100%;box-sizing:border-box;margin:14px 0 10px 0;padding:18px 12px;font-size:24px;font-weight:700;text-align:center;border:1px solid var(--line);border-radius:12px;color:var(--ink);">
     <div class="field" style="margin-bottom:12px;"><label>Tarih</label><input type="date" id="quickTxTarih" style="width:100%;box-sizing:border-box;padding:12px 12px;border:1px solid var(--line);border-radius:10px;font-size:15px;color:var(--ink);"></div>
-    <div class="sk-toggle">
+
+    <div id="tahsilatYontemRow" class="hidden" style="margin-bottom:14px;">
+      <label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;">ÖDEME YÖNTEMİ</label>
+      <div style="display:flex;gap:8px;">
+        <button type="button" id="tahsilatNakitBtn" class="tah-yontem-btn active" style="flex:1;padding:13px 0;border:1px solid var(--line);border-radius:10px;background:#fff;font-weight:700;font-size:14px;cursor:pointer;">Nakit Ödemesi</button>
+        <button type="button" id="tahsilatCekBtn" class="tah-yontem-btn" style="flex:1;padding:13px 0;border:1px solid var(--line);border-radius:10px;background:#fff;font-weight:700;font-size:14px;cursor:pointer;">Çek Ödemesi</button>
+      </div>
+    </div>
+
+    <div class="sk-toggle hidden" id="quickTxCekToggleRow">
       <div class="sk-toggle-switch" id="quickTxCekToggle"><div class="knob"></div></div>
       <span style="font-size:14px;font-weight:600;">Çek mi?</span>
     </div>
@@ -887,6 +897,28 @@
       <div class="sk-toggle-switch" id="quickTxCiroToggle"><div class="knob"></div></div>
       <span style="font-size:14px;font-weight:600;">Ciro Edildi mi?</span>
     </div>
+
+    <div id="cekDetayForm" class="hidden" style="margin-top:4px;border-top:1px solid var(--line);padding-top:12px;">
+      <div id="cekDurumRow" class="hidden" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:10px 12px;background:#f4f7f8;border-radius:10px;">
+        <span style="font-size:13px;font-weight:700;color:var(--muted);">Çekin Durumu</span>
+        <button type="button" id="cekDurumBtn" style="border:none;border-radius:8px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;">Kasada</button>
+      </div>
+      <div class="field" style="margin-bottom:10px;"><label>Çek Numarası</label><input id="cekNo" style="width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;"></div>
+      <div class="field" style="margin-bottom:10px;"><label>Banka Adı</label><input id="cekBanka" style="width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;"></div>
+      <div class="field" style="margin-bottom:10px;"><label>Şube Adı</label><input id="cekSube" style="width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;"></div>
+      <div class="field" style="margin-bottom:10px;"><label>IBAN / Hesap No (isteğe bağlı)</label><input id="cekIban" style="width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;"></div>
+      <div class="field" style="margin-bottom:10px;"><label>Düzenleme Tarihi</label><input type="date" id="cekDuzenlemeTarihi" style="width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;"></div>
+      <div class="field" style="margin-bottom:10px;"><label>Vade Tarihi</label><input type="date" id="cekVadeTarihi" style="width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;"></div>
+      <div class="field" style="margin-bottom:10px;"><label>Keşide Tarihi</label><input type="date" id="cekKesideTarihi" style="width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;"></div>
+      <div class="field" style="margin-bottom:10px;"><label>Keşideci (çeki düzenleyen)</label><input id="cekKesideci" style="width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;"></div>
+      <div class="field" style="margin-bottom:10px;"><label>Keşide Yeri</label><input id="cekKesideYeri" style="width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;"></div>
+      <div class="field" style="margin-bottom:10px;"><label>Lehtar (kime düzenlenmiş)</label><input id="cekLehtar" style="width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;"></div>
+      <div class="sk-toggle" style="margin-bottom:4px;">
+        <div class="sk-toggle-switch" id="cekCiroDurumToggle"><div class="knob"></div></div>
+        <span style="font-size:14px;font-weight:600;">Cirolu mu?</span>
+      </div>
+    </div>
+
     <button id="quickTxSave" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;cursor:pointer;margin-top:6px;">Kaydet</button>
     <button id="quickTxCancel" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
   </div>
@@ -2622,9 +2654,42 @@ document.getElementById('ciSave').onclick = () => {
 };
 
 let quickTxLedger = null, quickTxId = null, quickTxType = null, quickTxEditDate = null;
-let quickTxCekOn = false, quickTxCiroOn = false;
+let quickTxCekOn = false, quickTxCiroOn = false, tahsilatYontem = 'nakit', editingTx = null, quickTxPrevCiro = false;
+function tahYontemSec(yontem){
+  tahsilatYontem = yontem;
+  document.getElementById('tahsilatNakitBtn').classList.toggle('active', yontem === 'nakit');
+  document.getElementById('tahsilatCekBtn').classList.toggle('active', yontem === 'cek');
+  document.getElementById('cekDetayForm').classList.toggle('hidden', yontem !== 'cek');
+}
+document.getElementById('tahsilatNakitBtn').onclick = () => tahYontemSec('nakit');
+document.getElementById('tahsilatCekBtn').onclick = () => tahYontemSec('cek');
+document.getElementById('cekDurumBtn').onclick = function(){
+  if(!editingTx) return;
+  editingTx.ciro = !editingTx.ciro;
+  this.textContent = editingTx.ciro ? 'Ciro Edildi' : 'Kasada';
+  this.style.background = editingTx.ciro ? '#e8f5ee' : '#fdf3e3';
+  this.style.color = editingTx.ciro ? '#1f9d64' : '#b9770e';
+  save();
+  const c2 = getLedger().find(x=>x.id===activeCariId);
+  if(c2){ renderCekSayfalari(c2); applyEkstreListFilter(dActivePage); }
+};
+function cekFormuDoldur(tx){
+  const d = tx && tx.cekDetay ? tx.cekDetay : {};
+  document.getElementById('cekNo').value = d.no || '';
+  document.getElementById('cekBanka').value = d.banka || '';
+  document.getElementById('cekSube').value = d.sube || '';
+  document.getElementById('cekIban').value = d.iban || '';
+  document.getElementById('cekDuzenlemeTarihi').value = d.duzenlemeTarihi || '';
+  document.getElementById('cekVadeTarihi').value = d.vadeTarihi || '';
+  document.getElementById('cekKesideTarihi').value = d.kesideTarihi || '';
+  document.getElementById('cekKesideci').value = d.kesideci || '';
+  document.getElementById('cekKesideYeri').value = d.kesideYeri || '';
+  document.getElementById('cekLehtar').value = d.lehtar || '';
+  const ciroToggle = document.getElementById('cekCiroDurumToggle');
+  ciroToggle.classList.toggle('on', !!d.cirolu);
+}
 function openQuickTx(id, ledgerKey, type){
-  quickTxLedger = ledgerKey; quickTxId = id; quickTxType = type; quickTxEditDate = null;
+  quickTxLedger = ledgerKey; quickTxId = id; quickTxType = type; quickTxEditDate = null; editingTx = null; quickTxPrevCiro = false;
   const c = state[ledgerKey].find(x=>x.id===id);
   document.getElementById('quickTxTitle').textContent = type + (c ? ' — ' + c.name : '');
   document.getElementById('quickTxAmount').value = '';
@@ -2633,6 +2698,17 @@ function openQuickTx(id, ledgerKey, type){
   document.getElementById('quickTxCekToggle').classList.remove('on');
   document.getElementById('quickTxCiroToggle').classList.remove('on');
   document.getElementById('quickTxCiroRow').classList.add('hidden');
+  document.getElementById('cekDurumRow').classList.add('hidden');
+  cekFormuDoldur(null);
+
+  const isTahsilat = type === 'TAHSİLAT';
+  document.getElementById('tahsilatYontemRow').classList.toggle('hidden', !isTahsilat);
+  document.getElementById('quickTxCekToggleRow').classList.toggle('hidden', isTahsilat);
+  if(isTahsilat){
+    tahYontemSec('nakit');
+  } else {
+    document.getElementById('cekDetayForm').classList.add('hidden');
+  }
   document.getElementById('quickTxOverlay').classList.add('show');
   setTimeout(()=>document.getElementById('quickTxAmount').focus(), 50);
 }
@@ -2665,7 +2741,26 @@ document.getElementById('quickTxSave').onclick = () => {
     tarihIso = quickTxEditDate || new Date().toISOString();
   }
 
-  const tx = { type: quickTxType, desc: '', amount, date: tarihIso, cek: quickTxCekOn, ciro: quickTxCekOn && quickTxCiroOn };
+  const isTahsilat = quickTxType === 'TAHSİLAT';
+  const cekSecili = isTahsilat ? (tahsilatYontem === 'cek') : quickTxCekOn;
+  const tx = { type: quickTxType, desc: '', amount, date: tarihIso, cek: cekSecili, ciro: isTahsilat ? (cekSecili && quickTxPrevCiro) : (quickTxCekOn && quickTxCiroOn) };
+  if(cekSecili && isTahsilat){
+    tx.cekDetay = {
+      no: document.getElementById('cekNo').value.trim(),
+      banka: document.getElementById('cekBanka').value.trim(),
+      sube: document.getElementById('cekSube').value.trim(),
+      iban: document.getElementById('cekIban').value.trim(),
+      duzenlemeTarihi: document.getElementById('cekDuzenlemeTarihi').value,
+      vadeTarihi: document.getElementById('cekVadeTarihi').value,
+      kesideTarihi: document.getElementById('cekKesideTarihi').value,
+      kesideci: document.getElementById('cekKesideci').value.trim(),
+      kesideYeri: document.getElementById('cekKesideYeri').value.trim(),
+      cariAdi: c.name,
+      lehtar: document.getElementById('cekLehtar').value.trim(),
+      cirolu: document.getElementById('cekCiroDurumToggle').classList.contains('on'),
+      alindigiTarih: secilenTarih || tarihIso.slice(0,10)
+    };
+  }
   c.transactions.push(tx);
 
   if(quickTxType === 'ÖDEME') state.cash -= amount;
@@ -2890,12 +2985,13 @@ function renderCekSayfalari(c){
   ekstreCekVerisi = { cekAlinan, tahsilatlar, odemeler, cekCiro };
 }
 
-function basitSatirHtml(t){
+function basitSatirHtml(t, idx){
   const amt = Math.abs(t.amount);
   const dateStr = new Date(t.date).toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'});
+  const cekBadge = t.cek ? `<button type="button" class="cek-durum-mini-btn" data-tidx="${idx}" style="margin-top:4px;border:none;border-radius:7px;padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;background:${t.ciro ? '#e8f5ee' : '#fdf3e3'};color:${t.ciro ? '#1f9d64' : '#b9770e'};">${t.ciro ? 'Ciro Edildi' : 'Kasada'} · değiştir</button>` : '';
   return `
     <div class="tx-row">
-      <div class="tx-left"><div class="tx-type pos">${dateStr}</div>${t.desc ? `<div class="tx-desc">${t.desc}</div>` : ''}</div>
+      <div class="tx-left"><div class="tx-type pos">${dateStr}</div>${t.desc ? `<div class="tx-desc">${t.desc}</div>` : ''}${cekBadge}</div>
       <div class="tx-amount">${fmtPlain(amt)}</div>
     </div>`;
 }
@@ -2917,9 +3013,22 @@ function applyEkstreListFilter(pageIdx){
   else { filtered = ekstreCekVerisi.cekCiro; baslik = 'CİRO EDİLEN ÇEKLER'; bosMetin = 'Henüz ciro edilen çek yok'; }
   baslikEl.textContent = baslik;
   const dListEl = document.getElementById('dList');
-  dListEl.innerHTML = filtered.length
-    ? filtered.slice().sort((a,b)=> new Date(b.date) - new Date(a.date)).map(basitSatirHtml).join('')
+  const sirali = filtered.slice().sort((a,b)=> new Date(b.date) - new Date(a.date));
+  dListEl.innerHTML = sirali.length
+    ? sirali.map((t,i)=>basitSatirHtml(t, i)).join('')
     : `<div class="empty-tx">${bosMetin}</div>`;
+  dListEl.querySelectorAll('.cek-durum-mini-btn').forEach(btn=>{
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const t = sirali[parseInt(btn.dataset.tidx, 10)];
+      if(!t) return;
+      t.ciro = !t.ciro;
+      save();
+      const c2 = getLedger().find(x=>x.id===activeCariId);
+      if(c2){ renderCekSayfalari(c2); }
+      applyEkstreListFilter(pageIdx);
+    };
+  });
 }
 
 function goToCardPage(idx, animate){
@@ -3243,6 +3352,7 @@ document.getElementById('rcEdit').onclick = () => {
     return;
   }
   const editLedger = activeLedger, editId = activeCariId, editType = t.type, editAmount = Math.abs(t.amount), editDate = t.date;
+  const editWasCek = !!t.cek, editWasCiro = !!t.ciro, editCekDetay = t.cekDetay;
   if(removeCurrentReceiptTx()){
     save();
     renderDetail();
@@ -3250,8 +3360,13 @@ document.getElementById('rcEdit').onclick = () => {
   receiptOverlay.classList.remove('show');
   openQuickTx(editId, editLedger, editType);
   quickTxEditDate = editDate;
+  quickTxPrevCiro = editWasCiro;
   document.getElementById('quickTxAmount').value = fmtPlain(editAmount);
   document.getElementById('quickTxTarih').value = new Date(editDate).toISOString().slice(0,10);
+  if(editType === 'TAHSİLAT' && editWasCek){
+    tahYontemSec('cek');
+    cekFormuDoldur({ cekDetay: editCekDetay });
+  }
 };
 
 document.getElementById('rcClose').onclick = () => receiptOverlay.classList.remove('show');
