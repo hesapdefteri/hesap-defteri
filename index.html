@@ -1415,6 +1415,18 @@
   </div>
 </div>
 
+<div class="receipt-overlay" id="cekDetayOverlay">
+  <div class="receipt-card">
+    <div class="receipt-head">
+      <div class="r-type" id="cdType">ÇEK</div>
+      <div class="r-date" id="cdDate">--</div>
+    </div>
+    <div class="receipt-body" id="cdBody"></div>
+    <button class="receipt-close" id="cdClose">Kapat</button>
+  </div>
+</div>
+
+
 <div class="receipt-overlay" id="receiptOverlay">
   <div class="receipt-card">
     <div class="receipt-head">
@@ -3688,7 +3700,9 @@ function renderCekSenet(){
       ? `<div class="swipe-actions" style="width:168px;">
           <button type="button" class="cek-ciro-swipe-btn" data-idx="${i}" style="width:168px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:13px;cursor:pointer;">Ciro Et</button>
         </div>`
-      : '';
+      : `<div class="swipe-actions" style="width:168px;">
+          <button type="button" class="cek-iade-swipe-btn" data-idx="${i}" style="width:168px;border:none;background:#d9534f;color:#fff;font-weight:700;font-size:13px;cursor:pointer;">Çeki İade Al</button>
+        </div>`;
     return `
       <div class="swipe-wrap" style="border-radius:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(20,30,40,.06);">
         ${swipeActions}
@@ -3710,6 +3724,80 @@ function renderCekSenet(){
   list.querySelectorAll('.cek-ciro-swipe-btn').forEach(btn=>{
     btn.onclick = (e) => { e.stopPropagation(); openCekCikis(parseInt(btn.dataset.idx, 10)); };
   });
+  list.querySelectorAll('.cek-iade-swipe-btn').forEach(btn=>{
+    btn.onclick = (e) => { e.stopPropagation(); iadeAlCek(parseInt(btn.dataset.idx, 10)); };
+  });
+  list.querySelectorAll('.swipe-content[data-idx]').forEach(el=>{
+    el.onclick = () => {
+      if(el.__isSwipeMoved && el.__isSwipeMoved()) return;
+      if(el.classList.contains('swiped')){ el.style.transform=''; el.classList.remove('swiped'); return; }
+      openCekDetay(parseInt(el.dataset.idx, 10));
+    };
+  });
+}
+
+// Çek Senet listesindeki bir satıra dokununca, girişte kaydedilen tüm çek
+// bilgilerini olduğu gibi (salt-okunur) gösteren detay ekranı.
+function cdTarih(v){ return v ? new Date(v).toLocaleDateString('tr-TR') : '—'; }
+function openCekDetay(idx){
+  const r = cekSenetListData[idx];
+  if(!r) return;
+  const t = r.tx, d = t.cekDetay || {};
+  const durum = t.ciro ? 'Ciro Edildi' : 'Kasada';
+  document.getElementById('cdType').textContent = 'ÇEK';
+  document.getElementById('cdDate').textContent = cdTarih(t.date);
+  const rows = [
+    ['Çeki Veren Müşteri', r.cari.name || '—'],
+    ['Tutar', fmtPlain(Math.abs(t.amount)) + '₺'],
+    ['Çek Numarası', d.no || '—'],
+    ['Banka Adı', d.banka || '—'],
+    ['Şube Adı', d.sube || '—'],
+    ['IBAN / Hesap No', d.iban || '—'],
+    ['Düzenleme Tarihi', cdTarih(d.duzenlemeTarihi)],
+    ['Vade Tarihi', cdTarih(d.vadeTarihi)],
+    ['Keşide Tarihi', cdTarih(d.kesideTarihi)],
+    ['Keşideci', d.kesideci || '—'],
+    ['Keşide Yeri', d.kesideYeri || '—'],
+    ['Lehtar', d.lehtar || '—'],
+    ['Alındığı Tarih', cdTarih(d.alindigiTarih)],
+    ['Çekin Durumu', durum]
+  ];
+  if(t.ciro && d.kimeCiroEdildi) rows.push(['Kime Ciro Edildi', d.kimeCiroEdildi]);
+  document.getElementById('cdBody').innerHTML = rows.map(([lbl,val])=>
+    `<div class="receipt-line"><span class="rl-lbl">${lbl}</span><span class="rl-val">${val}</span></div>`
+  ).join('');
+  document.getElementById('cekDetayOverlay').classList.add('show');
+}
+document.getElementById('cdClose').onclick = () => { document.getElementById('cekDetayOverlay').classList.remove('show'); };
+
+// Ciro edilmiş bir çeki listeden doğrudan "iade al": ilgili tedarikçideki
+// Çek Çıkış ödemesini siler (kasayı geri yükler) ve çeki yeniden Kasada durumuna döndürür.
+function iadeAlCek(idx){
+  const r = cekSenetListData[idx];
+  if(!r) return;
+  const t = r.tx;
+  if(!t.ciro) return;
+  openConfirm('Çeki İade Al', 'Bu çek iade alınacak; ilgili tedarikçi ödemesi silinecek ve çek yeniden Kasada durumuna dönecektir. Onaylıyor musunuz?', () => {
+    for(const td of state.tedarikci){
+      const list2 = td.transactions || [];
+      const i2 = list2.findIndex(x => x.cekKaynakId === t.cekId);
+      if(i2 > -1){
+        const odemeTx = list2[i2];
+        list2.splice(i2, 1);
+        state.cash += Math.abs(odemeTx.amount);
+        break;
+      }
+    }
+    t.ciro = false;
+    if(t.cekDetay){
+      delete t.cekDetay.kimeCiroEdildi;
+      delete t.cekDetay.cikisTarihi;
+    }
+    save();
+    renderCekSenet();
+    render();
+    renderCariHesaplar();
+  }, 'Evet, İade Al');
 }
 
 let cekCikisIdx = null;
