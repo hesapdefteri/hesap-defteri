@@ -3729,7 +3729,13 @@ function openCekCikis(idx){
       </button>`;
     }).join('');
     listEl.querySelectorAll('.cek-cikis-tedarikci-btn').forEach(btn=>{
-      btn.onclick = () => cekCikisiUygula(btn.dataset.id);
+      btn.onclick = () => {
+        const td = state.tedarikci.find(x=>x.id===btn.dataset.id);
+        const adi = td ? td.name : '';
+        openConfirm('Ciro Onayı', 'Seçtiğiniz çek ' + adi + '\'e ciro edilecektir. Onaylıyor musunuz?', () => {
+          cekCikisiUygula(btn.dataset.id);
+        });
+      };
     });
   }
   document.getElementById('cekCikisOverlay').classList.add('show');
