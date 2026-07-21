@@ -195,6 +195,15 @@
 
   .overlay{position:fixed;inset:0;background:rgba(20,30,35,.45);display:none;align-items:flex-end;justify-content:center;z-index:50;}
   #dEkstreOverlay{align-items:flex-start;padding-top:calc(env(safe-area-inset-top) + 14px);}
+  .dcek-pager{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .dcek-pager::-webkit-scrollbar{display:none;}
+  .dcek-page{flex:0 0 100%;min-width:100%;scroll-snap-align:start;box-sizing:border-box;padding:0 1px;}
+  .dcek-page-head{display:flex;justify-content:space-between;align-items:center;padding:2px 2px 8px 2px;}
+  .dcek-page-title{font-size:11.5px;font-weight:800;letter-spacing:.3px;color:#7a8590;}
+  .dcek-page-total{font-size:15px;font-weight:800;color:var(--ink);}
+  .dcek-dots{display:flex;justify-content:center;gap:6px;margin-top:8px;}
+  .dcek-dot{width:6px;height:6px;border-radius:50%;background:#d5dade;transition:background .2s,width .2s;}
+  .dcek-dot.active{background:var(--accent);width:16px;border-radius:3px;}
   .overlay.show{display:flex;}
   .modal{background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:20px 20px 26px 20px;}
   .modal h3{margin:0 0 14px 0;font-size:17px;}
@@ -410,6 +419,7 @@
   .sk-form-card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(20,40,50,.05);margin-bottom:14px;}
   .sk-form-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .sk-toggle{display:flex;align-items:center;gap:10px;padding:6px 0;}
+  .sk-toggle.hidden{display:none;}
   .sk-toggle-switch{width:44px;height:26px;border-radius:14px;background:#dfe5e7;position:relative;cursor:pointer;flex-shrink:0;transition:background .2s;}
   .sk-toggle-switch.on{background:var(--green);}
   .sk-toggle-switch .knob{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;}
@@ -657,7 +667,35 @@
       <button id="dBorcEkleBtn" style="flex:1;padding:11px 0;border:none;border-radius:10px;background:#fdeceb;color:#c0392b;font-weight:700;font-size:13.5px;cursor:pointer;">Borç Ekle</button>
       <button id="dAlacakEkleBtn" style="flex:1;padding:11px 0;border:none;border-radius:10px;background:#e8f6ee;color:#1f9d64;font-weight:700;font-size:13.5px;cursor:pointer;">Alacak Ekle</button>
     </div>
-    <div class="d-list" id="dList" style="flex:1;overflow-y:auto;min-height:0;margin-top:10px;"></div>
+    <div class="dcek-pager" id="dPager" style="margin-top:10px;">
+      <div class="dcek-page" data-page="0">
+        <div class="dcek-page-head"><span class="dcek-page-title">GENEL</span><span class="dcek-page-total" id="dGenelToplamBaslik">0,00₺</span></div>
+        <div class="d-list" id="dList" style="max-height:48vh;overflow-y:auto;min-height:0;"></div>
+      </div>
+      <div class="dcek-page" data-page="1">
+        <div class="dcek-page-head"><span class="dcek-page-title">ALINAN ÇEKLER</span><span class="dcek-page-total" id="dCekAlinanToplam">0,00₺</span></div>
+        <div class="d-list" id="dListCekAlinan" style="max-height:48vh;overflow-y:auto;min-height:0;"></div>
+      </div>
+      <div class="dcek-page" data-page="2">
+        <div class="dcek-page-head"><span class="dcek-page-title">TAHSİLATLAR</span><span class="dcek-page-total" id="dTahsilatToplam">0,00₺</span></div>
+        <div class="d-list" id="dListTahsilat" style="max-height:48vh;overflow-y:auto;min-height:0;"></div>
+      </div>
+      <div class="dcek-page" data-page="3">
+        <div class="dcek-page-head"><span class="dcek-page-title">ÖDEMELER</span><span class="dcek-page-total" id="dOdemeToplam">0,00₺</span></div>
+        <div class="d-list" id="dListOdeme" style="max-height:48vh;overflow-y:auto;min-height:0;"></div>
+      </div>
+      <div class="dcek-page" data-page="4">
+        <div class="dcek-page-head"><span class="dcek-page-title">CİRO EDİLEN ÇEKLER</span><span class="dcek-page-total" id="dCekCiroToplam">0,00₺</span></div>
+        <div class="d-list" id="dListCekCiro" style="max-height:48vh;overflow-y:auto;min-height:0;"></div>
+      </div>
+    </div>
+    <div class="dcek-dots" id="dDots">
+      <span class="dcek-dot active" data-i="0"></span>
+      <span class="dcek-dot" data-i="1"></span>
+      <span class="dcek-dot" data-i="2"></span>
+      <span class="dcek-dot" data-i="3"></span>
+      <span class="dcek-dot" data-i="4"></span>
+    </div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 4px;border-top:1px solid var(--line);margin-top:4px;">
       <span style="font-size:13px;font-weight:700;color:var(--muted);">TOPLAM ₺</span>
       <span id="dEkstreToplam" style="font-size:18px;font-weight:800;color:var(--ink);">0,00</span>
@@ -836,7 +874,15 @@
     <h3 id="quickTxTitle" style="margin-bottom:14px;">Tahsilat</h3>
     <input type="text" inputmode="decimal" id="quickTxAmount" placeholder="0,00" style="width:100%;box-sizing:border-box;margin:14px 0 10px 0;padding:18px 12px;font-size:24px;font-weight:700;text-align:center;border:1px solid var(--line);border-radius:12px;color:var(--ink);">
     <div class="field" style="margin-bottom:12px;"><label>Tarih</label><input type="date" id="quickTxTarih" style="width:100%;box-sizing:border-box;padding:12px 12px;border:1px solid var(--line);border-radius:10px;font-size:15px;color:var(--ink);"></div>
-    <button id="quickTxSave" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;cursor:pointer;">Kaydet</button>
+    <div class="sk-toggle">
+      <div class="sk-toggle-switch" id="quickTxCekToggle"><div class="knob"></div></div>
+      <span style="font-size:14px;font-weight:600;">Çek mi?</span>
+    </div>
+    <div class="sk-toggle hidden" id="quickTxCiroRow">
+      <div class="sk-toggle-switch" id="quickTxCiroToggle"><div class="knob"></div></div>
+      <span style="font-size:14px;font-weight:600;">Ciro Edildi mi?</span>
+    </div>
+    <button id="quickTxSave" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;cursor:pointer;margin-top:6px;">Kaydet</button>
     <button id="quickTxCancel" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
   </div>
 </div>
@@ -2481,6 +2527,9 @@ function renderEkstreInfo(){
 }
 function showDEkstreOverlay(){
   resetEkstreCardSwipe();
+  const pager = document.getElementById('dPager');
+  pager.scrollLeft = 0;
+  document.querySelectorAll('#dDots .dcek-dot').forEach((d,i)=> d.classList.toggle('active', i===0));
   document.getElementById('dEkstreOverlay').classList.add('show');
 }
 function openCariEkstrePopup(id, ledgerKey){
@@ -2609,15 +2658,31 @@ document.getElementById('ciSave').onclick = () => {
 };
 
 let quickTxLedger = null, quickTxId = null, quickTxType = null, quickTxEditDate = null;
+let quickTxCekOn = false, quickTxCiroOn = false;
 function openQuickTx(id, ledgerKey, type){
   quickTxLedger = ledgerKey; quickTxId = id; quickTxType = type; quickTxEditDate = null;
   const c = state[ledgerKey].find(x=>x.id===id);
   document.getElementById('quickTxTitle').textContent = type + (c ? ' — ' + c.name : '');
   document.getElementById('quickTxAmount').value = '';
   document.getElementById('quickTxTarih').value = new Date().toISOString().slice(0,10);
+  quickTxCekOn = false; quickTxCiroOn = false;
+  document.getElementById('quickTxCekToggle').classList.remove('on');
+  document.getElementById('quickTxCiroToggle').classList.remove('on');
+  document.getElementById('quickTxCiroRow').classList.add('hidden');
   document.getElementById('quickTxOverlay').classList.add('show');
   setTimeout(()=>document.getElementById('quickTxAmount').focus(), 50);
 }
+document.getElementById('quickTxCekToggle').onclick = function(){
+  quickTxCekOn = skToggleSwitch(this);
+  document.getElementById('quickTxCiroRow').classList.toggle('hidden', !quickTxCekOn);
+  if(!quickTxCekOn){
+    quickTxCiroOn = false;
+    document.getElementById('quickTxCiroToggle').classList.remove('on');
+  }
+};
+document.getElementById('quickTxCiroToggle').onclick = function(){
+  quickTxCiroOn = skToggleSwitch(this);
+};
 document.getElementById('quickTxCancel').onclick = () => { document.getElementById('quickTxOverlay').classList.remove('show'); };
 document.getElementById('quickTxOverlay').onclick = (e) => {
   if(e.target === document.getElementById('quickTxOverlay')) document.getElementById('quickTxOverlay').classList.remove('show');
@@ -2636,7 +2701,7 @@ document.getElementById('quickTxSave').onclick = () => {
     tarihIso = quickTxEditDate || new Date().toISOString();
   }
 
-  const tx = { type: quickTxType, desc: '', amount, date: tarihIso };
+  const tx = { type: quickTxType, desc: '', amount, date: tarihIso, cek: quickTxCekOn, ciro: quickTxCekOn && quickTxCiroOn };
   c.transactions.push(tx);
 
   if(quickTxType === 'ÖDEME') state.cash -= amount;
@@ -2841,9 +2906,56 @@ function renderDetail(){
   enableSwipeRows(dList);
 
   document.getElementById('dToplam').textContent = fmtPlain(cariBalance(c));
+  renderCekSayfalari(c);
 
   render();
 }
+
+function renderCekSayfalari(c){
+  const list = c.transactions || [];
+  document.getElementById('dGenelToplamBaslik').textContent = fmt(cariBalance(c));
+
+  function basitSatir(t){
+    const amt = Math.abs(t.amount);
+    const dateStr = new Date(t.date).toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'});
+    return `
+      <div class="tx-row">
+        <div class="tx-left"><div class="tx-type pos">${dateStr}</div>${t.desc ? `<div class="tx-desc">${t.desc}</div>` : ''}</div>
+        <div class="tx-amount">${fmtPlain(amt)}</div>
+      </div>`;
+  }
+  function sayfaDoldur(filtered, listId, toplamId, bosMetin){
+    const el = document.getElementById(listId);
+    el.innerHTML = filtered.length
+      ? filtered.slice().sort((a,b)=> new Date(b.date) - new Date(a.date)).map(basitSatir).join('')
+      : `<div class="empty-tx">${bosMetin}</div>`;
+    document.getElementById(toplamId).textContent = fmt(filtered.reduce((s,t)=> s + Math.abs(t.amount), 0));
+  }
+
+  sayfaDoldur(list.filter(t => t.cek && !t.ciro), 'dListCekAlinan', 'dCekAlinanToplam', 'Henüz alınan çek yok');
+  sayfaDoldur(list.filter(t => t.type === 'TAHSİLAT'), 'dListTahsilat', 'dTahsilatToplam', 'Henüz tahsilat yok');
+  sayfaDoldur(list.filter(t => t.type === 'ÖDEME'), 'dListOdeme', 'dOdemeToplam', 'Henüz ödeme yok');
+  sayfaDoldur(list.filter(t => t.cek && t.ciro), 'dListCekCiro', 'dCekCiroToplam', 'Henüz ciro edilen çek yok');
+}
+
+(function(){
+  const pager = document.getElementById('dPager');
+  const dots = document.querySelectorAll('#dDots .dcek-dot');
+  let scrollTimeout;
+  pager.addEventListener('scroll', () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      const idx = Math.round(pager.scrollLeft / pager.clientWidth);
+      dots.forEach((d,i)=> d.classList.toggle('active', i===idx));
+    }, 60);
+  });
+  dots.forEach(dot=>{
+    dot.onclick = () => {
+      const i = parseInt(dot.dataset.i, 10);
+      pager.scrollTo({left: i * pager.clientWidth, behavior:'smooth'});
+    };
+  });
+})();
 
 document.getElementById('txTabs').querySelectorAll('button').forEach(btn=>{
   btn.onclick = () => {
