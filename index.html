@@ -2801,6 +2801,7 @@ document.getElementById('quickTxSave').onclick = () => {
 
   const tx = { type: quickTxType, desc: '', amount, date: tarihIso, cek: cekSecili, ciro: isTahsilat ? (cekSecili && quickTxPrevCiro) : (quickTxCekOn && quickTxCiroOn) };
   if(cekSecili && isTahsilat){
+    tx.cekId = 'cek_' + Date.now() + '_' + Math.floor(Math.random()*100000);
     tx.cekDetay = {
       no: document.getElementById('cekNo').value.trim(),
       banka: document.getElementById('cekBanka').value.trim(),
@@ -2992,11 +2993,15 @@ function renderDetail(){
     btn.onclick = (e) => {
       e.stopPropagation();
       const item = currentDetailTx[parseInt(btn.dataset.idx, 10)];
-      openConfirm('Bu hareketi sil', 'Bu işlem geri alınamaz. Emin misin?', () => {
+      const uyariMetni = item.t.cekCikis
+        ? 'Bu işlem geri alınamaz. Ayrıca bu çekin cirosu iptal edilecek ve çek Kasada durumuna dönecektir. Emin misin?'
+        : 'Bu işlem geri alınamaz. Emin misin?';
+      openConfirm('Bu hareketi sil', uyariMetni, () => {
         const c2 = getLedger().find(x=>x.id===activeCariId);
         if(c2){
           const i = c2.transactions.indexOf(item.t);
           if(i !== -1){
+            revertCekCikisIfNeeded(item.t);
             c2.transactions.splice(i, 1);
             if(item.t.type === 'TAHSİLAT') state.cash -= item.t.amount;
             if(item.t.type === 'ÖDEME') state.cash += item.t.amount;
@@ -3369,7 +3374,11 @@ function openConfirm(title, text, action){
   document.getElementById('confirmDeleteOverlay').classList.add('show');
 }
 document.getElementById('rcDelete').onclick = () => {
-  openConfirm('Bu hareketi sil', 'Bu işlem geri alınamaz. Emin misin?', () => {
+  const uyariMetni = (currentReceiptTx && currentReceiptTx.cekCikis)
+    ? 'Bu işlem geri alınamaz. Ayrıca bu çekin cirosu iptal edilecek ve çek Kasada durumuna dönecektir. Emin misin?'
+    : 'Bu işlem geri alınamaz. Emin misin?';
+  openConfirm('Bu hareketi sil', uyariMetni, () => {
+    revertCekCikisIfNeeded(currentReceiptTx);
     if(removeCurrentReceiptTx()){
       save();
       renderDetail();
@@ -3711,6 +3720,7 @@ function cekCikisiUygula(tedarikciId){
   if(!tedarikci) return;
   const t = r.tx;
   if(!t.cekDetay) t.cekDetay = {};
+  if(!t.cekId) t.cekId = 'cek_' + Date.now() + '_' + Math.floor(Math.random()*100000);
   t.ciro = true;
   t.cekDetay.kimeCiroEdildi = tedarikci.name;
   t.cekDetay.cikisTarihi = new Date().toISOString().slice(0,10);
@@ -3722,6 +3732,7 @@ function cekCikisiUygula(tedarikciId){
     date: new Date().toISOString(),
     cek: true,
     cekCikis: true,
+    cekKaynakId: t.cekId,
     cekDetay: Object.assign({}, t.cekDetay)
   };
   tedarikci.transactions.push(odemeTx);
@@ -3731,6 +3742,23 @@ function cekCikisiUygula(tedarikciId){
   renderCekSenet();
   render();
   renderCariHesaplar();
+}
+// Bir "Çek Çıkış" ödemesi silinirse, o çekin kaynağı olan tahsilat kaydındaki
+// ciro/kime-verildi bilgisini geri alır (çek yeniden "Kasada" durumuna döner).
+function revertCekCikisIfNeeded(tx){
+  if(!tx || !tx.cekCikis || !tx.cekKaynakId) return false;
+  for(const c of state.cari){
+    const orig = (c.transactions||[]).find(t => t.cekId === tx.cekKaynakId);
+    if(orig){
+      orig.ciro = false;
+      if(orig.cekDetay){
+        delete orig.cekDetay.kimeCiroEdildi;
+        delete orig.cekDetay.cikisTarihi;
+      }
+      return true;
+    }
+  }
+  return false;
 }
 document.getElementById('cekCikisIptal').onclick = () => { document.getElementById('cekCikisOverlay').classList.remove('show'); };
 document.getElementById('cekCikisOverlay').onclick = (e) => { if(e.target === document.getElementById('cekCikisOverlay')) document.getElementById('cekCikisOverlay').classList.remove('show'); };
