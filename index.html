@@ -3688,7 +3688,7 @@ function renderCekListInto(containerId){
     el.onclick = () => {
       if(el.__isSwipeMoved && el.__isSwipeMoved()) return;
       if(el.classList.contains('swiped')){ el.style.transform=''; el.classList.remove('swiped'); return; }
-      openCekDetay(parseInt(el.dataset.idx, 10));
+      openCekDegistir(parseInt(el.dataset.idx, 10));
     };
   });
 }
