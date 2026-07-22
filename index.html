@@ -199,6 +199,11 @@
   .field-ios input, .field-ios select{border:none;background:transparent;font-size:15px;color:var(--ink);text-align:right;flex:1;min-width:0;padding:0;}
   .field-ios input::placeholder{color:#c3cbce;}
   .field-ios input:focus, .field-ios select:focus{outline:none;}
+  /* Etiketin üstte, içeriğin (cari seçim satırı gibi) altta durduğu iOS satırı */
+  .field-ios-block{padding:12px 14px;border-bottom:1px solid var(--line);}
+  .field-ios-block:last-child{border-bottom:none;}
+  .field-ios-block > label{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;}
+  #overlay .modal, #urunOverlay .modal, #skAlisOverlay .modal, #skSatisOverlay .modal, #kalemEkleOverlay .modal, #cariInfoOverlay .modal, #yeniCariOverlay .modal{background:#f2f2f7;}
   .cari-input-row{display:flex;gap:8px;align-items:stretch;}
   .cari-input-row input{flex:1;min-width:0;}
   .cari-sec-btn{flex-shrink:0;width:46px;border:1px solid #dfe5e7;border-radius:10px;background:#fbfcfc;color:var(--accent);font-size:18px;cursor:pointer;}
@@ -532,16 +537,18 @@
       <button class="active income" id="segIncome" type="button">Gelir</button>
       <button id="segExpense" type="button">Gider</button>
     </div>
-    <div class="field">
-      <label>Açıklama</label>
-      <input type="text" id="fDesc" placeholder="Örn: Saf Plast tahsilat">
+    <div class="ios-card">
+      <div class="field-ios">
+        <label>Açıklama</label>
+        <input type="text" id="fDesc" placeholder="Örn: Saf Plast tahsilat">
+      </div>
+      <div class="field-ios">
+        <label>Tutar (₺)</label>
+        <input type="number" id="fAmount" placeholder="0,00" inputmode="decimal">
+      </div>
     </div>
-    <div class="field">
-      <label>Tutar (₺)</label>
-      <input type="number" id="fAmount" placeholder="0,00" inputmode="decimal">
-    </div>
-    <div class="field">
-      <label>Kategori</label>
+    <div class="ios-card" style="padding:12px 14px;">
+      <label style="display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;">Kategori</label>
       <div class="kat-row">
         <select id="fCat">
           <option>Aidat</option>
@@ -674,12 +681,14 @@
       <button id="ciTurAlici" class="ci-tur-btn">Alıcı</button>
       <button id="ciTurTedarikci" class="ci-tur-btn">Tedarikçi</button>
     </div>
-    <input id="ciPhone" placeholder="Telefon Numarası" class="ci-input">
-    <input id="ciEmail" placeholder="Mail Adresi" class="ci-input">
-    <input id="ciTaxNo" placeholder="Vergi Numarası" class="ci-input">
-    <input id="ciTaxOffice" placeholder="Vergi Dairesi" class="ci-input">
-    <input id="ciAddress" placeholder="Adres" class="ci-input">
-    <input id="ciContact" placeholder="İlgili Kişi" class="ci-input">
+    <div class="ios-card">
+      <div class="field-ios"><label>Telefon</label><input id="ciPhone" placeholder="—"></div>
+      <div class="field-ios"><label>Mail</label><input id="ciEmail" placeholder="—"></div>
+      <div class="field-ios"><label>Vergi No</label><input id="ciTaxNo" placeholder="—"></div>
+      <div class="field-ios"><label>Vergi Dairesi</label><input id="ciTaxOffice" placeholder="—"></div>
+      <div class="field-ios"><label>Adres</label><input id="ciAddress" placeholder="—"></div>
+      <div class="field-ios"><label>İlgili Kişi</label><input id="ciContact" placeholder="—"></div>
+    </div>
     <button id="ciSave" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;cursor:pointer;margin-top:6px;">Kaydet</button>
     <button id="ciCancel" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
   </div>
@@ -688,18 +697,22 @@
 <div class="overlay" id="yeniCariOverlay" style="z-index:90;">
   <div class="modal" style="max-height:88vh;overflow-y:auto;padding-bottom:14px;">
     <h3 style="margin-bottom:12px;">Yeni Cari Hesap</h3>
-    <input id="ncAd" placeholder="Hesap Adı" class="ci-input">
+    <div class="ios-card">
+      <div class="field-ios"><label>Hesap Adı</label><input id="ncAd" placeholder="—"></div>
+    </div>
     <div style="display:flex;gap:8px;margin-bottom:14px;">
       <button id="ncTurAlici" class="ci-tur-btn active">Alıcı</button>
       <button id="ncTurTedarikci" class="ci-tur-btn">Tedarikçi</button>
     </div>
-    <input id="ncPhone" placeholder="Telefon Numarası" class="ci-input">
-    <input id="ncEmail" placeholder="Mail Adresi" class="ci-input">
-    <input id="ncTaxNo" placeholder="Vergi Numarası" class="ci-input">
-    <input id="ncTaxOffice" placeholder="Vergi Dairesi" class="ci-input">
-    <input id="ncAddress" placeholder="Adres" class="ci-input">
-    <input id="ncContact" placeholder="İlgili Kişi" class="ci-input">
-    <input id="ncAcilis" placeholder="Açılış Bakiyesi (opsiyonel)" class="ci-input" type="text" inputmode="decimal">
+    <div class="ios-card">
+      <div class="field-ios"><label>Telefon</label><input id="ncPhone" placeholder="—"></div>
+      <div class="field-ios"><label>Mail</label><input id="ncEmail" placeholder="—"></div>
+      <div class="field-ios"><label>Vergi No</label><input id="ncTaxNo" placeholder="—"></div>
+      <div class="field-ios"><label>Vergi Dairesi</label><input id="ncTaxOffice" placeholder="—"></div>
+      <div class="field-ios"><label>Adres</label><input id="ncAddress" placeholder="—"></div>
+      <div class="field-ios"><label>İlgili Kişi</label><input id="ncContact" placeholder="—"></div>
+      <div class="field-ios"><label>Açılış Bakiyesi</label><input id="ncAcilis" type="text" inputmode="decimal" placeholder="isteğe bağlı"></div>
+    </div>
     <div style="display:flex;gap:8px;margin-bottom:4px;">
       <button type="button" id="ncAcilisBorc" class="ci-tur-btn active">Borç</button>
       <button type="button" id="ncAcilisAlacak" class="ci-tur-btn">Alacak</button>
@@ -993,21 +1006,23 @@
 <div class="overlay sk-modal-wide" id="urunOverlay" style="z-index:95;">
   <div class="modal">
     <h3 id="skNewTitle">Yeni Stok Kartı</h3>
-    <div class="field"><label>Stok Kodu (otomatik)</label><input type="text" id="skStokKodu" readonly style="background:#eef1f2;color:var(--muted);"></div>
-    <div class="field"><label>Ürün Adı</label><input type="text" id="urunAdiInput" placeholder="ör. CTP 43 bluz askısı"></div>
-    <div class="field"><label>Ürün Açıklaması</label><input type="text" id="skAciklama" placeholder="isteğe bağlı"></div>
-    <div class="sk-form-row2">
-      <div class="field">
+    <div class="ios-card">
+      <div class="field-ios"><label>Stok Kodu</label><input type="text" id="skStokKodu" readonly style="color:var(--muted);"></div>
+      <div class="field-ios"><label>Ürün Adı</label><input type="text" id="urunAdiInput" placeholder="ör. CTP 43 bluz askısı"></div>
+      <div class="field-ios"><label>Ürün Açıklaması</label><input type="text" id="skAciklama" placeholder="isteğe bağlı"></div>
+    </div>
+    <div class="ios-card">
+      <div class="field-ios">
         <label>Birim</label>
         <select id="skBirim">
           <option>Adet</option><option>Kg</option><option>Metre</option><option>Koli</option><option>Litre</option>
         </select>
       </div>
-      <div class="field"><label>Başlangıç Miktarı</label><input type="number" id="urunMiktarInput" placeholder="0" inputmode="numeric"></div>
+      <div class="field-ios"><label>Başlangıç Miktarı</label><input type="number" id="urunMiktarInput" placeholder="0" inputmode="numeric"></div>
     </div>
-    <div class="sk-form-row2">
-      <div class="field"><label>Alış Fiyatı</label><input type="number" id="skAlisFiyatiInput" placeholder="0,00" inputmode="decimal"></div>
-      <div class="field"><label>Satış Fiyatı</label><input type="number" id="skSatisFiyatiInput" placeholder="0,00" inputmode="decimal"></div>
+    <div class="ios-card">
+      <div class="field-ios"><label>Alış Fiyatı</label><input type="number" id="skAlisFiyatiInput" placeholder="0,00" inputmode="decimal"></div>
+      <div class="field-ios"><label>Satış Fiyatı</label><input type="number" id="skSatisFiyatiInput" placeholder="0,00" inputmode="decimal"></div>
     </div>
     <div class="sk-toggle">
       <div class="sk-toggle-switch on" id="skKdvToggle"><div class="knob"></div></div>
@@ -1047,30 +1062,27 @@
 <div class="overlay" id="skAlisOverlay">
   <div class="modal">
     <h3 id="skAlisTitle">Yeni Alış Kaydı</h3>
-    <div class="sk-form-row2">
-      <div class="field"><label>Tarih</label><input type="date" id="skAlisTarih"></div>
-      <div class="field"><label>Belge No</label><input type="text" id="skAlisBelge" placeholder="ör. FTR-001"></div>
-    </div>
-    <div class="field"><label>Cari Hesap (Tedarikçi)</label>
-      <div class="cari-input-row">
-        <input type="text" id="skAlisCari" list="skTedarikciList" placeholder="tedarikçi adı">
-        <button type="button" class="cari-sec-btn" id="skAlisCariSecBtn">▾</button>
+    <div class="ios-card">
+      <div class="field-ios"><label>Tarih</label><input type="date" id="skAlisTarih"></div>
+      <div class="field-ios"><label>Belge No</label><input type="text" id="skAlisBelge" placeholder="ör. FTR-001"></div>
+      <div class="field-ios-block"><label>Cari Hesap (Tedarikçi)</label>
+        <div class="cari-input-row">
+          <input type="text" id="skAlisCari" list="skTedarikciList" placeholder="tedarikçi adı">
+          <button type="button" class="cari-sec-btn" id="skAlisCariSecBtn">▾</button>
+        </div>
       </div>
     </div>
     <datalist id="skTedarikciList"></datalist>
     <div id="skAlisFiyatHint" style="font-size:12.5px;color:var(--accent);margin:-8px 0 12px 0;display:none;"></div>
-    <div class="sk-form-row2">
-      <div class="field"><label>Alınan Miktar</label><input type="number" id="skAlisMiktar" placeholder="0" inputmode="decimal"></div>
-      <div class="field"><label>Birim Fiyat</label><input type="number" id="skAlisFiyat" placeholder="0,00" inputmode="decimal"></div>
+    <div class="ios-card">
+      <div class="field-ios"><label>Alınan Miktar</label><input type="number" id="skAlisMiktar" placeholder="0" inputmode="decimal"></div>
+      <div class="field-ios"><label>Birim Fiyat</label><input type="number" id="skAlisFiyat" placeholder="0,00" inputmode="decimal"></div>
     </div>
     <button type="button" id="skAlisFiyatGecmisiBtn" style="width:100%;text-align:left;background:none;border:none;color:var(--accent);font-size:13px;font-weight:700;padding:0 0 12px 0;cursor:pointer;">📈 Bu tedarikçiden fiyat geçmişini gör</button>
-    <div class="sk-form-row2">
-      <div class="field"><label>İskonto %</label><input type="number" id="skAlisIskonto" placeholder="0" inputmode="decimal"></div>
-      <div class="field"><label>KDV %</label><input type="number" id="skAlisKdv" placeholder="20" inputmode="decimal"></div>
-    </div>
-    <div class="field">
-      <label>Toplam Tutar</label>
-      <input type="text" id="skAlisToplam" readonly style="font-weight:800;background:#eef1f2;">
+    <div class="ios-card">
+      <div class="field-ios"><label>İskonto %</label><input type="number" id="skAlisIskonto" placeholder="0" inputmode="decimal"></div>
+      <div class="field-ios"><label>KDV %</label><input type="number" id="skAlisKdv" placeholder="20" inputmode="decimal"></div>
+      <div class="field-ios"><label>Toplam Tutar</label><input type="text" id="skAlisToplam" readonly style="font-weight:800;color:var(--ink);"></div>
     </div>
     <div class="sk-toggle">
       <div class="sk-toggle-switch" id="skAlisIadeToggle"><div class="knob"></div></div>
@@ -1086,30 +1098,27 @@
 <div class="overlay" id="skSatisOverlay">
   <div class="modal">
     <h3 id="skSatisTitle">Yeni Satış Kaydı</h3>
-    <div class="sk-form-row2">
-      <div class="field"><label>Tarih</label><input type="date" id="skSatisTarih"></div>
-      <div class="field"><label>Fatura No</label><input type="text" id="skSatisBelge" placeholder="ör. FTR-001"></div>
-    </div>
-    <div class="field"><label>Cari Hesap (Müşteri)</label>
-      <div class="cari-input-row">
-        <input type="text" id="skSatisCari" list="skMusteriList" placeholder="müşteri adı">
-        <button type="button" class="cari-sec-btn" id="skSatisCariSecBtn">▾</button>
+    <div class="ios-card">
+      <div class="field-ios"><label>Tarih</label><input type="date" id="skSatisTarih"></div>
+      <div class="field-ios"><label>Fatura No</label><input type="text" id="skSatisBelge" placeholder="ör. FTR-001"></div>
+      <div class="field-ios-block"><label>Cari Hesap (Müşteri)</label>
+        <div class="cari-input-row">
+          <input type="text" id="skSatisCari" list="skMusteriList" placeholder="müşteri adı">
+          <button type="button" class="cari-sec-btn" id="skSatisCariSecBtn">▾</button>
+        </div>
       </div>
     </div>
     <datalist id="skMusteriList"></datalist>
     <div id="skSatisFiyatHint" style="font-size:12.5px;color:var(--accent);margin:-8px 0 12px 0;display:none;"></div>
-    <div class="sk-form-row2">
-      <div class="field"><label>Satılan Miktar</label><input type="number" id="skSatisMiktar" placeholder="0" inputmode="decimal"></div>
-      <div class="field"><label>Birim Satış Fiyatı</label><input type="number" id="skSatisFiyat" placeholder="0,00" inputmode="decimal"></div>
+    <div class="ios-card">
+      <div class="field-ios"><label>Satılan Miktar</label><input type="number" id="skSatisMiktar" placeholder="0" inputmode="decimal"></div>
+      <div class="field-ios"><label>Birim Satış Fiyatı</label><input type="number" id="skSatisFiyat" placeholder="0,00" inputmode="decimal"></div>
     </div>
     <button type="button" id="skSatisFiyatGecmisiBtn" style="width:100%;text-align:left;background:none;border:none;color:var(--accent);font-size:13px;font-weight:700;padding:0 0 12px 0;cursor:pointer;">📈 Bu müşteriye fiyat geçmişini gör</button>
-    <div class="sk-form-row2">
-      <div class="field"><label>İskonto %</label><input type="number" id="skSatisIskonto" placeholder="0" inputmode="decimal"></div>
-      <div class="field"><label>KDV %</label><input type="number" id="skSatisKdv" placeholder="20" inputmode="decimal"></div>
-    </div>
-    <div class="field">
-      <label>Toplam Tutar</label>
-      <input type="text" id="skSatisToplam" readonly style="font-weight:800;background:#eef1f2;">
+    <div class="ios-card">
+      <div class="field-ios"><label>İskonto %</label><input type="number" id="skSatisIskonto" placeholder="0" inputmode="decimal"></div>
+      <div class="field-ios"><label>KDV %</label><input type="number" id="skSatisKdv" placeholder="20" inputmode="decimal"></div>
+      <div class="field-ios"><label>Toplam Tutar</label><input type="text" id="skSatisToplam" readonly style="font-weight:800;color:var(--ink);"></div>
     </div>
     <div class="sk-toggle">
       <div class="sk-toggle-switch" id="skSatisIadeToggle"><div class="knob"></div></div>
@@ -1243,12 +1252,13 @@
 <div class="overlay" id="kalemEkleOverlay">
   <div class="modal">
     <h3 id="kalemEkleTitle">Ürün Ekle</h3>
-    <div class="field"><label>Miktar</label><input type="number" id="kalemMiktar" placeholder="0" inputmode="decimal"></div>
-    <div class="field"><label>Birim Fiyat</label><input type="number" id="kalemFiyat" placeholder="0,00" inputmode="decimal"></div>
+    <div class="ios-card">
+      <div class="field-ios"><label>Miktar</label><input type="number" id="kalemMiktar" placeholder="0" inputmode="decimal"></div>
+      <div class="field-ios"><label>Birim Fiyat</label><input type="number" id="kalemFiyat" placeholder="0,00" inputmode="decimal"></div>
+    </div>
     <div id="kalemFiyatHint" style="font-size:12.5px;color:var(--accent);margin:-8px 0 12px 0;display:none;"></div>
-    <div class="field">
-      <label>Tutar</label>
-      <input type="text" id="kalemTutar" readonly style="font-weight:800;background:#eef1f2;">
+    <div class="ios-card">
+      <div class="field-ios"><label>Tutar</label><input type="text" id="kalemTutar" readonly style="font-weight:800;color:var(--ink);"></div>
     </div>
     <div class="modal-actions">
       <button id="kalemSil" style="background:#fdeceb;color:var(--red);display:none;">Sil</button>
@@ -2215,20 +2225,16 @@ function renderSiparisDetayBody(){
         <button type="button" id="siparisTurAlici" class="ci-tur-btn ${d.ledgerKey==='cari'?'active':''}">Alıcı</button>
         <button type="button" id="siparisTurTedarikci" class="ci-tur-btn ${d.ledgerKey==='tedarikci'?'active':''}">Tedarikçi</button>
       </div>
-      <div class="field"><label>Cari Hesap</label>
+      <div class="field-ios-block"><label>Cari Hesap</label>
         <div class="cari-input-row">
           <input type="text" id="siparisCari" list="${datalistId}" value="${d.cariAdi||''}" placeholder="cari adı">
           <button type="button" class="cari-sec-btn" id="siparisCariSecBtn">▾</button>
         </div>
       </div>
-      <div class="sk-form-row2">
-        <div class="field"><label>Belge No</label><input type="text" id="siparisBelge" value="${d.belgeNo||''}"></div>
-        <div class="field"><label>Tarih</label><input type="date" id="siparisTarih" value="${(d.tarih||'').slice(0,10)}"></div>
-      </div>
-      <div class="sk-form-row2">
-        <div class="field"><label>Teslimat Tarihi</label><input type="date" id="siparisVade" value="${(d.vadeTarihi||'').slice(0,10)}"></div>
-        <div class="field"><label>Açıklama</label><input type="text" id="siparisAciklama" value="${d.aciklama||''}" placeholder="isteğe bağlı"></div>
-      </div>
+      <div class="field-ios"><label>Belge No</label><input type="text" id="siparisBelge" value="${d.belgeNo||''}"></div>
+      <div class="field-ios"><label>Tarih</label><input type="date" id="siparisTarih" value="${(d.tarih||'').slice(0,10)}"></div>
+      <div class="field-ios"><label>Teslimat Tarihi</label><input type="date" id="siparisVade" value="${(d.vadeTarihi||'').slice(0,10)}"></div>
+      <div class="field-ios"><label>Açıklama</label><input type="text" id="siparisAciklama" value="${d.aciklama||''}" placeholder="isteğe bağlı"></div>
       <div class="fis-kdv-row">
         <label>KDV Dahil (%20)</label>
         <div class="sk-toggle-switch ${kdvDahil?'on':''}" id="siparisKdvToggle"><div class="knob"></div></div>
@@ -4573,18 +4579,16 @@ function renderSkTab(tab){
 function skTabGenelHtml(c){
   return `
     <div class="sk-form-card">
-      <div class="field"><label>Stok Kodu</label><input type="text" id="skgStokKodu" value="${c.stokKodu||''}"></div>
-      <div class="field"><label>Ürün Adı</label><input type="text" id="skgAd" value="${c.ad||''}"></div>
-      <div class="field"><label>Ürün Açıklaması</label><input type="text" id="skgAciklama" value="${c.aciklama||''}"></div>
-      <div class="sk-form-row2">
-        <div class="field">
-          <label>Birim</label>
-          <select id="skgBirim">
-            ${['Adet','Kg','Metre','Koli','Litre'].map(b=>`<option ${b===c.birim?'selected':''}>${b}</option>`).join('')}
-          </select>
-        </div>
-        <div class="field"><label>Açılış Miktarı</label><input type="number" id="skgAcilis" value="${c.acilisMiktar||0}"></div>
+      <div class="field-ios"><label>Stok Kodu</label><input type="text" id="skgStokKodu" value="${c.stokKodu||''}"></div>
+      <div class="field-ios"><label>Ürün Adı</label><input type="text" id="skgAd" value="${c.ad||''}"></div>
+      <div class="field-ios"><label>Ürün Açıklaması</label><input type="text" id="skgAciklama" value="${c.aciklama||''}"></div>
+      <div class="field-ios">
+        <label>Birim</label>
+        <select id="skgBirim">
+          ${['Adet','Kg','Metre','Koli','Litre'].map(b=>`<option ${b===c.birim?'selected':''}>${b}</option>`).join('')}
+        </select>
       </div>
+      <div class="field-ios"><label>Açılış Miktarı</label><input type="number" id="skgAcilis" value="${c.acilisMiktar||0}"></div>
       <div class="sk-toggle">
         <div class="sk-toggle-switch ${toNum(c.kdvAlis)>0?'on':''}" id="skgKdvToggle"><div class="knob"></div></div>
         <span id="skgKdvLabel" style="font-size:14px;font-weight:600;">KDV Dahil (%20)</span>
@@ -5269,19 +5273,16 @@ function renderFisDetayBody(){
   const datalistId = fisTuru==='alis' ? 'skTedarikciList' : 'skMusteriList';
   document.getElementById('fisDetayBody').innerHTML = `
     <div class="sk-form-card">
-      <div class="field"><label>${cariLabel}</label>
+      <div class="field-ios-block"><label>${cariLabel}</label>
         <div class="cari-input-row">
           <input type="text" id="fisCari" list="${datalistId}" value="${d.cariAdi||''}" placeholder="${fisTuru==='alis'?'tedarikçi adı':'müşteri adı'}">
           <button type="button" class="cari-sec-btn" id="fisCariSecBtn">▾</button>
         </div>
       </div>
-      <div class="sk-form-row2">
-        <div class="field"><label>Belge No</label><input type="text" id="fisBelge" value="${d.belgeNo||''}"></div>
-        <div class="field"><label>İşlem Tarihi</label><input type="date" id="fisTarih" value="${(d.tarih||'').slice(0,10)}"></div>
-      </div>
-      <div class="sk-form-row2">
-        <div class="field"><label>Vade Tarihi</label><input type="date" id="fisVade" value="${(d.vadeTarihi||'').slice(0,10)}"></div>
-        <div class="field"><label>Açıklama</label><input type="text" id="fisAciklama" value="${d.aciklama||''}" placeholder="isteğe bağlı"></div>
+      <div class="field-ios"><label>Belge No</label><input type="text" id="fisBelge" value="${d.belgeNo||''}"></div>
+      <div class="field-ios"><label>İşlem Tarihi</label><input type="date" id="fisTarih" value="${(d.tarih||'').slice(0,10)}"></div>
+      <div class="field-ios"><label>Vade Tarihi</label><input type="date" id="fisVade" value="${(d.vadeTarihi||'').slice(0,10)}"></div>
+      <div class="field-ios"><label>Açıklama</label><input type="text" id="fisAciklama" value="${d.aciklama||''}" placeholder="isteğe bağlı"></div>
       </div>
       <div class="fis-kdv-row">
         <label>KDV Dahil (%20)</label>
