@@ -1347,23 +1347,24 @@
       <div class="cari-card-balance" id="kasaToplam">0,00₺</div>
       <div class="cari-card-name">Güncel Nakit Durumu</div>
     </div>
-    <div class="cari-card" id="gelenCeklerCard" style="margin-top:12px;">
+    <div class="cari-card" id="gelenCeklerCard" style="margin-top:12px;cursor:pointer;">
       <div class="cari-card-top">
         <span class="cari-card-label">GELEN ÇEKLER</span>
-        <span class="cari-card-logo"><i class="c1"></i><i class="c2"></i></span>
+        <span style="color:rgba(255,255,255,.55);font-size:20px;font-weight:700;">›</span>
       </div>
       <div class="cari-card-balance" id="gelenCeklerToplam">0,00₺</div>
       <div class="cari-card-name" id="gelenCeklerAlt">Kasada bekleyen çek yok</div>
     </div>
   </div>
-  <div style="display:flex;gap:8px;padding:14px 16px 0 16px;">
-    <button type="button" id="kasaTabHareketler" class="ci-tur-btn active">Hareketler</button>
-    <button type="button" id="kasaTabCekler" class="ci-tur-btn">Gelen Çekler</button>
-  </div>
   <div class="d-list" id="kasaList" style="padding:16px 16px 100px 16px;"></div>
-  <div class="d-list hidden" id="gelenCeklerWrap" style="padding:16px 16px 100px 16px;">
-    <div id="gelenCeklerList"></div>
+</div>
+
+<div class="detail-screen" id="kasaCekScreen">
+  <div class="d-header">
+    <button class="d-back" id="kasaCekBack">‹</button>
+    <div class="d-title">Gelen Çekler</div>
   </div>
+  <div class="d-list" id="gelenCeklerList" style="padding:16px 16px 100px 16px;"></div>
 </div>
 
 <div class="detail-screen" id="cekSenetScreen">
@@ -3454,6 +3455,7 @@ function hideAllScreens(){
   document.getElementById('siparisDetayScreen').classList.remove('show');
   document.getElementById('ayarlarScreen').classList.remove('show');
   kasaScreen.classList.remove('show');
+  document.getElementById('kasaCekScreen').classList.remove('show');
   document.getElementById('cekSenetScreen').classList.remove('show');
   document.getElementById('masrafScreen').classList.remove('show');
   document.getElementById('masrafDetayScreen').classList.remove('show');
@@ -3657,18 +3659,18 @@ function openCekSenetScreen(){
   document.getElementById('cekSenetScreen').classList.add('show');
   nudge();
 }
-document.getElementById('gelenCeklerCard').onclick = null;
-document.getElementById('kasaTabHareketler').onclick = () => {
-  document.getElementById('kasaTabHareketler').classList.add('active');
-  document.getElementById('kasaTabCekler').classList.remove('active');
-  document.getElementById('kasaList').classList.remove('hidden');
-  document.getElementById('gelenCeklerWrap').classList.add('hidden');
+document.getElementById('gelenCeklerCard').onclick = () => {
+  buildCekSenetListData();
+  renderCekListInto('gelenCeklerList');
+  kasaScreen.classList.remove('show');
+  document.getElementById('kasaCekScreen').classList.add('show');
+  nudge();
 };
-document.getElementById('kasaTabCekler').onclick = () => {
-  document.getElementById('kasaTabCekler').classList.add('active');
-  document.getElementById('kasaTabHareketler').classList.remove('active');
-  document.getElementById('gelenCeklerWrap').classList.remove('hidden');
-  document.getElementById('kasaList').classList.add('hidden');
+document.getElementById('kasaCekBack').onclick = () => {
+  document.getElementById('kasaCekScreen').classList.remove('show');
+  kasaScreen.classList.add('show');
+  renderKasa();
+  nudge();
 };
 
 let cekSenetListData = [];
