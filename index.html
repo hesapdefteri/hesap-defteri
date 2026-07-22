@@ -2811,6 +2811,7 @@ document.getElementById('quickTxSave').onclick = () => {
   render();
   renderCariHesaplar();
   if(kasaScreen.classList.contains('show')) renderKasa();
+  renderCekSenet();
 };
 
 // Borç/Alacak Ekle artık ayrı buton değil, Tahsilat/Ödeme pop-up'ının içindeki
@@ -3367,6 +3368,7 @@ document.getElementById('rcDelete').onclick = () => {
       renderDetail();
       renderCariHesaplar();
       if(kasaScreen.classList.contains('show')) renderKasa();
+      renderCekSenet();
     }
     receiptOverlay.classList.remove('show');
   });
@@ -3644,9 +3646,9 @@ function renderKasa(){
 // Kasada duran çekler buradan bir tedarikçiye "Çıkışa Ver" ile ödeme olarak devredilebilir;
 // orijinal Tahsilat hareketi ve Kasa'daki kaydı hiç değişmeden kalır, sadece durum güncellenir. ----------
 function openCekSenetScreen(){
-  renderKasa();
+  renderCekSenet();
   hideAllScreens();
-  kasaScreen.classList.add('show');
+  document.getElementById('cekSenetScreen').classList.add('show');
   nudge();
 }
 document.getElementById('gelenCeklerCard').onclick = null;
@@ -3724,6 +3726,7 @@ function renderCekListInto(containerId){
 }
 function renderCekSenet(){
   buildCekSenetListData();
+  renderCekListInto('cekSenetList');
   renderCekListInto('gelenCeklerList');
 }
 
