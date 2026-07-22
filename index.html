@@ -4002,7 +4002,7 @@ document.getElementById('masrafEkleSave').onclick = () => {
 function renderRapor(){
   const musteriToplam = state.cari.reduce((s,c)=> s + cariBalance(c), 0);
   const tedarikciToplam = state.tedarikci.reduce((s,c)=> s + cariBalance(c), 0);
-  const sum = (mod) => (state.modules[mod]||[]).reduce((s,it)=> s + it.amount, 0);
+  const masrafToplam = (state.masrafHesaplari||[]).reduce((s,k)=> s + (k.transactions||[]).reduce((s2,t)=> s2 + t.amount, 0), 0);
   let satisToplam = 0, alisToplam = 0;
   [...state.cari, ...state.tedarikci].forEach(c=>{
     (c.transactions||[]).forEach(t=>{
@@ -4018,7 +4018,7 @@ function renderRapor(){
     ['Tedarikçi Borç', tedarikciToplam],
     ['Satışlar Toplamı', satisToplam],
     ['Alışlar Toplamı', alisToplam],
-    ['Masraflar Toplamı', sum('masraflar')],
+    ['Masraflar Toplamı', masrafToplam],
   ];
   let html = rows.map(([lbl, val])=>`
     <div class="tx-row">
