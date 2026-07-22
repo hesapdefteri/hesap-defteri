@@ -59,12 +59,15 @@
   .am-badge.b-ayarlar{background:linear-gradient(135deg,#9aa8b8,#6d7c8d);}
   .am-badge.b-iletisim{background:linear-gradient(135deg,#6dd0c8,#2f9c8f);}
 
-  .urun-search-bar{display:flex;align-items:center;gap:10px;background:var(--green);padding:22px 16px 16px 16px;flex-shrink:0;}
-  .urun-back{background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding:0 2px;}
-  .urun-search-icon{color:rgba(255,255,255,.85);font-size:16px;}
-  .urun-search-bar input{flex:1;background:none;border:none;border-bottom:1px solid rgba(255,255,255,.5);color:#fff;font-size:17px;padding:6px 2px;}
-  .urun-search-bar input::placeholder{color:rgba(255,255,255,.75);}
-  .urun-list{flex:1;overflow-y:auto;padding:16px;background:#f4f7f8;display:flex;flex-direction:column;gap:14px;}
+  .urun-search-bar{display:flex;align-items:center;gap:10px;background:#fff;padding:22px 16px 14px 16px;flex-shrink:0;border-bottom:1px solid var(--line);}
+  .urun-back{background:none;border:none;color:var(--accent);font-size:22px;cursor:pointer;padding:0 2px;}
+  .urun-search-icon{color:var(--muted);font-size:15px;}
+  .urun-search-bar input{flex:1;background:#f0f1f3;border:none;border-radius:10px;color:var(--ink);font-size:16px;padding:9px 12px;}
+  .urun-search-bar input::placeholder{color:var(--muted);}
+  .urun-list{flex:1;overflow-y:auto;padding:16px;background:#f4f7f8;}
+  .urun-list .swipe-wrap{border-bottom:1px solid var(--line);}
+  .urun-list .swipe-wrap:last-child{border-bottom:none;}
+  .urun-list.sk-list{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(20,40,50,.05);}
   body{
     margin:0;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
@@ -159,7 +162,7 @@
   .swipe-btn.act-odeme{background:#c0392b;}
   .swipe-btn.sip-list-duzenle{background:#2f5c8a;}
   .swipe-btn.sip-list-sil{background:#c0392b;}
-  .sk-list .swipe-wrap{border-bottom:none;border-radius:12px;}
+  .sk-list .swipe-wrap{border-radius:0;}
   .swipe-content{position:relative;background:#fff;transition:transform .2s ease;touch-action:pan-y;border-bottom:none !important;}
   .acct-row.bar{border-left:4px solid var(--accent);}
   .cari-sub{padding:4px 0 0 0;}
@@ -361,6 +364,8 @@
   /* ===== Stok Kartı Modülü ===== */
     .sk-list{flex:1;overflow-y:auto;padding:14px 16px;background:#f4f7f8;display:flex;flex-direction:column;gap:12px;}
   .sk-card{background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(20,40,50,.08);padding:20px 20px;cursor:pointer;}
+  .sk-list .sk-card{border-radius:0;box-shadow:none;}
+  .sk-list > .sk-card:not(:last-child){border-bottom:1px solid var(--line);}
   .sk-card.pasif{opacity:.5;}
   .sk-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
   .sk-card-name{font-size:19px;font-weight:800;color:#3d4b50;}
