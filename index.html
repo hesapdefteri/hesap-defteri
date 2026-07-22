@@ -1347,6 +1347,14 @@
       <div class="cari-card-balance" id="kasaToplam">0,00₺</div>
       <div class="cari-card-name">Güncel Nakit Durumu</div>
     </div>
+    <div class="cari-card" id="gelenCeklerCard" style="margin-top:12px;cursor:pointer;">
+      <div class="cari-card-top">
+        <span class="cari-card-label">GELEN ÇEKLER</span>
+        <span class="cari-card-logo"><i class="c1"></i><i class="c2"></i></span>
+      </div>
+      <div class="cari-card-balance" id="gelenCeklerToplam">0,00₺</div>
+      <div class="cari-card-name" id="gelenCeklerAlt">Kasada bekleyen çek yok</div>
+    </div>
   </div>
   <div class="d-list" id="kasaList" style="padding:16px 16px 100px 16px;"></div>
 </div>
@@ -2801,6 +2809,8 @@ document.getElementById('quickTxSave').onclick = () => {
   activeLedger = quickTxLedger;
   render();
   renderCariHesaplar();
+  if(kasaScreen.classList.contains('show')) renderKasa();
+  if(document.getElementById('cekSenetScreen').classList.contains('show')) renderCekSenet();
 };
 
 // Borç/Alacak Ekle artık ayrı buton değil, Tahsilat/Ödeme pop-up'ının içindeki
@@ -3355,6 +3365,9 @@ document.getElementById('rcDelete').onclick = () => {
     if(removeCurrentReceiptTx()){
       save();
       renderDetail();
+      renderCariHesaplar();
+      if(kasaScreen.classList.contains('show')) renderKasa();
+      if(document.getElementById('cekSenetScreen').classList.contains('show')) renderCekSenet();
     }
     receiptOverlay.classList.remove('show');
   });
@@ -3492,10 +3505,7 @@ document.getElementById('anaMenu').querySelectorAll('.am-tile').forEach(tile=>{
     } else if(mod === 'iletisim'){
       document.getElementById('iletisimOverlay').classList.add('show');
     } else if(mod === 'cekSenet'){
-      renderCekSenet();
-      hideAllScreens();
-      document.getElementById('cekSenetScreen').classList.add('show');
-      nudge();
+      openCekSenetScreen();
     } else if(mod === 'kasa'){
       renderKasa();
       hideAllScreens();
@@ -3529,6 +3539,18 @@ document.getElementById('kasaAddBtn').onclick = openModal;
 // state.cash'e hiç dokunmaz; sadece mevcut veriyi okuyup listeler. ----------
 function renderKasa(){
   document.getElementById('kasaToplam').textContent = fmt(state.cash);
+
+  let cekAdet = 0, cekToplam = 0;
+  state.cari.forEach(c=>{
+    (c.transactions||[]).forEach(t=>{
+      if(t.cek && !t.ciro){ cekAdet++; cekToplam += Math.abs(t.amount); }
+    });
+  });
+  document.getElementById('gelenCeklerToplam').textContent = fmtPlain(cekToplam) + '₺';
+  document.getElementById('gelenCeklerAlt').textContent = cekAdet
+    ? cekAdet + ' çek kasada bekliyor'
+    : 'Kasada bekleyen çek yok';
+
   const rows = [];
   [...state.cari, ...state.tedarikci].forEach(c=>{
     (c.transactions||[]).forEach(t=>{
@@ -3620,6 +3642,14 @@ function renderKasa(){
 // ---------- Çek Senet — tüm carilerden alınan çeklerin tek listede takibi.
 // Kasada duran çekler buradan bir tedarikçiye "Çıkışa Ver" ile ödeme olarak devredilebilir;
 // orijinal Tahsilat hareketi ve Kasa'daki kaydı hiç değişmeden kalır, sadece durum güncellenir. ----------
+function openCekSenetScreen(){
+  renderCekSenet();
+  hideAllScreens();
+  document.getElementById('cekSenetScreen').classList.add('show');
+  nudge();
+}
+document.getElementById('gelenCeklerCard').onclick = () => openCekSenetScreen();
+
 let cekSenetListData = [];
 function renderCekSenet(){
   const rows = [];
@@ -3645,13 +3675,11 @@ function renderCekSenet(){
     const altBilgi = (!t.ciro)
       ? ''
       : (d.kimeCiroEdildi ? `<div style="font-size:11.5px;color:var(--muted);margin-top:4px;">Ciro: ${d.kimeCiroEdildi}</div>` : '');
-    const swipeActions = !t.ciro
-      ? `<div class="swipe-actions" style="width:168px;">
-          <button type="button" class="cek-ciro-swipe-btn" data-idx="${i}" style="width:168px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:13px;cursor:pointer;">Ciro Et</button>
-        </div>`
-      : `<div class="swipe-actions" style="width:168px;">
-          <button type="button" class="cek-iade-swipe-btn" data-idx="${i}" style="width:168px;border:none;background:#d9534f;color:#fff;font-weight:700;font-size:13px;cursor:pointer;">Çeki İade Al</button>
-        </div>`;
+    const stateBtn = !t.ciro
+      ? `<button type="button" class="cek-ciro-swipe-btn" data-idx="${i}" style="flex:1;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;">Ciro Et</button>`
+      : `<button type="button" class="cek-iade-swipe-btn" data-idx="${i}" style="flex:1;border:none;background:#d9534f;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;">İade Al</button>`;
+    const degistirBtn = `<button type="button" class="cek-degistir-swipe-btn" data-idx="${i}" style="flex:1;border:none;background:#5b6b73;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;">Değiştir</button>`;
+    const swipeActions = `<div class="swipe-actions" style="width:224px;">${stateBtn}${degistirBtn}</div>`;
     return `
       <div class="swipe-wrap" style="border-radius:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(20,30,40,.06);">
         ${swipeActions}
@@ -3675,6 +3703,9 @@ function renderCekSenet(){
   });
   list.querySelectorAll('.cek-iade-swipe-btn').forEach(btn=>{
     btn.onclick = (e) => { e.stopPropagation(); iadeAlCek(parseInt(btn.dataset.idx, 10)); };
+  });
+  list.querySelectorAll('.cek-degistir-swipe-btn').forEach(btn=>{
+    btn.onclick = (e) => { e.stopPropagation(); openCekDegistir(parseInt(btn.dataset.idx, 10)); };
   });
   list.querySelectorAll('.swipe-content[data-idx]').forEach(el=>{
     el.onclick = () => {
@@ -3719,6 +3750,19 @@ function openCekDetay(idx){
 }
 document.getElementById('cdClose').onclick = () => { document.getElementById('cekDetayOverlay').classList.remove('show'); };
 
+// Çek Senet listesindeki "Değiştir": ilgili carinin ekstresini arka planda
+// hesaplayıp (doğru bakiye için), aynı fiş düzenleme akışını (openTxDetay/openReceipt)
+// açar — cari hesap ekstresindeki "Değiştir" ile birebir aynı, kanıtlanmış akış.
+function openCekDegistir(idx){
+  const r = cekSenetListData[idx];
+  if(!r) return;
+  activeLedger = 'cari';
+  activeCariId = r.cari.id;
+  renderDetail();
+  const item = currentDetailTx.find(x => x.t === r.tx);
+  if(item) openTxDetay(item);
+}
+
 // Ciro edilmiş bir çeki listeden doğrudan "iade al": ilgili tedarikçideki
 // Çek Çıkış ödemesini siler (kasayı geri yükler) ve çeki yeniden Kasada durumuna döndürür.
 function iadeAlCek(idx){
@@ -3746,6 +3790,7 @@ function iadeAlCek(idx){
     renderCekSenet();
     render();
     renderCariHesaplar();
+    if(kasaScreen.classList.contains('show')) renderKasa();
   }, 'Evet, İade Al');
 }
 
@@ -3814,6 +3859,7 @@ function cekCikisiUygula(tedarikciId){
   renderCekSenet();
   render();
   renderCariHesaplar();
+  if(kasaScreen.classList.contains('show')) renderKasa();
 }
 // Bir "Çek Çıkış" ödemesi silinirse, o çekin kaynağı olan tahsilat kaydındaki
 // ciro/kime-verildi bilgisini geri alır (çek yeniden "Kasada" durumuna döner).
