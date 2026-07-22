@@ -1312,6 +1312,7 @@
 <div class="detail-screen" id="kasaCekScreen">
   <div class="d-header">
     <div class="d-title">Gelen Çekler</div>
+    <button class="d-share" id="kasaCekYeniBtn" title="Yeni Çek">＋</button>
   </div>
   <div class="d-list" id="gelenCeklerList" style="padding:16px 16px 100px 16px;"></div>
 </div>
@@ -4140,6 +4141,7 @@ let cariSecTargetId = null;
 let cariSecTerm = '';
 
 function openCariSec(ledgerKey, targetInputId){
+  cariSecMode = 'fill';
   cariSecLedger = ledgerKey;
   cariSecTargetId = targetInputId;
   cariSecTerm = '';
@@ -4149,12 +4151,26 @@ function openCariSec(ledgerKey, targetInputId){
   document.getElementById('cariSecScreen').classList.add('show');
   nudge();
 }
+// Kasa & Çek > Gelen Çekler ekranındaki "+": cari hesaba önce girmeye gerek kalmadan,
+// direkt bir müşteri seçip Tahsilat/Çek formunu o hesap için açar.
+let cariSecMode = 'fill';
+function openCekYeniCariSec(){
+  cariSecMode = 'yeniCek';
+  cariSecLedger = 'cari';
+  cariSecTerm = '';
+  document.getElementById('cariSecSearch').value = '';
+  document.getElementById('cariSecSearch').placeholder = 'müşteri ara';
+  renderCariSecList();
+  document.getElementById('cariSecScreen').classList.add('show');
+  nudge();
+}
+document.getElementById('kasaCekYeniBtn').onclick = () => openCekYeniCariSec();
 function renderCariSecList(){
   const term = cariSecTerm.toLocaleLowerCase('tr-TR');
   const list = state[cariSecLedger].filter(c => !term || c.name.toLocaleLowerCase('tr-TR').includes(term));
   const el = document.getElementById('cariSecList');
   el.innerHTML = list.length ? list.slice().sort((a,b)=>a.name.localeCompare(b.name,'tr')).map(c=>`
-    <div class="sk-card" data-name="${c.name}">
+    <div class="sk-card" data-name="${c.name}" data-id="${c.id}">
       <div class="sk-card-top">
         <div class="sk-card-name">${c.name}</div>
       </div>
@@ -4162,6 +4178,16 @@ function renderCariSecList(){
   `).join('') : '<div class="sk-empty">Henüz kayıtlı cari yok — adı yazıp devam edebilirsin</div>';
   el.querySelectorAll('.sk-card[data-name]').forEach(row=>{
     row.onclick = () => {
+      if(cariSecMode === 'yeniCek'){
+        const c = state.cari.find(x=>x.id===row.dataset.id);
+        document.getElementById('cariSecScreen').classList.remove('show');
+        cariSecMode = 'fill';
+        if(!c) return;
+        openQuickTx(c.id, 'cari', 'TAHSİLAT');
+        tahYontemSec('cek');
+        nudge();
+        return;
+      }
       const input = document.getElementById(cariSecTargetId);
       input.value = row.dataset.name;
       input.dispatchEvent(new Event('input'));
