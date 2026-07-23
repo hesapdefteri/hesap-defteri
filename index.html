@@ -3715,7 +3715,7 @@ function renderKasa(){
       }
     });
   });
-  document.getElementById('gelenCeklerToplam').textContent = fmtPlain(cekToplam) + '₺';
+  document.getElementById('gelenCeklerToplam').textContent = fmtWhole(cekToplam);
   document.getElementById('gelenCeklerAlt').textContent = cekAdet
     ? (cekAdet + ' çek' + (ciroAdet ? ' (' + (cekAdet - ciroAdet) + ' kasada, ' + ciroAdet + ' ciro edildi)' : ' kasada bekliyor'))
     : 'Kasada bekleyen çek yok';
@@ -3857,7 +3857,7 @@ function cekRowHtml(r, i){
           ${altBilgi}
         </div>
         <div style="text-align:right;flex-shrink:0;">
-          <div style="font-weight:800;font-size:15px;color:var(--ink);">${fmtPlain(Math.abs(t.amount))}₺</div>
+          <div style="font-weight:800;font-size:15px;color:var(--ink);">${fmtWhole(Math.abs(t.amount))}</div>
           <div style="margin-top:6px;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;display:inline-block;background:${durumBg};color:${durumColor};">${durum}</div>
         </div>
       </div>
@@ -3921,7 +3921,7 @@ function openCekOnizleme(idx){
   const tarihStr = v => v ? new Date(v).toLocaleDateString('tr-TR') : '—';
   document.getElementById('cekOnBaslik').textContent = r.cari.name;
   document.getElementById('cekOnCari').textContent = r.cari.name;
-  document.getElementById('cekOnTutar').textContent = fmtPlain(Math.abs(t.amount)) + '₺';
+  document.getElementById('cekOnTutar').textContent = fmtWhole(Math.abs(t.amount));
   document.getElementById('cekOnDurum').textContent = t.ciro ? 'Ciro Edildi' : 'Kasada';
   document.getElementById('cekOnCiroRow').classList.toggle('hidden', !(t.ciro && d.kimeCiroEdildi));
   document.getElementById('cekOnCiroKime').textContent = d.kimeCiroEdildi || '';
@@ -4031,7 +4031,7 @@ function openCekCikis(idx){
   const r = cekSenetListData[idx];
   if(!r) return;
   cekCikisIdx = idx;
-  document.getElementById('cekCikisAciklama').textContent = r.cari.name + ' çekini (' + fmtPlain(Math.abs(r.tx.amount)) + '₺) hangi tedarikçiye ciro edeceksin?';
+  document.getElementById('cekCikisAciklama').textContent = r.cari.name + ' çekini (' + fmtWhole(Math.abs(r.tx.amount)) + ') hangi tedarikçiye ciro edeceksin?';
   const listEl = document.getElementById('cekCikisTedarikciList');
   if(!state.tedarikci.length){
     listEl.innerHTML = '<div class="empty-tx">Tedarikçi kaydı yok</div>';
