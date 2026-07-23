@@ -6485,6 +6485,43 @@ function ensureBestKuruTemizleme(){
 }
 if(ensureBestKuruTemizleme()) save();
 
+// Temmuz 2026: Garanti BBVA "Gelen Para Transferi" maili — Murat Şanal (gönderen adı
+// bankada "Şanal Kuru Temizleme" olarak geçiyor) hesaba 2.000₺ havale gönderdi
+// (Açıklama: Xym, 23.07.2026 06:45). Kullanıcı onayıyla yeni müşteri cari hesabı
+// açılıp TAHSİLAT olarak işlendi. Para banka hesabına geldiği için (nakit değil)
+// kasaya (state.cash) DOKUNULMADI — bunun yerine aynı tutar Banka modülüne
+// "Para Yatır" olarak işlendi (kullanıcı: "ayrı modül olsun, kasaya bağlantı yaparız" —
+// yani Kasa/Banka arasında bir bağlantı/senkron ileride ayrıca kurulacak, şimdilik yok).
+function ensureMuratSanalTahsilat(){
+  const existing = state.cari.find(c => normAd(c.name) === normAd('Murat Şanal'));
+  let changed = false;
+  if(!existing){
+    state.cari.push({ id:'muratsanal', name:'Murat Şanal', transactions: [
+      {type:'TAHSİLAT', desc:'Garanti BBVA havale (Şanal Kuru Temizleme)', amount:2000.00, date:'2026-07-23T06:45:20.000Z'}
+    ]});
+    changed = true;
+  }
+  const already = state.banka.transactions.some(t => t.desc === 'Murat Şanal — Garanti BBVA havale' && t.date === '2026-07-23T06:45:20.000Z');
+  if(!already){
+    state.banka.transactions.push({ type:'YATIR', desc:'Murat Şanal — Garanti BBVA havale', amount:2000.00, date:'2026-07-23T06:45:20.000Z' });
+    changed = true;
+  }
+  return changed;
+}
+if(ensureMuratSanalTahsilat()) save();
+
+// Temmuz 2026: Garanti BBVA günlük hesap hareketleri maili — MAVI MARKET / YASEMIN AC
+// kart harcamaları (2 adet, 22.07.2026). Kullanıcı onayıyla masraf olarak, banka
+// hesabından düştüğü için Banka modülüne "Para Çek" olarak işlendi (Kasa'ya dokunulmadı).
+function ensureGarantiMasraflarTemmuz2026(){
+  const already = state.banka.transactions.some(t => t.date === '2026-07-22T14:13:30.000Z' && t.desc.indexOf('MAVI MARKET') > -1);
+  if(already) return false;
+  state.banka.transactions.push({ type:'CEK', desc:'MAVI MARKET / YASEMIN AC (Garanti BBVA kart harcaması)', amount:185.00, date:'2026-07-22T14:13:30.000Z' });
+  state.banka.transactions.push({ type:'CEK', desc:'MAVI MARKET / YASEMIN AC (Garanti BBVA kart harcaması)', amount:465.00, date:'2026-07-22T20:19:21.000Z' });
+  return true;
+}
+if(ensureGarantiMasraflarTemmuz2026()) save();
+
 // Kullanıcının gönderdiği ekstre ekran görüntülerinden (Drysan Kuru Temizleme, Temmuz 2023
 // - Haziran 2026 arası) elle işlendi. Toplam 199.110,00 satış / -198.860,00 tahsilat = 250,00
 // net bakiye ile ekran görüntüsündeki "TOPLAM ₺ 250,00" ile birebir eşleşiyor.
