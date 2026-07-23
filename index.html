@@ -2694,13 +2694,10 @@ function tahYontemSec(yontem){
   const labelMap = { nakit: 'Nakit Ödemesi', cek: 'Çek Ödemesi', borc: 'Borç Ekle', alacak: 'Alacak Ekle' };
   document.getElementById('tahYontemSecLabel').textContent = labelMap[yontem] || 'Nakit Ödemesi';
   const isCek = yontem === 'cek';
-  document.getElementById('quickTxSave').classList.toggle('hidden', isCek);
-  if(isCek){
-    document.getElementById('cekWizOverlay').classList.add('show');
-    showCekWizStep(0);
-  } else {
-    document.getElementById('cekWizOverlay').classList.remove('show');
-  }
+  // Kullanıcı isteğiyle: soru-soru sihirbaz yerine tüm çek bilgileri tek
+  // ekranda (cekDetayForm, aşağı kaydırılabilir) gösteriliyor.
+  document.getElementById('cekDetayForm').classList.toggle('hidden', !isCek);
+  if(isCek) requestAnimationFrame(()=>scrollCekBankaWheelTo(document.getElementById('cekBanka').value));
 }
 // Çek detay formu, kullanıcı isteğiyle tek uzun form yerine bir soru bir pop-up
 // ekranında soran bir sihirbaza çevrildi. Her adımın input'u aynı id'yi koruyor
