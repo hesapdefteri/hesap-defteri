@@ -136,6 +136,7 @@
   .cari-card-info-row .civ{font-size:14px;font-weight:600;color:var(--ink);text-align:right;}
             .cari-card-swipe-wrap{position:relative;overflow:hidden;border-radius:16px;flex-shrink:0;}
   .cari-card-swipe-wrap .cari-card{position:relative;z-index:1;}
+  .cari-card-mini{padding:12px 14px;display:flex;align-items:center;font-size:16px;font-weight:700;color:var(--ink);}
   .ci-input{width:100%;box-sizing:border-box;margin-bottom:10px;padding:13px 12px;font-size:15px;border:1px solid var(--line);border-radius:12px;color:var(--ink);}
   .ci-tur-btn{flex:1;padding:12px 0;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--muted);font-weight:700;font-size:14px;cursor:pointer;}
   .ci-tur-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
@@ -667,6 +668,12 @@
           </div>
         </div>
       </div>
+      <div class="cari-card cari-card-mini hidden" id="dEkstreCardMini">
+        <span id="dEkstreCardMiniName">Hesap Adı</span>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:center;margin-top:2px;margin-bottom:2px;">
+      <button id="dCardToggleBtn" title="Kartı küçült" style="width:44px;height:22px;border:none;background:transparent;color:var(--muted);font-size:15px;line-height:1;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;">⌄</button>
     </div>
     <div class="dcek-dots" id="dDots">
       <span class="dcek-dot active" data-i="0"></span>
@@ -2627,9 +2634,34 @@ function renderEkstreInfo(){
   ];
   document.getElementById('dEkstreInfoBody').innerHTML = rows.map(([l,v])=>`<div class="cari-card-info-row"><span class="cil">${l}</span><span class="civ">${v}</span></div>`).join('');
 }
+let dCardCollapsed = false;
+function setDCardCollapsed(collapsed){
+  dCardCollapsed = collapsed;
+  const cardEl = document.getElementById('dEkstreCardEl');
+  const mini = document.getElementById('dEkstreCardMini');
+  const dots = document.getElementById('dDots');
+  const toggleBtn = document.getElementById('dCardToggleBtn');
+  if(collapsed){
+    document.getElementById('dEkstreCardMiniName').textContent = document.getElementById('dEkstreCardName').textContent;
+    cardEl.classList.add('hidden');
+    mini.classList.remove('hidden');
+    dots.classList.add('hidden');
+    toggleBtn.textContent = '⌃';
+    toggleBtn.title = 'Kartı büyüt';
+  } else {
+    cardEl.classList.remove('hidden');
+    mini.classList.add('hidden');
+    dots.classList.remove('hidden');
+    toggleBtn.textContent = '⌄';
+    toggleBtn.title = 'Kartı küçült';
+  }
+}
+document.getElementById('dCardToggleBtn').onclick = () => setDCardCollapsed(!dCardCollapsed);
+
 function showDEkstreOverlay(){
   resetEkstreCardSwipe();
   goToCardPage(0, false);
+  setDCardCollapsed(false);
   document.getElementById('dEkstreOverlay').classList.add('show');
 }
 function openCariEkstrePopup(id, ledgerKey){
@@ -3096,17 +3128,18 @@ function renderDetail(){
 
   const sortedKeys = [...groups.keys()].sort((a,b)=> b.localeCompare(a));
 
-  dList.innerHTML = sortedKeys.map(key=>{
+  dList.innerHTML = sortedKeys.map((key, gi)=>{
     const g = groups.get(key);
     const rowsHtml = g.rows.map(({t, idx})=> rowHtml(t, idx)).join('');
     const [gMain, gCents] = fmtPlain(g.total).split(',');
+    const isOpen = gi === 0;
     return `
       <div class="kasa-ay-group">
         <div class="kasa-ay-header" data-key="${key}">
-          <div class="kasa-ay-label"><span class="kasa-ay-chevron">▾</span> ${g.label}</div>
+          <div class="kasa-ay-label"><span class="kasa-ay-chevron">${isOpen ? '▴' : '▾'}</span> ${g.label}</div>
           <div class="kasa-ay-toplam ${g.total<0?'neg':''}">${gMain}<span class="cents">,${gCents}</span></div>
         </div>
-        <div class="kasa-ay-body hidden" id="dAy-${key}">${rowsHtml}</div>
+        <div class="kasa-ay-body${isOpen ? '' : ' hidden'}" id="dAy-${key}">${rowsHtml}</div>
       </div>`;
   }).join('');
 
