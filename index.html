@@ -5300,11 +5300,13 @@ function openFisDetay(id){
 
 function renderFisDetayBody(){
   const d = draftFis;
-  const kalemToplam = d.kalemler.reduce((s,k)=>s+toNum(k.tutar),0);
+  const kalemToplam = d.kalemler.length ? d.kalemler.reduce((s,k)=>s+toNum(k.tutar),0) : toNum(d.toplam);
   const kdvDahil = !!d.kdvDahil;
   const kdvTutar = kdvDahil ? kalemToplam * 0.20 : 0;
   const genelToplam = kalemToplam + kdvTutar;
-  d.toplam = genelToplam;
+  // Kalemsiz (kalem eklenmeden geçmişten taşınan) faturalarda orijinal tutar korunur;
+  // sadece gerçekten kalem eklenince toplam otomatik güncellenir.
+  if(d.kalemler.length) d.toplam = genelToplam;
   const cariLabel = fisTuru==='alis' ? 'Cari Hesap (Tedarikçi)' : 'Cari Hesap (Müşteri)';
   const datalistId = fisTuru==='alis' ? 'skTedarikciList' : 'skMusteriList';
   document.getElementById('fisDetayBody').innerHTML = `
