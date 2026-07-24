@@ -1504,10 +1504,14 @@
     </div>
   </div>
   <div class="d-list" id="bankaScrollArea" style="padding:14px 16px 100px 16px;">
-    <div class="sheet-title">TAKSİTLİ İŞLEMLER</div>
-    <div class="acct-card cari-sub" id="taksitCard"></div>
-    <div class="sheet-title" style="margin-top:16px;">DİĞER HAREKETLER</div>
-    <div id="bankaList"></div>
+    <div id="taksitliBolum">
+      <div class="sheet-title">TAKSİTLİ İŞLEMLER</div>
+      <div class="acct-card cari-sub" id="taksitCard"></div>
+    </div>
+    <div id="digerBolum">
+      <div class="sheet-title">DİĞER HAREKETLER</div>
+      <div id="bankaList"></div>
+    </div>
   </div>
 </div>
 
@@ -3419,6 +3423,8 @@ function goToBankaCardPage(idx, animate){
   track.style.transform = `translateX(-${idx * 50}%)`;
   document.querySelectorAll('#bankaDots .dcek-dot').forEach((d,i)=> d.classList.toggle('active', i===idx));
   bankaActivePage = idx;
+  document.getElementById('taksitliBolum').style.display = idx === 1 ? '' : 'none';
+  document.getElementById('digerBolum').style.display = idx === 0 ? '' : 'none';
 }
 (function(){
   const pager = document.getElementById('bankaCardPager');
