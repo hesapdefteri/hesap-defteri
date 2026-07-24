@@ -4209,7 +4209,7 @@ function renderTaksitler(){
       d.setMonth(d.getMonth() + (r.t.taksitSayisi - 1)); // son taksidin bittiği ay
       let key = keyOf(d);
       let label = d.toLocaleDateString('tr-TR', {month:'long', year:'numeric'});
-      if(key === '2026-06' || key === '2026-07'){ key = '2026-06-07'; label = 'Haziran - Temmuz 2026'; } // ikisi ödendi, tek grupta birleştir
+      if(key === '2026-06' || key === '2026-07'){ key = '2026-06-07'; label = 'Temmuz 2026'; } // ikisi ödendi, Temmuz grubunda birleştir
       if(key > simdiKey) return; // henüz gelmemiş ayı gösterme
       if(!groups.has(key)) groups.set(key, { label, items: [], total: 0 });
       const g = groups.get(key);
