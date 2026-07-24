@@ -3999,7 +3999,7 @@ function renderTaksitler(){
     const kalan = taksitKalan(t);
     const dateStr = new Date(t.tarih).toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'});
     const circleHtml = kalan > 0
-      ? `<span class="siparis-date-circle son-hareket" style="background:#d6453b;"><b>${kalan}</b>TAKSİT</span>`
+      ? `<span class="siparis-date-circle son-hareket" style="background:#d6453b;"><b>${kalan}/${t.taksitSayisi}</b>KALAN</span>`
       : `<span class="siparis-date-circle son-hareket" style="background:#1f8a54;"><b>✓</b>BİTTİ</span>`;
     return `
       <div class="acct-row" data-idx="${idx}">
