@@ -7486,6 +7486,28 @@ function ensureTaksitDuzeltmeleriTemmuz2026(){
 }
 if(ensureTaksitDuzeltmeleriTemmuz2026()) save();
 
+// Ağustos 2026 kart ödemesi gerçekleşti — o ayda taksidi düşen kalemler bir taksit ilerletildi.
+function ensureAgustosOdemesi2026(){
+  let changed = false;
+  const ilerlet = [
+    { desc:'U.S POLO BULVAR SAMSUN', tarih:'2026-06-05T00:00:01', yeniOdenen:3 },
+    { desc:'IYZICO *AMAZON.COM.T', tarih:'2026-06-09T00:00:01', taksitTutari:49.40, yeniOdenen:6 },
+    { desc:'IYZICO *AMAZON.COM.T', tarih:'2026-06-09T00:00:00', taksitTutari:66.02, yeniOdenen:6 },
+    { desc:'IYZICO *AMAZON.COM.T', tarih:'2026-06-06T00:00:00', taksitTutari:380.55, yeniOdenen:6 },
+    { desc:'IYZICO *AMAZON.COM.T', tarih:'2026-06-06T00:00:01', taksitTutari:380.55, yeniOdenen:6 },
+    { desc:'34287-NAKİL VASITALARI VE (Vergi)', tarih:'2026-07-20T00:00:00', yeniOdenen:2 }
+  ];
+  ilerlet.forEach(d=>{
+    const t = state.banka.taksitler.find(x => x.desc === d.desc && x.tarih === d.tarih && (d.taksitTutari === undefined || x.taksitTutari === d.taksitTutari));
+    if(t && t.odenenTaksit !== d.yeniOdenen){
+      t.odenenTaksit = d.yeniOdenen;
+      changed = true;
+    }
+  });
+  return changed;
+}
+if(ensureAgustosOdemesi2026()) save();
+
 // Kullanıcının gönderdiği ekstre ekran görüntülerinden (Drysan Kuru Temizleme, Temmuz 2023
 // - Haziran 2026 arası) elle işlendi. Toplam 199.110,00 satış / -198.860,00 tahsilat = 250,00
 // net bakiye ile ekran görüntüsündeki "TOPLAM ₺ 250,00" ile birebir eşleşiyor.
