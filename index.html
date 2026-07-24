@@ -7483,21 +7483,18 @@ if(ensure20TemmuzHarcamalari()) save();
 function ensureTaksitDuzeltmeleriTemmuz2026(){
   let changed = false;
   const duzeltmeler = [
-    { desc:'DESA DERİ', tarih:'2026-06-05T00:00:00', yeniOdenen:2 },
-    { desc:'U.S POLO BULVAR SAMSUN', tarih:'2026-06-05T00:00:01', yeniOdenen:2 },
-    { desc:'IYZICO *AMAZON.COM.T', tarih:'2026-06-09T00:00:00', taksitTutari:66.02, yeniOdenen:5 },
-    { desc:'IYZICO *AMAZON.COM.T', tarih:'2026-06-09T00:00:01', taksitTutari:49.40, yeniOdenen:5 },
-    { desc:'IYZICO *AMAZON.COM.T', tarih:'2026-06-06T00:00:00', taksitTutari:380.55, yeniOdenen:5 },
-    { desc:'IYZICO *AMAZON.COM.T', tarih:'2026-06-06T00:00:01', taksitTutari:380.55, yeniOdenen:5 }
+    { desc:'DESA DERİ', yeniOdenen:2 },
+    { desc:'U.S POLO BULVAR SAMSUN', yeniOdenen:2 },
+    { desc:'IYZICO *AMAZON.COM.T', taksitTutari:66.02, yeniOdenen:5 },
+    { desc:'IYZICO *AMAZON.COM.T', taksitTutari:49.40, yeniOdenen:5 },
+    { desc:'IYZICO *AMAZON.COM.T', taksitTutari:380.55, yeniOdenen:5 }
   ];
   duzeltmeler.forEach(d=>{
-    const t = state.banka.taksitler.find(x => x.desc === d.desc && x.tarih === d.tarih && (d.taksitTutari === undefined || x.taksitTutari === d.taksitTutari));
-    if(t && t.odenenTaksit !== d.yeniOdenen){
-      t.odenenTaksit = d.yeniOdenen;
-      changed = true;
-    }
+    state.banka.taksitler.filter(x => x.desc === d.desc && (d.taksitTutari === undefined || x.taksitTutari === d.taksitTutari)).forEach(t=>{
+      if(t.odenenTaksit < d.yeniOdenen){ t.odenenTaksit = d.yeniOdenen; changed = true; }
+    });
   });
-  if(!state.banka.taksitler.some(x => x.desc === '34287-NAKİL VASITALARI VE (Vergi)' && x.tarih === '2026-07-20T00:00:00')){
+  if(!state.banka.taksitler.some(x => x.desc === '34287-NAKİL VASITALARI VE (Vergi)')){
     state.banka.taksitler.push({ desc:'34287-NAKİL VASITALARI VE (Vergi)', taksitTutari:1527.83, taksitSayisi:3, odenenTaksit:1, tarih:'2026-07-20T00:00:00', kart:'Bonus Flexi Card' });
     changed = true;
   }
@@ -7506,22 +7503,20 @@ function ensureTaksitDuzeltmeleriTemmuz2026(){
 if(ensureTaksitDuzeltmeleriTemmuz2026()) save();
 
 // Ağustos 2026 kart ödemesi gerçekleşti — o ayda taksidi düşen kalemler bir taksit ilerletildi.
+// (desc+tutar ile eşleştirilir, tam tarih damgasına bağlı değildir — eski cihaz verisiyle de çalışır)
 function ensureAgustosOdemesi2026(){
   let changed = false;
   const ilerlet = [
-    { desc:'U.S POLO BULVAR SAMSUN', tarih:'2026-06-05T00:00:01', yeniOdenen:3 },
-    { desc:'IYZICO *AMAZON.COM.T', tarih:'2026-06-09T00:00:01', taksitTutari:49.40, yeniOdenen:6 },
-    { desc:'IYZICO *AMAZON.COM.T', tarih:'2026-06-09T00:00:00', taksitTutari:66.02, yeniOdenen:6 },
-    { desc:'IYZICO *AMAZON.COM.T', tarih:'2026-06-06T00:00:00', taksitTutari:380.55, yeniOdenen:6 },
-    { desc:'IYZICO *AMAZON.COM.T', tarih:'2026-06-06T00:00:01', taksitTutari:380.55, yeniOdenen:6 },
-    { desc:'34287-NAKİL VASITALARI VE (Vergi)', tarih:'2026-07-20T00:00:00', yeniOdenen:2 }
+    { desc:'U.S POLO BULVAR SAMSUN', yeniOdenen:3 },
+    { desc:'IYZICO *AMAZON.COM.T', taksitTutari:49.40, yeniOdenen:6 },
+    { desc:'IYZICO *AMAZON.COM.T', taksitTutari:66.02, yeniOdenen:6 },
+    { desc:'IYZICO *AMAZON.COM.T', taksitTutari:380.55, yeniOdenen:6 },
+    { desc:'34287-NAKİL VASITALARI VE (Vergi)', yeniOdenen:2 }
   ];
   ilerlet.forEach(d=>{
-    const t = state.banka.taksitler.find(x => x.desc === d.desc && x.tarih === d.tarih && (d.taksitTutari === undefined || x.taksitTutari === d.taksitTutari));
-    if(t && t.odenenTaksit !== d.yeniOdenen){
-      t.odenenTaksit = d.yeniOdenen;
-      changed = true;
-    }
+    state.banka.taksitler.filter(x => x.desc === d.desc && (d.taksitTutari === undefined || x.taksitTutari === d.taksitTutari)).forEach(t=>{
+      if(t.odenenTaksit < d.yeniOdenen){ t.odenenTaksit = d.yeniOdenen; changed = true; }
+    });
   });
   return changed;
 }
