@@ -4185,7 +4185,7 @@ function renderTaksitler(){
   // Şu anki ay "DEVAM EDENLER" olarak vurgulanır; gelecek aylar üstte, geçmiş aylar altta.
   const keyOf = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
   const BASLANGIC_KEY = '2026-06', BITIS_KEY = '2026-12';
-  const suankiKey = keyOf(new Date());
+  const gercekSuankiKey = keyOf(new Date());
   const groups = new Map();
   rows.forEach(({t, idx})=>{
     for(let k=1; k<=t.taksitSayisi; k++){
@@ -4200,6 +4200,11 @@ function renderTaksitler(){
       g.total += t.taksitTutari;
     }
   });
+  // "Devam Edenler" = ödenmemiş taksidi olan, bugüne en yakın ay (gerçek şu anki ay ödenmişse
+  // bir sonraki aya kayar) — yoksa ödenmiş bir ayı yanlışlıkla "devam ediyor" göstermiş oluruz.
+  const anahtarlarArtan = [...groups.keys()].sort((a,b)=> a.localeCompare(b));
+  const suankiKey = anahtarlarArtan.find(k => k >= gercekSuankiKey && groups.get(k).items.some(i => !i.odendi))
+    || anahtarlarArtan.find(k => groups.get(k).items.some(i => !i.odendi));
   const sortedKeys = [...groups.keys()].sort((a,b)=> b.localeCompare(a)); // gelecek üstte, geçmiş altta
   const groupsHtml = sortedKeys.map(key=>{
     const g = groups.get(key);
