@@ -165,6 +165,7 @@
   .swipe-btn-tamamlandi{width:96px;border:none;background:#2e8b57;color:#fff;font-weight:700;font-size:12px;cursor:pointer;padding:0 4px;text-align:center;}
   .swipe-btn-tamamlandi.disabled{background:#b8c0c2;color:rgba(255,255,255,.75);cursor:default;}
     .swipe-btn{width:84px;border:none;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:6px;font-size:12.5px;font-weight:600;color:#fff;cursor:pointer;padding:0;}
+    #bankaList .swipe-btn, #bankaIslenenList .swipe-btn{width:58px;font-size:10.5px;padding:0 2px;}
   .swipe-btn .ico{font-size:16px;display:inline-flex;align-items:center;}
   .swipe-btn.act-satis{background:#2f6690;}
   .swipe-btn.act-tahsilat{background:#1f9d64;}
@@ -202,6 +203,7 @@
   .dcard-pager{overflow:hidden;position:relative;}
   .dcard-track{display:flex;width:600%;}
   .dcard-page{flex:0 0 50%;min-width:50%;box-sizing:border-box;}
+  #bankaCardTrack .dcard-page{flex:0 0 33.3334%;min-width:33.3334%;}
   .dcek-dot.active{background:var(--accent);width:16px;border-radius:3px;}
   .overlay.show{display:flex;}
   .modal{background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:20px 20px 26px 20px;}
@@ -1497,12 +1499,27 @@
               </div>
             </div>
           </div>
+          <div class="dcard-page" data-page="2">
+            <div class="cari-card-bottom" style="align-items:center;">
+              <div class="cari-card-info" style="display:flex;flex-wrap:wrap;gap:8px 14px;">
+                <div style="flex:1 1 40%;min-width:110px;">
+                  <div style="font-size:12pt;letter-spacing:.3px;color:var(--muted);">İŞLENEN TOPLAM</div>
+                  <div id="islenenOzetToplam" style="font-size:12pt;font-weight:800;color:var(--ink);margin-top:2px;">0,00₺</div>
+                </div>
+                <div style="flex:1 1 40%;min-width:110px;">
+                  <div style="font-size:12pt;letter-spacing:.3px;color:var(--muted);">İŞLEM SAYISI</div>
+                  <div id="islenenOzetSayisi" style="font-size:12pt;font-weight:800;color:var(--green);margin-top:2px;">0</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <div class="dcek-dots" id="bankaDots">
       <span class="dcek-dot" data-i="0"></span>
       <span class="dcek-dot active" data-i="1"></span>
+      <span class="dcek-dot" data-i="2"></span>
     </div>
   </div>
   <div class="d-list" id="bankaScrollArea" style="padding:14px 16px 100px 16px;">
@@ -3452,11 +3469,12 @@ let bankaActivePage = 0;
 function goToBankaCardPage(idx, animate){
   const track = document.getElementById('bankaCardTrack');
   track.style.transition = animate === false ? 'none' : 'transform .25s ease';
-  track.style.transform = `translateX(-${idx * 50}%)`;
+  track.style.transform = `translateX(-${idx * (100/3)}%)`;
   document.querySelectorAll('#bankaDots .dcek-dot').forEach((d,i)=> d.classList.toggle('active', i===idx));
   bankaActivePage = idx;
   document.getElementById('taksitliBolum').style.display = idx === 1 ? '' : 'none';
   document.getElementById('digerBolum').style.display = idx === 0 ? '' : 'none';
+  document.getElementById('islenenBolum').style.display = idx === 2 ? '' : 'none';
 }
 (function(){
   const pager = document.getElementById('bankaCardPager');
@@ -3473,9 +3491,9 @@ function goToBankaCardPage(idx, animate){
     if(!dragging) return;
     lastX = e.clientX;
     const delta = lastX - startX;
-    const pct = (delta / pager.clientWidth) * 50;
-    let x = -(baseIdx * 50) + pct;
-    x = Math.max(-50, Math.min(0, x));
+    const pct = (delta / pager.clientWidth) * (100/3);
+    let x = -(baseIdx * (100/3)) + pct;
+    x = Math.max(-(2 * (100/3)), Math.min(0, x));
     track.style.transform = `translateX(${x}%)`;
   });
   function finish(){
@@ -3486,7 +3504,7 @@ function goToBankaCardPage(idx, animate){
     if(Math.abs(delta) > pager.clientWidth * 0.18){
       newIdx = delta < 0 ? baseIdx + 1 : baseIdx - 1;
     }
-    newIdx = Math.max(0, Math.min(1, newIdx));
+    newIdx = Math.max(0, Math.min(2, newIdx));
     goToBankaCardPage(newIdx, true);
   }
   pager.addEventListener('pointerup', finish);
@@ -4295,6 +4313,9 @@ function renderBanka(){
 function renderBankaIslenen(){
   const rows = state.banka.transactions.map((t, idx) => ({ t, idx })).filter(({t}) => t.islendi);
   rows.sort((a,b)=> new Date(b.t.date) - new Date(a.t.date));
+  const islenenToplam = rows.reduce((s,{t})=> s + Math.abs(t.amount), 0);
+  document.getElementById('islenenOzetToplam').textContent = fmt(islenenToplam);
+  document.getElementById('islenenOzetSayisi').textContent = rows.length;
   const list = document.getElementById('bankaIslenenList');
   if(!rows.length){
     list.innerHTML = '<div class="empty-tx">Henüz işlenen hareket yok</div>';
