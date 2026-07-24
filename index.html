@@ -1481,7 +1481,7 @@
   <div style="padding:16px 16px 0 16px;flex-shrink:0;">
     <div class="cari-card" id="bankaSummaryCard">
       <div class="cari-card-top">
-        <span class="cari-card-label">GARANTİ BANKASI</span>
+        <span class="cari-card-label" style="font-size:15px;">GARANTİ BANKASI</span>
         <span class="cari-card-icon" style="background:linear-gradient(135deg,#5fb946,#1a7a34);"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><g><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(20 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(110 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(200 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(290 12 12)"/></g><path d="M12 13.5 C 13 16.5, 15 18, 17.5 21" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span>
       </div>
       <div class="cari-card-balance" id="bankaToplam" style="color:#1a7a34;">0<span style="font-size:0.5em;">,00₺</span></div>
@@ -4272,6 +4272,7 @@ function taksitSonrakiOdemeTarihi(t){
 }
 function taksitOzetHesapla(){
   const now = new Date();
+  now.setMonth(now.getMonth() + 1); // bir sonraki ay (şu an: Ağustos) için hesapla
   let toplamAlisveris = 0, buAyOdenecek = 0;
   (state.banka.taksitler || []).forEach(t=>{
     toplamAlisveris += (t.taksitTutari || 0) * (t.taksitSayisi || 1);
@@ -4282,15 +4283,15 @@ function taksitOzetHesapla(){
       }
     }
   });
-  return { toplamAlisveris, buAyOdenecek };
+  return { toplamAlisveris, buAyOdenecek, ay: now };
 }
 function renderTaksitOzet(){
-  const { toplamAlisveris, buAyOdenecek } = taksitOzetHesapla();
+  const { toplamAlisveris, buAyOdenecek, ay } = taksitOzetHesapla();
   document.getElementById('taksitOzetToplam').textContent = fmtWhole(toplamAlisveris);
   document.getElementById('taksitOzetBuAy').textContent = fmtWhole(buAyOdenecek);
-  const ayAdiHam = new Date().toLocaleDateString('tr-TR', { month: 'long' });
+  const ayAdiHam = ay.toLocaleDateString('tr-TR', { month: 'long' });
   const ayAdi = ayAdiHam.charAt(0).toUpperCase() + ayAdiHam.slice(1);
-  document.getElementById('taksitOzetAyAdi').textContent = (ayAdi + ' Ayında Ödenecek').toUpperCase();
+  document.getElementById('taksitOzetAyAdi').textContent = (ayAdi + '\'ta Ödenecek').toUpperCase();
 }
 
 let taksitDetayIdx = null;
