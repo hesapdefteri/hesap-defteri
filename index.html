@@ -173,6 +173,7 @@
   .swipe-btn.sip-list-duzenle{background:#2f5c8a;}
   .swipe-btn.sip-list-tahsilat{background:#1f8a54;}
   .swipe-btn.sip-list-odeme{background:#c9722f;}
+  .swipe-btn.sip-list-masraf{background:#8e5bc9;}
   .swipe-btn.sip-list-sil{background:#c0392b;}
   .swipe-btn.fis-list-duzenle{background:#2f5c8a;}
   .swipe-btn.fis-list-sil{background:#c0392b;}
@@ -1614,6 +1615,16 @@
     <div id="bankaOdemeTedarikciList" style="max-height:48vh;overflow-y:auto;"></div>
     <button type="button" id="bankaOdemeYeniTedarikciBtn" style="width:100%;text-align:center;padding:13px 12px;border:1.5px dashed var(--accent);border-radius:12px;background:none;font-weight:700;font-size:14px;color:var(--accent);cursor:pointer;margin-top:4px;">＋ Yeni Tedarikçi Ekle</button>
     <button id="bankaOdemeIptal" style="margin-top:12px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
+  </div>
+</div>
+
+<div class="overlay" id="bankaMasrafSecOverlay" style="z-index:95;align-items:center;">
+  <div class="modal" style="padding-bottom:14px;border-radius:20px;max-height:80vh;overflow-y:auto;">
+    <h3 style="margin-bottom:4px;">Masraf — Kalem Seç</h3>
+    <p style="color:var(--muted);font-size:13px;margin:0 0 14px 0;" id="bankaMasrafAciklama"></p>
+    <div id="bankaMasrafKalemList" style="max-height:48vh;overflow-y:auto;"></div>
+    <button type="button" id="bankaMasrafYeniKalemBtn" style="width:100%;text-align:center;padding:13px 12px;border:1.5px dashed var(--accent);border-radius:12px;background:none;font-weight:700;font-size:14px;color:var(--accent);cursor:pointer;margin-top:4px;">＋ Yeni Masraf Kalemi Ekle</button>
+    <button id="bankaMasrafIptal" style="margin-top:12px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
   </div>
 </div>
 
@@ -4210,6 +4221,7 @@ function renderBanka(){
           <div class="swipe-actions">
             <button class="swipe-btn sip-list-tahsilat banka-tahsilat" data-idx="${idx}">Tahsilat</button>
             <button class="swipe-btn sip-list-odeme banka-odeme" data-idx="${idx}">Ödeme</button>
+            <button class="swipe-btn sip-list-masraf banka-masraf" data-idx="${idx}">Masraf</button>
             <button class="swipe-btn sip-list-duzenle banka-duzenle" data-idx="${idx}">Değiştir</button>
             <button class="swipe-btn sip-list-sil banka-sil" data-idx="${idx}">Sil</button>
           </div>
@@ -4246,6 +4258,9 @@ function renderBanka(){
   });
   list.querySelectorAll('.banka-odeme').forEach(btn=>{
     btn.onclick = (e) => { e.stopPropagation(); openBankaOdemeSec(parseInt(btn.dataset.idx, 10)); };
+  });
+  list.querySelectorAll('.banka-masraf').forEach(btn=>{
+    btn.onclick = (e) => { e.stopPropagation(); openBankaMasrafSec(parseInt(btn.dataset.idx, 10)); };
   });
   list.querySelectorAll('.banka-duzenle').forEach(btn=>{
     btn.onclick = (e) => { e.stopPropagation(); openBankaForm(parseInt(btn.dataset.idx, 10)); };
@@ -4384,6 +4399,57 @@ document.getElementById('bankaOdemeYeniTedarikciBtn').onclick = () => {
 };
 document.getElementById('bankaOdemeIptal').onclick = () => { document.getElementById('bankaOdemeSecOverlay').classList.remove('show'); };
 document.getElementById('bankaOdemeSecOverlay').onclick = (e) => { if(e.target === document.getElementById('bankaOdemeSecOverlay')) document.getElementById('bankaOdemeSecOverlay').classList.remove('show'); };
+
+let bankaMasrafIdx = null;
+function openBankaMasrafSec(idx){
+  bankaMasrafIdx = idx;
+  const t = state.banka.transactions[idx];
+  const [main, cents] = fmtPlain(Math.abs(t.amount)).split(',');
+  document.getElementById('bankaMasrafAciklama').textContent =
+    (t.desc ? t.desc + ' — ' : '') + main + ',' + cents + '₺ tutarındaki hareketi hangi masraf kalemine işleyelim?';
+  const listEl = document.getElementById('bankaMasrafKalemList');
+  if(!state.masrafHesaplari.length){
+    listEl.innerHTML = '<div class="empty-tx">Masraf kalemi yok</div>';
+  } else {
+    listEl.innerHTML = state.masrafHesaplari.map(k=>{
+      const harf = (k.name || '?').trim().charAt(0).toUpperCase();
+      return `<button type="button" class="banka-masraf-kalem-btn" data-id="${k.id}" style="width:100%;display:flex;align-items:center;gap:10px;text-align:left;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;font-weight:600;font-size:14px;color:var(--ink);cursor:pointer;margin-bottom:8px;">
+        <span style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;background:linear-gradient(135deg,#a586ef,#6845d1);">${harf}</span>
+        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${k.name}</span>
+      </button>`;
+    }).join('');
+    listEl.querySelectorAll('.banka-masraf-kalem-btn').forEach(btn=>{
+      btn.onclick = () => {
+        const k = state.masrafHesaplari.find(x=>x.id===btn.dataset.id);
+        const adi = k ? k.name : '';
+        openConfirm('Masraf Onayı', main + ',' + cents + '₺ ' + adi + ' masraf kalemine işlenecek. Onaylıyor musunuz?', () => {
+          bankaMasrafiUygula(btn.dataset.id);
+        }, 'Evet, İşle');
+      };
+    });
+  }
+  document.getElementById('bankaMasrafSecOverlay').classList.add('show');
+}
+function bankaMasrafiUygula(kalemId){
+  const t = state.banka.transactions[bankaMasrafIdx];
+  const k = state.masrafHesaplari.find(x=>x.id===kalemId);
+  if(!t || !k) return;
+  if(!k.transactions) k.transactions = [];
+  k.transactions.push({ desc: t.desc ? ('Banka: ' + t.desc) : 'Banka havalesi', amount: Math.abs(t.amount), date: t.date });
+  t.desc = (t.desc ? t.desc + ' — ' : '') + k.name + ' masrafına işlendi';
+  save();
+  document.getElementById('bankaMasrafSecOverlay').classList.remove('show');
+  renderBanka();
+}
+let bankaMasrafYeniKalemBekliyor = false;
+document.getElementById('bankaMasrafYeniKalemBtn').onclick = () => {
+  document.getElementById('bankaMasrafSecOverlay').classList.remove('show');
+  bankaMasrafYeniKalemBekliyor = true;
+  document.getElementById('mkAd').value = '';
+  document.getElementById('masrafYeniKalemOverlay').classList.add('show');
+};
+document.getElementById('bankaMasrafIptal').onclick = () => { document.getElementById('bankaMasrafSecOverlay').classList.remove('show'); };
+document.getElementById('bankaMasrafSecOverlay').onclick = (e) => { if(e.target === document.getElementById('bankaMasrafSecOverlay')) document.getElementById('bankaMasrafSecOverlay').classList.remove('show'); };
 
 let bankaEditIdx = null;
 let bankaSegTur = 'CEK';
@@ -4842,10 +4908,16 @@ document.getElementById('masrafYeniKalemOverlay').onclick = (e) => {
 document.getElementById('mkSave').onclick = () => {
   const ad = document.getElementById('mkAd').value.trim();
   if(!ad) return;
-  state.masrafHesaplari.push({ id: 'mk_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6), name: ad, transactions: [] });
+  const yeniKalem = { id: 'mk_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6), name: ad, transactions: [] };
+  state.masrafHesaplari.push(yeniKalem);
   save();
   document.getElementById('masrafYeniKalemOverlay').classList.remove('show');
-  renderMasrafScreen();
+  if(bankaMasrafYeniKalemBekliyor){
+    bankaMasrafYeniKalemBekliyor = false;
+    bankaMasrafiUygula(yeniKalem.id);
+  } else {
+    renderMasrafScreen();
+  }
 };
 
 // Bir kaleme hızlı hareket (masraf) ekleme
