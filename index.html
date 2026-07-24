@@ -4219,7 +4219,8 @@ function renderTaksitler(){
       return `
         <div class="kasa-ay-group">
           <div class="kasa-ay-header" data-taksit-key="${key}">
-            <div class="kasa-ay-label"><span class="kasa-ay-chevron">▾</span> ${g.label}</div>
+            <div class="kasa-ay-label">${g.label}</div>
+            <span class="taksit-ay-chevron-buyuk" style="font-size:20px;color:#2f6690;margin:0 8px;">▾</span>
             <div class="kasa-ay-toplam neg">${gMain}<span class="cents">,${gCents}</span></div>
           </div>
           <div class="kasa-ay-body hidden" id="taksitAy-${key}">${itemsHtml}</div>
@@ -4238,7 +4239,7 @@ function renderTaksitler(){
       const key = header.dataset.taksitKey;
       const body = document.getElementById('taksitAy-' + key);
       body.classList.toggle('hidden');
-      header.querySelector('.kasa-ay-chevron').textContent = body.classList.contains('hidden') ? '▾' : '▴';
+      header.querySelector('.taksit-ay-chevron-buyuk').textContent = body.classList.contains('hidden') ? '▾' : '▴';
     };
   });
 }
