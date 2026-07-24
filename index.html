@@ -4175,13 +4175,13 @@ function renderTaksitler(){
     const kalan = taksitKalan(t);
     const dateStr = new Date(t.tarih).toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'});
     const anaRenk = kalan === 0 ? '#1f8a54' : (kalan === 1 ? '#d98c1f' : '#2f6690');
-    const anaIcerik = kalan === 0 ? '<b>✓</b>BİTTİ' : `<b>${kalan}</b>KALAN`;
+    const anaIcerik = kalan === 0 ? '✓' : `${kalan}`;
     const kalanRenk = '#1c3566';
     const kalanRozet = kalan > 0
-      ? `<span style="position:absolute;top:-5px;left:-5px;min-width:19px;height:19px;padding:0 4px;border-radius:50%;background:${kalanRenk};color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.3);border:2px solid #fff;">${t.taksitSayisi}</span>`
+      ? `<span style="position:absolute;top:-4px;left:-4px;min-width:14px;height:14px;padding:0 3px;border-radius:50%;background:${kalanRenk};color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.3);border:1.5px solid #fff;">${t.taksitSayisi}</span>`
       : '';
     const circleHtml = `<div style="position:relative;flex-shrink:0;">
-        <span class="siparis-date-circle son-hareket" style="width:44px;height:44px;background:${anaRenk};font-size:11px;">${anaIcerik}</span>
+        <span class="siparis-date-circle son-hareket" style="width:22px;height:22px;background:${anaRenk};font-size:11px;">${anaIcerik}</span>
         ${kalanRozet}
       </div>`;
     return `
