@@ -4204,7 +4204,7 @@ function renderTaksitler(){
   rows.forEach(({t, idx})=>{
     for(let k=1; k<=t.taksitSayisi; k++){
       const d = new Date(t.tarih);
-      d.setMonth(d.getMonth() + (k-1));
+      d.setMonth(d.getMonth() + k); // kesim tarihi 4'ü: ilk taksit alışveriş ayından sonraki ayda
       const key = keyOf(d);
       if(key < BASLANGIC_KEY || key > BITIS_KEY) continue;
       if(!groups.has(key)) groups.set(key, { label: d.toLocaleDateString('tr-TR', {month:'long', year:'numeric'}), items: [], total: 0 });
@@ -4264,10 +4264,11 @@ function renderTaksitler(){
 }
 
 // Bir taksitli alışverişin bir sonraki (henüz ödenmemiş) taksidinin düşeceği ay:
-// alışveriş tarihine, o ana kadar ödenmiş taksit sayısı kadar ay eklenir.
+// hesap kesim tarihi her ayın 4'ü olduğu için ilk fatura, alışveriş ayından SONRAKİ ayda kesilir
+// (+1), sonrasına o ana kadar ödenmiş taksit sayısı kadar ay daha eklenir.
 function taksitSonrakiOdemeTarihi(t){
   const d = new Date(t.tarih);
-  d.setMonth(d.getMonth() + (t.odenenTaksit || 0));
+  d.setMonth(d.getMonth() + 1 + (t.odenenTaksit || 0));
   return d;
 }
 function taksitOzetHesapla(){
@@ -7521,6 +7522,26 @@ function ensureAgustosOdemesi2026(){
   return changed;
 }
 if(ensureAgustosOdemesi2026()) save();
+
+// DÜZELTME (kullanıcı onayıyla): Hesap kesim tarihi her ayın 4'ü. Haziran ayındaki tüm
+// alışverişler (4'ünden sonra yapıldığı için) ilk kez TEMMUZ kapanışında faturalandı.
+// Temmuz ödendi → bunların hepsi şu an sadece 1. taksitte. Önceki (ekstre ekran görüntülerinden
+// yanlış çıkarılan) ileri taksit sayıları bu yüzden geçersiz — gerçek kesim tarihine göre sıfırlanıyor.
+// Vergi (34287) 20 Temmuz'da alındığı için ilk faturası Ağustos kapanışında, henüz ödenmedi (0).
+function ensureKesimTarihiDuzeltmesi(){
+  let changed = false;
+  const haziranSerileri = ['DESA DERİ', 'U.S POLO BULVAR SAMSUN', 'Ankara Anonim Türk Sigorta', 'TRENDYOL.COM', 'IYZICO *AMAZON.COM.T'];
+  state.banka.taksitler.forEach(t=>{
+    if(haziranSerileri.includes(t.desc) && new Date(t.tarih) < new Date('2026-07-01')){
+      if(t.odenenTaksit !== 1){ t.odenenTaksit = 1; changed = true; }
+    }
+    if(t.desc === '34287-NAKİL VASITALARI VE (Vergi)'){
+      if(t.odenenTaksit !== 0){ t.odenenTaksit = 0; changed = true; }
+    }
+  });
+  return changed;
+}
+if(ensureKesimTarihiDuzeltmesi()) save();
 
 // Kullanıcının gönderdiği ekstre ekran görüntülerinden (Drysan Kuru Temizleme, Temmuz 2023
 // - Haziran 2026 arası) elle işlendi. Toplam 199.110,00 satış / -198.860,00 tahsilat = 250,00
