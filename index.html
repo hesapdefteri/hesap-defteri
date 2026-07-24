@@ -4207,10 +4207,11 @@ function renderTaksitler(){
     bitenler.forEach(r=>{
       const d = new Date(r.t.tarih);
       d.setMonth(d.getMonth() + (r.t.taksitSayisi - 1)); // son taksidin bittiği ay
-      if(keyOf(d) === '2026-06') d.setMonth(d.getMonth() + 1); // Haziran → Temmuz'a birleştirildi
-      const key = keyOf(d);
+      let key = keyOf(d);
+      let label = d.toLocaleDateString('tr-TR', {month:'long', year:'numeric'});
+      if(key === '2026-06' || key === '2026-07'){ key = '2026-06-07'; label = 'Haziran - Temmuz 2026'; } // ikisi ödendi, tek grupta birleştir
       if(key > simdiKey) return; // henüz gelmemiş ayı gösterme
-      if(!groups.has(key)) groups.set(key, { label: d.toLocaleDateString('tr-TR', {month:'long', year:'numeric'}), items: [], total: 0 });
+      if(!groups.has(key)) groups.set(key, { label, items: [], total: 0 });
       const g = groups.get(key);
       g.items.push(r);
       g.total += r.t.taksitTutari * r.t.taksitSayisi;
