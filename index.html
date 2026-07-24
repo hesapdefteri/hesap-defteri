@@ -176,6 +176,7 @@
   .swipe-btn.sip-list-odeme{background:#c9722f;}
   .swipe-btn.sip-list-masraf{background:#8e5bc9;}
   .swipe-btn.sip-list-sil{background:#c0392b;}
+  .swipe-btn.sip-list-tasi{background:#2f8a8a;}
   .swipe-btn.fis-list-duzenle{background:#2f5c8a;}
   .swipe-btn.fis-list-sil{background:#c0392b;}
   .sk-list .swipe-wrap{border-radius:0;}
@@ -1646,6 +1647,20 @@
     <div id="bankaMasrafKalemList" style="max-height:48vh;overflow-y:auto;"></div>
     <button type="button" id="bankaMasrafYeniKalemBtn" style="width:100%;text-align:center;padding:13px 12px;border:1.5px dashed var(--accent);border-radius:12px;background:none;font-weight:700;font-size:14px;color:var(--accent);cursor:pointer;margin-top:4px;">＋ Yeni Masraf Kalemi Ekle</button>
     <button id="bankaMasrafIptal" style="margin-top:12px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
+  </div>
+</div>
+
+<div class="overlay" id="bankaTasiOverlay" style="z-index:95;align-items:center;">
+  <div class="modal" style="padding-bottom:14px;border-radius:20px;max-height:85vh;overflow-y:auto;">
+    <h3 style="margin-bottom:4px;">Taşı — Çoklu Kayıt</h3>
+    <p style="color:var(--muted);font-size:13px;margin:0 0 14px 0;" id="bankaTasiAciklama"></p>
+    <div style="font-weight:700;font-size:13px;color:var(--ink);margin:10px 0 6px 0;">Cari Hesaplar</div>
+    <div id="bankaTasiCariList" style="max-height:22vh;overflow-y:auto;"></div>
+    <div style="font-weight:700;font-size:13px;color:var(--ink);margin:10px 0 6px 0;">Tedarikçiler</div>
+    <div id="bankaTasiTedarikciList" style="max-height:22vh;overflow-y:auto;"></div>
+    <div style="font-weight:700;font-size:13px;color:var(--ink);margin:10px 0 6px 0;">Masraf Kalemleri</div>
+    <div id="bankaTasiMasrafList" style="max-height:22vh;overflow-y:auto;"></div>
+    <button id="bankaTasiKapat" style="margin-top:12px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Kapat</button>
   </div>
 </div>
 
@@ -4241,9 +4256,12 @@ function renderBanka(){
       const [main, cents] = fmtPlain(t.amount).split(',');
       return `
         <div class="swipe-wrap">
+          <div class="swipe-actions-left">
+            <button class="swipe-btn sip-list-sil banka-sil" data-idx="${idx}">Sil</button>
+            <button class="swipe-btn sip-list-tasi banka-tasi" data-idx="${idx}">Taşı</button>
+          </div>
           <div class="swipe-actions">
             <button class="swipe-btn sip-list-duzenle banka-duzenle" data-idx="${idx}">Değiştir</button>
-            <button class="swipe-btn sip-list-sil banka-sil" data-idx="${idx}">Sil</button>
             <button class="swipe-btn sip-list-masraf banka-masraf" data-idx="${idx}">Masraf</button>
             <button class="swipe-btn sip-list-odeme banka-odeme" data-idx="${idx}">Ödeme</button>
             <button class="swipe-btn sip-list-tahsilat banka-tahsilat" data-idx="${idx}">Tahsilat</button>
@@ -4252,6 +4270,7 @@ function renderBanka(){
             <div class="tx-left">
               <div class="tx-type ${neg ? 'neg' : 'pos'}"><span class="tx-date">${dateStr}</span></div>
               ${t.desc ? `<div class="tx-desc">${t.desc}</div>` : ''}
+              ${t.mpTargets && t.mpTargets.length ? `<div class="tx-desc" style="color:#2f8a8a;font-weight:700;">🔗 Çoklu İşlem${t.mpNo ? ' #' + t.mpNo : ''} (${fmt(bankaCokluDagitilan(t))} / ${fmt(Math.abs(t.amount))})</div>` : ''}
             </div>
             <div class="tx-amount ${neg ? 'neg' : ''}">${neg ? '-' : ''}${main}<span class="cents">,${cents}</span></div>
           </div>
@@ -4287,6 +4306,9 @@ function renderBanka(){
   });
   list.querySelectorAll('.banka-duzenle').forEach(btn=>{
     btn.onclick = (e) => { e.stopPropagation(); openBankaForm(parseInt(btn.dataset.idx, 10)); };
+  });
+  list.querySelectorAll('.banka-tasi').forEach(btn=>{
+    btn.onclick = (e) => { e.stopPropagation(); openBankaTasi(parseInt(btn.dataset.idx, 10)); };
   });
   list.querySelectorAll('.banka-sil').forEach(btn=>{
     btn.onclick = (e) => {
@@ -4528,6 +4550,134 @@ document.getElementById('bankaMasrafYeniKalemBtn').onclick = () => {
 };
 document.getElementById('bankaMasrafIptal').onclick = () => { document.getElementById('bankaMasrafSecOverlay').classList.remove('show'); };
 document.getElementById('bankaMasrafSecOverlay').onclick = (e) => { if(e.target === document.getElementById('bankaMasrafSecOverlay')) document.getElementById('bankaMasrafSecOverlay').classList.remove('show'); };
+
+// Temmuz 2026: "Taşı" — bir Banka hareketinin tutarını birden fazla cari/masraf kalemine
+// bölüştürme (çoklu kayıt / multi-posting) özelliği. Her hareket ilk hedefi eklendiğinde
+// benzersiz bir mpNo (işlem no) alır, tüm hedef kayıtların desc'ine bu no eklenir. Aynı
+// hedef (type+id) bir banka hareketine SADECE BİR KEZ eklenebilir (mükerrer engellenir).
+// Dağıtılan toplam, hareketin tutarına ulaşınca hareket otomatik "İşlenen" listesine geçer.
+let bankaTasiIdx = null;
+function generateIslemNo(){
+  return 'IK-' + Date.now().toString(36).toUpperCase() + '-' + Math.floor(Math.random()*900+100);
+}
+function bankaCokluDagitilan(t){
+  return (t.mpTargets||[]).reduce((s,x)=> s + x.amount, 0);
+}
+function bankaCokluKalan(t){
+  const kalan = Math.abs(t.amount) - bankaCokluDagitilan(t);
+  return kalan > 0 ? kalan : 0;
+}
+function openBankaTasi(idx){
+  bankaTasiIdx = idx;
+  const t = state.banka.transactions[idx];
+  if(!t) return;
+  if(!t.mpTargets) t.mpTargets = [];
+  const toplam = Math.abs(t.amount);
+  const dagitilan = bankaCokluDagitilan(t);
+  const kalan = bankaCokluKalan(t);
+  document.getElementById('bankaTasiAciklama').innerHTML =
+    (t.desc ? t.desc + ' — ' : '') + fmt(toplam) + ' tutarındaki hareketi birden fazla cari/masraf kalemine bölüştür.'
+    + '<br><b>Dağıtılan: ' + fmt(dagitilan) + ' · Kalan: ' + fmt(kalan) + '</b>'
+    + (t.mpNo ? ' · İşlem No: ' + t.mpNo : '');
+
+  const yapilan = (type, id) => t.mpTargets.find(x => x.type === type && x.id === id);
+
+  const renderGrup = (list, type, renkGradient) => {
+    if(!list || !list.length) return '<div class="empty-tx" style="padding:6px 0;">Kayıt yok</div>';
+    return list.map(item=>{
+      const harf = (item.name || '?').trim().charAt(0).toUpperCase();
+      const yapildi = yapilan(type, item.id);
+      if(yapildi){
+        return `<div style="display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#f4f4f7;margin-bottom:8px;">
+          <span style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;background:${renkGradient};">${harf}</span>
+          <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;font-size:14px;color:var(--ink);">${item.name}</span>
+          <span style="font-weight:700;font-size:13px;color:#1f9d64;white-space:nowrap;">${fmt(yapildi.amount)} ✓</span>
+          <button type="button" class="banka-tasi-kaldir" data-type="${type}" data-id="${item.id}" style="border:none;background:none;color:#c0392b;font-weight:700;font-size:12px;cursor:pointer;padding:4px 6px;">Kaldır</button>
+        </div>`;
+      }
+      return `<div style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;margin-bottom:8px;">
+        <span style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;background:${renkGradient};">${harf}</span>
+        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;font-size:14px;color:var(--ink);">${item.name}</span>
+        <input type="number" step="0.01" class="banka-tasi-tutar" data-type="${type}" data-id="${item.id}" placeholder="Tutar" style="width:80px;text-align:right;padding:7px 8px;border:1px solid var(--line);border-radius:8px;font-size:13px;">
+        <button type="button" class="banka-tasi-ekle" data-type="${type}" data-id="${item.id}" style="border:none;background:#2f8a8a;color:#fff;font-weight:700;font-size:12px;cursor:pointer;padding:7px 10px;border-radius:8px;white-space:nowrap;">Ekle</button>
+      </div>`;
+    }).join('');
+  };
+
+  document.getElementById('bankaTasiCariList').innerHTML = renderGrup(state.cari, 'cari', 'linear-gradient(135deg,#5b8bf5,#2e56c9)');
+  document.getElementById('bankaTasiTedarikciList').innerHTML = renderGrup(state.tedarikci, 'tedarikci', 'linear-gradient(135deg,#5b6b73,#38454b)');
+  document.getElementById('bankaTasiMasrafList').innerHTML = renderGrup(state.masrafHesaplari, 'masraf', 'linear-gradient(135deg,#a586ef,#6845d1)');
+
+  const wireGrup = (containerId) => {
+    const el = document.getElementById(containerId);
+    el.querySelectorAll('.banka-tasi-ekle').forEach(btn=>{
+      btn.onclick = () => {
+        const type = btn.dataset.type, id = btn.dataset.id;
+        const row = btn.closest('div');
+        const input = row.querySelector('.banka-tasi-tutar');
+        const tutar = parseFloat((input.value || '').replace(',', '.'));
+        if(!tutar || tutar <= 0){ input.focus(); return; }
+        bankaTasiHedefEkle(type, id, tutar);
+      };
+    });
+    el.querySelectorAll('.banka-tasi-kaldir').forEach(btn=>{
+      btn.onclick = () => bankaTasiHedefKaldir(btn.dataset.type, btn.dataset.id);
+    });
+  };
+  wireGrup('bankaTasiCariList');
+  wireGrup('bankaTasiTedarikciList');
+  wireGrup('bankaTasiMasrafList');
+
+  document.getElementById('bankaTasiOverlay').classList.add('show');
+}
+function bankaTasiHedefEkle(type, id, tutar){
+  const t = state.banka.transactions[bankaTasiIdx];
+  if(!t) return;
+  if(!t.mpTargets) t.mpTargets = [];
+  if(t.mpTargets.some(x => x.type === type && x.id === id)) return; // mükerrer engelle
+  let hedef, kayitTuru;
+  if(type === 'cari'){ hedef = state.cari.find(x=>x.id===id); kayitTuru = 'TAHSİLAT'; }
+  else if(type === 'tedarikci'){ hedef = state.tedarikci.find(x=>x.id===id); kayitTuru = 'ÖDEME'; }
+  else { hedef = state.masrafHesaplari.find(x=>x.id===id); kayitTuru = null; }
+  if(!hedef) return;
+  if(!t.mpNo) t.mpNo = generateIslemNo();
+  const desc = (t.desc ? 'Banka: ' + t.desc : 'Banka hareketi') + ' [Çoklu İşlem #' + t.mpNo + ']';
+  if(type === 'masraf'){
+    if(!hedef.transactions) hedef.transactions = [];
+    hedef.transactions.push({ desc, amount: tutar, date: t.date });
+  } else {
+    hedef.transactions.push({ type: kayitTuru, desc, amount: tutar, date: t.date });
+  }
+  t.mpTargets.push({ type, id, name: hedef.name, amount: tutar });
+  if(bankaCokluKalan(t) <= 0) t.islendi = true;
+  save();
+  openBankaTasi(bankaTasiIdx);
+  renderBanka();
+}
+function bankaTasiHedefKaldir(type, id){
+  const t = state.banka.transactions[bankaTasiIdx];
+  if(!t || !t.mpTargets) return;
+  const kayit = t.mpTargets.find(x => x.type === type && x.id === id);
+  if(!kayit) return;
+  openConfirm('Kaldır', kayit.name + ' hedefine yapılan ' + fmt(kayit.amount) + ' kaydı silinsin mi?', () => {
+    let hedef;
+    if(type === 'cari') hedef = state.cari.find(x=>x.id===id);
+    else if(type === 'tedarikci') hedef = state.tedarikci.find(x=>x.id===id);
+    else hedef = state.masrafHesaplari.find(x=>x.id===id);
+    if(hedef && hedef.transactions && t.mpNo){
+      const marker = '[Çoklu İşlem #' + t.mpNo + ']';
+      const i = hedef.transactions.findIndex(x => x.amount === kayit.amount && (x.desc||'').includes(marker));
+      if(i > -1) hedef.transactions.splice(i, 1);
+    }
+    t.mpTargets = t.mpTargets.filter(x => !(x.type === type && x.id === id));
+    if(bankaCokluKalan(t) > 0) t.islendi = false;
+    save();
+    openBankaTasi(bankaTasiIdx);
+    renderBanka();
+  });
+}
+document.getElementById('bankaTasiKapat').onclick = () => { document.getElementById('bankaTasiOverlay').classList.remove('show'); renderBanka(); };
+document.getElementById('bankaTasiOverlay').onclick = (e) => { if(e.target === document.getElementById('bankaTasiOverlay')){ document.getElementById('bankaTasiOverlay').classList.remove('show'); renderBanka(); } };
 
 let bankaEditIdx = null;
 let bankaSegTur = 'CEK';
