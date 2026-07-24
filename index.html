@@ -7455,6 +7455,33 @@ function ensure20TemmuzHarcamalari(){
 }
 if(ensure20TemmuzHarcamalari()) save();
 
+// Temmuz 2026: Bonus Flexi Card "Gelecek Dönem" ekranından gerçek taksit ilerlemesi görüldü,
+// önceden tahmin edilen odenenTaksit değerleri düzeltildi + yeni "34287-Nakil Vasıtaları" (Vergi)
+// taksitli kaydı eklendi (Ağustos 2/3, Eylül 3/3 görünüyor → şu an 1 taksit ödenmiş demek).
+function ensureTaksitDuzeltmeleriTemmuz2026(){
+  let changed = false;
+  const duzeltmeler = [
+    { desc:'U.S POLO BULVAR SAMSUN', tarih:'2026-06-05T00:00:01', yeniOdenen:2 },
+    { desc:'IYZICO *AMAZON.COM.T', tarih:'2026-06-09T00:00:00', taksitTutari:66.02, yeniOdenen:5 },
+    { desc:'IYZICO *AMAZON.COM.T', tarih:'2026-06-09T00:00:01', taksitTutari:49.40, yeniOdenen:5 },
+    { desc:'IYZICO *AMAZON.COM.T', tarih:'2026-06-06T00:00:00', taksitTutari:380.55, yeniOdenen:5 },
+    { desc:'IYZICO *AMAZON.COM.T', tarih:'2026-06-06T00:00:01', taksitTutari:380.55, yeniOdenen:5 }
+  ];
+  duzeltmeler.forEach(d=>{
+    const t = state.banka.taksitler.find(x => x.desc === d.desc && x.tarih === d.tarih && (d.taksitTutari === undefined || x.taksitTutari === d.taksitTutari));
+    if(t && t.odenenTaksit !== d.yeniOdenen){
+      t.odenenTaksit = d.yeniOdenen;
+      changed = true;
+    }
+  });
+  if(!state.banka.taksitler.some(x => x.desc === '34287-NAKİL VASITALARI VE (Vergi)' && x.tarih === '2026-07-20T00:00:00')){
+    state.banka.taksitler.push({ desc:'34287-NAKİL VASITALARI VE (Vergi)', taksitTutari:1527.83, taksitSayisi:3, odenenTaksit:1, tarih:'2026-07-20T00:00:00', kart:'Bonus Flexi Card' });
+    changed = true;
+  }
+  return changed;
+}
+if(ensureTaksitDuzeltmeleriTemmuz2026()) save();
+
 // Kullanıcının gönderdiği ekstre ekran görüntülerinden (Drysan Kuru Temizleme, Temmuz 2023
 // - Haziran 2026 arası) elle işlendi. Toplam 199.110,00 satış / -198.860,00 tahsilat = 250,00
 // net bakiye ile ekran görüntüsündeki "TOPLAM ₺ 250,00" ile birebir eşleşiyor.
