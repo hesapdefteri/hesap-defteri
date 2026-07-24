@@ -1487,7 +1487,7 @@
         <span class="cari-card-label">GARANTİ BANKASI</span>
         <span class="cari-card-icon" style="background:linear-gradient(135deg,#5fb946,#1a7a34);"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><g><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(20 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(110 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(200 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(290 12 12)"/></g><path d="M12 13.5 C 13 16.5, 15 18, 17.5 21" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span>
       </div>
-      <div class="cari-card-balance" id="bankaToplam" style="color:#1a7a34;">0,00₺</div>
+      <div class="cari-card-balance" id="bankaToplam" style="color:#1a7a34;">0<span style="font-size:0.5em;">,00₺</span></div>
       <div class="cari-card-name">Güncel Banka Bakiyesi</div>
       <div class="dcard-pager" id="bankaCardPager">
         <div class="dcard-track" id="bankaCardTrack">
@@ -4324,7 +4324,11 @@ document.getElementById('taksitDetayBack').onclick = () => {
 function renderBanka(){
   renderTaksitler();
   renderTaksitOzet();
-  document.getElementById('bankaToplam').textContent = fmt(bankaBakiye());
+  {
+    const bBakiye = bankaBakiye();
+    const [bMain, bCents] = fmtPlain(bBakiye).split(',');
+    document.getElementById('bankaToplam').innerHTML = bMain + '<span style="font-size:0.5em;">,' + bCents + '₺</span>';
+  }
   document.getElementById('tekIslemToplam').textContent = fmt(bankaBakiye());
   document.getElementById('tekIslemSayisi').textContent = state.banka.transactions.length;
 
