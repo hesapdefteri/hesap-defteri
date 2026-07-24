@@ -6817,7 +6817,12 @@ function ensureKalanGarantiHareketleri(){
     changed = true;
   }
   if(!state.banka.transactions.some(t => t.date === '2026-07-23T19:11:55.000Z' && t.amount === 10000 && t.type === 'CEK')){
-    state.banka.transactions.push({ type:'CEK', desc:'Giden transfer (MOBIL-FAST, alıcı bilinmiyor)', amount:10000.00, date:'2026-07-23T19:11:55.000Z' });
+    state.banka.transactions.push({ type:'CEK', desc:'Göçtürk Plastik (Orhan) — giden transfer', amount:10000.00, date:'2026-07-23T19:11:55.000Z' });
+    changed = true;
+  }
+  const goctuk = state.cari.find(c => normAd(c.name) === normAd('Göçtürk Plastik')) || state.tedarikci?.find?.(c => normAd(c.name) === normAd('Göçtürk Plastik'));
+  if(goctuk && !goctuk.transactions.some(t => t.date === '2026-07-23T19:11:55.000Z' && t.amount === 10000 && t.type === 'ÖDEME')){
+    goctuk.transactions.push({type:'ÖDEME', desc:'Garanti BBVA havale (Orhan)', amount:10000.00, date:'2026-07-23T19:11:55.000Z'});
     changed = true;
   }
   if(!state.banka.transactions.some(t => t.date === '2026-07-23T19:11:55.000Z' && t.amount === 16.76 && t.type === 'CEK')){
