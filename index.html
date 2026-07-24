@@ -4225,7 +4225,7 @@ function renderTaksitler(){
           <div class="kasa-ay-body hidden" id="taksitAy-${key}">${itemsHtml}</div>
         </div>`;
     }).join('');
-    bitenHtml = `<div class="sheet-title" style="margin-top:14px;">BİTEN TAKSİTLER</div>${groupsHtml}`;
+    bitenHtml = `<div style="border-top:2px solid var(--line);margin-top:16px;padding-top:14px;"><div class="sheet-title">BİTEN TAKSİTLER</div>${groupsHtml}</div>`;
   }
 
   list.innerHTML = devamHtml + bitenHtml;
