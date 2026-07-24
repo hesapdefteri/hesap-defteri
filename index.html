@@ -4165,7 +4165,21 @@ function renderTaksitler(){
     return;
   }
 
-  const rowHtml = ({t, idx, k, odendi}) => {
+  const rowHtml = ({t, idx, k, odendi, satinAlma}) => {
+    if(satinAlma){
+      const dateStr = new Date(t.tarih).toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'});
+      return `
+        <div class="acct-row" data-idx="${idx}">
+          <div style="position:relative;flex-shrink:0;">
+            <span class="siparis-date-circle son-hareket" style="width:44px;height:44px;background:#5b6b73;font-size:9px;">SATIN<br>ALMA</span>
+          </div>
+          <div class="name-wrap" style="flex:1;min-width:0;margin-left:12px;">
+            <span class="name">${t.desc}</span>
+            <div class="siparis-teslimat-row son-hareket-text">${dateStr}${t.kart ? ' · ' + t.kart : ''} · ${t.taksitSayisi} taksit</div>
+          </div>
+          <span class="amount">${fmtWhole(t.taksitTutari * t.taksitSayisi)}</span>
+        </div>`;
+    }
     const renk = odendi ? '#1f8a54' : '#c0392b';
     return `
       <div class="acct-row" data-idx="${idx}">
@@ -4200,6 +4214,19 @@ function renderTaksitler(){
       g.total += t.taksitTutari;
     }
   });
+
+  // Haziran 2026: taksit faturalanması bu ayda başlamıyor (kesim 4'ü, ilk fatura Temmuz'da) ama
+  // asıl SATIN ALMA hareketleri bu ayda oldu — bu yüzden ayrı bir "satın alma" grubu olarak,
+  // her zaman en altta, aynı şerit görünümüyle burada gösteriliyor.
+  const hazirandaAlinanlar = rows.filter(r => keyOf(new Date(r.t.tarih)) === '2026-06');
+  if(hazirandaAlinanlar.length){
+    groups.set('2026-06', {
+      label: 'Haziran 2026',
+      total: hazirandaAlinanlar.reduce((s,r)=> s + r.t.taksitTutari * r.t.taksitSayisi, 0),
+      items: hazirandaAlinanlar.map(r => ({ t: r.t, idx: r.idx, k: 0, odendi: true, satinAlma: true }))
+    });
+  }
+
   // "Devam Edenler" = ödenmemiş taksidi olan, bugüne en yakın ay (gerçek şu anki ay ödenmişse
   // bir sonraki aya kayar) — yoksa ödenmiş bir ayı yanlışlıkla "devam ediyor" göstermiş oluruz.
   const anahtarlarArtan = [...groups.keys()].sort((a,b)=> a.localeCompare(b));
