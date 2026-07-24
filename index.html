@@ -4218,12 +4218,12 @@ function renderTaksitler(){
       const [gMain, gCents] = fmtPlain(g.total).split(',');
       return `
         <div class="kasa-ay-group">
-          <div class="kasa-ay-header" data-taksit-key="${key}" style="gap:10px;">
+          <div class="kasa-ay-header" data-taksit-key="${key}" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;">
             <div class="kasa-ay-label" style="flex:1;">${g.label} <span style="font-weight:500;color:#8a94a3;font-size:13px;">(${g.items.length} kayıt)</span></div>
             <svg class="taksit-ay-chevron-buyuk" width="32" height="32" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;transition:transform .2s;">
               <path d="M6 9l6 6 6-6" stroke="#2f6690" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <div class="kasa-ay-toplam neg">${gMain}<span class="cents">,${gCents}</span></div>
+            <div class="kasa-ay-toplam neg" style="text-align:right;">${gMain}<span class="cents">,${gCents}</span></div>
           </div>
           <div class="kasa-ay-body hidden" id="taksitAy-${key}">${itemsHtml}</div>
         </div>`;
