@@ -3998,11 +3998,11 @@ function renderTaksitler(){
   list.innerHTML = rows.map(({t, idx})=>{
     const kalan = taksitKalan(t);
     const dateStr = new Date(t.tarih).toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'});
-    const anaRenk = kalan === 0 ? '#1f8a54' : '#1c3566';
-    const anaIcerik = kalan === 0 ? '<b>✓</b>BİTTİ' : `<b>${t.taksitSayisi}</b>TAKSİT`;
-    const kalanRenk = kalan === 1 ? '#d98c1f' : '#d6453b';
+    const anaRenk = kalan === 0 ? '#1f8a54' : (kalan === 1 ? '#d98c1f' : '#d6453b');
+    const anaIcerik = kalan === 0 ? '<b>✓</b>BİTTİ' : `<b>${kalan}</b>`;
+    const kalanRenk = '#1c3566';
     const kalanRozet = kalan > 0
-      ? `<span style="position:absolute;top:-6px;left:-6px;min-width:24px;height:24px;padding:0 5px;border-radius:50%;background:${kalanRenk};color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.3);border:2px solid #fff;">${kalan}</span>`
+      ? `<span style="position:absolute;top:-6px;left:-6px;min-width:24px;height:24px;padding:0 5px;border-radius:50%;background:${kalanRenk};color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.3);border:2px solid #fff;">${t.taksitSayisi}</span>`
       : '';
     const circleHtml = `<div style="position:relative;flex-shrink:0;">
         <span class="siparis-date-circle son-hareket" style="width:60px;height:60px;background:${anaRenk};">${anaIcerik}</span>
