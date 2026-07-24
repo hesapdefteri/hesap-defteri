@@ -1455,7 +1455,6 @@
 <div class="detail-screen" id="bankaScreen">
   <div class="d-header">
     <div class="d-title">Garanti Bankası</div>
-    <button class="d-share" id="bankaAddBtn" title="Ekle" style="visibility:visible;">＋</button>
   </div>
   <div style="padding:16px 16px 0 16px;flex-shrink:0;">
     <div class="cari-card" id="bankaSummaryCard">
@@ -4271,7 +4270,6 @@ function openBankaForm(idx){
   document.getElementById('bankaTarih').value = t ? new Date(t.date).toISOString().slice(0,10) : new Date().toISOString().slice(0,10);
   document.getElementById('bankaOverlay').classList.add('show');
 }
-document.getElementById('bankaAddBtn').onclick = () => openBankaForm();
 document.getElementById('bankaCancelBtn').onclick = () => { document.getElementById('bankaOverlay').classList.remove('show'); };
 document.getElementById('bankaOverlay').onclick = (e) => {
   if(e.target.id === 'bankaOverlay') document.getElementById('bankaOverlay').classList.remove('show');
