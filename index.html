@@ -4178,10 +4178,10 @@ function renderTaksitler(){
     const anaIcerik = kalan === 0 ? '<b>✓</b>BİTTİ' : `<b>${kalan}</b>KALAN`;
     const kalanRenk = '#1c3566';
     const kalanRozet = kalan > 0
-      ? `<span style="position:absolute;top:-6px;left:-6px;min-width:24px;height:24px;padding:0 5px;border-radius:50%;background:${kalanRenk};color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.3);border:2px solid #fff;">${t.taksitSayisi}</span>`
+      ? `<span style="position:absolute;top:-5px;left:-5px;min-width:19px;height:19px;padding:0 4px;border-radius:50%;background:${kalanRenk};color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.3);border:2px solid #fff;">${t.taksitSayisi}</span>`
       : '';
     const circleHtml = `<div style="position:relative;flex-shrink:0;">
-        <span class="siparis-date-circle son-hareket" style="width:60px;height:60px;background:${anaRenk};">${anaIcerik}</span>
+        <span class="siparis-date-circle son-hareket" style="width:44px;height:44px;background:${anaRenk};font-size:11px;">${anaIcerik}</span>
         ${kalanRozet}
       </div>`;
     return `
