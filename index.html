@@ -4207,6 +4207,7 @@ function renderTaksitler(){
     bitenler.forEach(r=>{
       const d = new Date(r.t.tarih);
       d.setMonth(d.getMonth() + (r.t.taksitSayisi - 1)); // son taksidin bittiği ay
+      if(keyOf(d) === '2026-06') d.setMonth(d.getMonth() + 1); // Haziran → Temmuz'a birleştirildi
       const key = keyOf(d);
       if(key > simdiKey) return; // henüz gelmemiş ayı gösterme
       if(!groups.has(key)) groups.set(key, { label: d.toLocaleDateString('tr-TR', {month:'long', year:'numeric'}), items: [], total: 0 });
