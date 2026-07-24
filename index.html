@@ -4204,9 +4204,8 @@ function renderTaksitler(){
     const keyOf = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
     const groups = new Map();
     bitenler.forEach(r=>{
-      const d = new Date(r.t.tarih);
-      d.setMonth(d.getMonth() + (r.t.taksitSayisi - 1)); // son taksidin bittiği ay
-      const key = keyOf(d);
+      const d = new Date(r.t.tarih); // satın alma ayına göre grupla — bitiş ayını taksit sayısından
+      const key = keyOf(d);          // hesaplamak gerçek fatura takvimini bilmediğimiz için yanılttı
       if(!groups.has(key)) groups.set(key, { label: d.toLocaleDateString('tr-TR', {month:'long', year:'numeric'}), items: [], total: 0 });
       const g = groups.get(key);
       g.items.push(r);
