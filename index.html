@@ -211,6 +211,19 @@
   .dcard-track{display:flex;width:600%;}
   .dcard-page{flex:0 0 50%;min-width:50%;box-sizing:border-box;}
   #bankaCardTrack .dcard-page{flex:0 0 25%;min-width:25%;}
+  .bonus-tx-row{display:flex;align-items:flex-start;gap:12px;padding:14px 12px;border-bottom:1px solid rgba(20,40,50,.08);}
+  .bonus-tx-row:last-child{border-bottom:none;}
+  .bonus-tx-date{flex:0 0 46px;text-align:center;line-height:1.05;}
+  .bonus-tx-date .g{font-size:22px;font-weight:800;color:#3d4a55;}
+  .bonus-tx-date .a{display:block;font-size:10px;font-weight:700;color:#8a94a3;letter-spacing:.4px;margin-top:2px;}
+  .bonus-tx-date .y{display:block;font-size:10px;color:#8a94a3;}
+  .bonus-tx-mid{flex:1;min-width:0;}
+  .bonus-tx-kat{font-size:15px;font-weight:700;color:#1f2b36;}
+  .bonus-tx-yer{font-size:13px;color:#6d7885;margin-top:2px;word-break:break-word;}
+  .bonus-tx-right{text-align:right;flex-shrink:0;}
+  .bonus-tx-tutar{font-size:15px;font-weight:800;color:#1f2b36;white-space:nowrap;}
+  .bonus-tx-taksit{font-size:13px;color:#6d7885;margin-top:2px;white-space:nowrap;}
+  .bonus-tx-fis{margin-top:8px;display:flex;justify-content:flex-end;}
   .dcek-dot.active{background:var(--accent);width:16px;border-radius:3px;}
   .overlay.show{display:flex;}
   .modal{background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:20px 20px 26px 20px;}
@@ -4197,7 +4210,11 @@ const BONUS_PLATINUM_OZET = {
   toplamTaksitli: 36730.00,
   acikAy: '2026-08',
   aylar: [
-    { key:'2026-08', label:'Ağustos 2026', kayit:12, tutar:8113.32 },
+    { key:'2026-08', label:'Ağustos 2026', kayit:12, tutar:8113.32, hareketler:[
+        { gun:'05', ay:'AĞU', yil:'2026', kategori:'Giyim / Aksesuar', yer:'U.S. POLO BULVAR SAMSUN', tutar:999.98, taksit:'(3/3) Taksit' },
+        { gun:'20', ay:'AĞU', yil:'2026', kategori:'Vergi', yer:'34287-NAKİL VASITALARI VE', tutar:1527.83, taksit:'(2/3) Taksit' },
+        { gun:'20', ay:'EYL', yil:'2026', kategori:'Vergi', yer:'34287-NAKİL VASITALARI VE', tutar:1527.83, taksit:'(3/3) Taksit' }
+      ] },
     { key:'2026-09', label:'Eylül 2026',   kayit:11, tutar:7493.32 },
     { key:'2026-10', label:'Ekim 2026',    kayit:8,  tutar:5037.35 },
     { key:'2026-11', label:'Kasım 2026',   kayit:7,  tutar:3509.52 },
@@ -4233,6 +4250,31 @@ function bankaKartBasligiUygula(bonusMu){
   }
 }
 
+const BONUS_FIS_IKON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16b8a8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h3"/><path d="M9 9h5M9 12.5h5M9 16h3"/></svg>';
+
+function bonusHareketlerHtml(a){
+  if(!a.hareketler || !a.hareketler.length){
+    return '<div class="sk-empty" style="padding:10px 12px;">' + a.kayit + ' taksit · ' + fmt(a.tutar) + '</div>';
+  }
+  return a.hareketler.map(h => `
+    <div class="bonus-tx-row">
+      <div class="bonus-tx-date">
+        <span class="g">${h.gun}</span>
+        <span class="a">${h.ay}</span>
+        <span class="y">${h.yil}</span>
+      </div>
+      <div class="bonus-tx-mid">
+        <div class="bonus-tx-kat">${h.kategori}</div>
+        <div class="bonus-tx-yer">${h.yer}</div>
+      </div>
+      <div class="bonus-tx-right">
+        <div class="bonus-tx-tutar">-${fmtPlain(h.tutar)} TL</div>
+        <div class="bonus-tx-taksit">${h.taksit}</div>
+        <div class="bonus-tx-fis">${BONUS_FIS_IKON}</div>
+      </div>
+    </div>`).join('');
+}
+
 function renderBonusKart(){
   const el = document.getElementById('bonusBuEkstre');
   if(!el) return;
@@ -4255,9 +4297,7 @@ function renderBonusKart(){
           </svg>
           <div class="kasa-ay-toplam neg" style="text-align:right;">${gMain}<span class="cents">,${gCents}</span></div>
         </div>
-        <div class="kasa-ay-body${acik ? '' : ' hidden'}" id="bonusAy-${a.key}">
-          <div class="sk-empty" style="padding:10px 12px;">${a.kayit} taksit · ${fmt(a.tutar)}</div>
-        </div>
+        <div class="kasa-ay-body${acik ? '' : ' hidden'}" id="bonusAy-${a.key}">${bonusHareketlerHtml(a)}</div>
       </div>`;
   }).join('');
 
