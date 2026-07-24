@@ -1458,46 +1458,36 @@
     <button class="d-share" id="bankaAddBtn" title="Ekle" style="visibility:visible;">＋</button>
   </div>
   <div style="padding:16px 16px 0 16px;flex-shrink:0;">
-    <div class="cari-card">
+    <div class="cari-card" id="bankaSummaryCard">
       <div class="cari-card-top">
-        <span class="cari-card-label">BANKA</span>
+        <span class="cari-card-label">GARANTİ BANKASI</span>
         <span class="cari-card-icon" style="background:linear-gradient(135deg,#5fb946,#1a7a34);"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><g><path d="M 12 12 C 7 11, 6 5, 12 2 C 18 5, 17 11, 12 12 Z"/><path d="M 12 12 C 7 11, 6 5, 12 2 C 18 5, 17 11, 12 12 Z" transform="rotate(90 12 12)"/><path d="M 12 12 C 7 11, 6 5, 12 2 C 18 5, 17 11, 12 12 Z" transform="rotate(180 12 12)"/><path d="M 12 12 C 7 11, 6 5, 12 2 C 18 5, 17 11, 12 12 Z" transform="rotate(270 12 12)"/></g><path d="M12 14 C 13 17, 15 18.5, 17.5 21.5" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span>
       </div>
       <div class="cari-card-balance" id="bankaToplam" style="color:#1a7a34;">0,00₺</div>
       <div class="cari-card-name">Güncel Banka Bakiyesi</div>
-    </div>
-    <div class="cari-card" id="taksitOzetCard" style="margin-top:12px;cursor:pointer;">
-      <div class="cari-card-top">
-        <span class="cari-card-label">TAKSİTLİ İŞLEMLER</span>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span class="cari-card-icon" style="background:linear-gradient(135deg,#f4877c,#d6453b);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span>
-          <span style="color:var(--muted);font-size:18px;font-weight:700;">›</span>
+      <div class="cari-card-bottom" style="align-items:center;">
+        <div class="cari-card-info" style="display:flex;flex-wrap:wrap;gap:8px 14px;">
+          <div style="flex:1 1 26%;min-width:92px;">
+            <div style="font-size:12pt;letter-spacing:.3px;color:var(--muted);">TOPLAM ALIŞVERİŞ</div>
+            <div id="taksitOzetToplam" style="font-size:12pt;font-weight:800;color:var(--ink);margin-top:2px;">0,00₺</div>
+          </div>
+          <div style="flex:1 1 26%;min-width:92px;">
+            <div style="font-size:12pt;letter-spacing:.3px;color:var(--muted);" id="taksitOzetAyAdi">BU AY ÖDENECEK</div>
+            <div id="taksitOzetBuAy" style="font-size:12pt;font-weight:800;color:var(--red);margin-top:2px;">0,00₺</div>
+          </div>
+          <div style="flex:1 1 26%;min-width:92px;">
+            <div style="font-size:12pt;letter-spacing:.3px;color:var(--muted);">TEK İŞLEMLİ TOPLAM</div>
+            <div id="tekIslemToplam" style="font-size:12pt;font-weight:800;color:var(--accent);margin-top:2px;">0,00₺</div>
+          </div>
         </div>
       </div>
-      <div class="cari-card-balance" id="taksitKartBuAy" style="color:#d6453b;">0,00₺</div>
-      <div class="cari-card-name" id="taksitKartAlt">Bu ay ödenecek</div>
     </div>
   </div>
   <div class="d-list" id="bankaScrollArea" style="padding:14px 16px 100px 16px;">
-    <div class="sheet-title">DİĞER HAREKETLER</div>
+    <div class="sheet-title">TAKSİTLİ İŞLEMLER</div>
+    <div class="acct-card cari-sub" id="taksitCard"></div>
+    <div class="sheet-title" style="margin-top:16px;">DİĞER HAREKETLER</div>
     <div id="bankaList"></div>
-  </div>
-</div>
-
-<div class="detail-screen" id="taksitliIslemlerScreen">
-  <div class="d-header">
-    <button class="urun-back" id="taksitliIslemlerBack">‹</button>
-    <div class="d-title">Taksitli İşlemler</div>
-    <span style="width:28px;"></span>
-  </div>
-  <div style="padding:16px 16px 0 16px;flex-shrink:0;">
-    <div class="acct-card taksit-detay-card">
-      <div class="gg-row"><span class="lbl">Toplam Alışveriş Tutarı</span><span class="val" id="taksitOzetToplam">—</span></div>
-      <div class="gg-row"><span class="lbl" id="taksitOzetAyAdi">Bu Ay Ödenecek</span><span class="val neg" id="taksitOzetBuAy">—</span></div>
-    </div>
-  </div>
-  <div class="d-list" id="taksitliIslemlerList" style="padding:14px 16px 100px 16px;">
-    <div class="acct-card" id="taksitCard"></div>
   </div>
 </div>
 
@@ -3777,7 +3767,6 @@ function hideAllScreens(){
   kasaScreen.classList.remove('show');
   document.getElementById('kasaCekScreen').classList.remove('show');
   document.getElementById('bankaScreen').classList.remove('show');
-  document.getElementById('taksitliIslemlerScreen').classList.remove('show');
   document.getElementById('taksitDetayScreen').classList.remove('show');
   document.getElementById('masrafScreen').classList.remove('show');
   document.getElementById('masrafDetayScreen').classList.remove('show');
@@ -4009,15 +3998,15 @@ function renderTaksitler(){
   list.innerHTML = rows.map(({t, idx})=>{
     const kalan = taksitKalan(t);
     const dateStr = new Date(t.tarih).toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'});
-    const badgeHtml = kalan > 0
-      ? `<span class="taksit-badge kalan"><b>${kalan}</b>TAKSİT</span>`
-      : `<span class="taksit-badge tamam"><b>✓</b>BİTTİ</span>`;
+    const circleHtml = kalan > 0
+      ? `<span class="siparis-date-circle son-hareket" style="background:#d6453b;"><b>${kalan}</b>TAKSİT</span>`
+      : `<span class="siparis-date-circle son-hareket" style="background:#1f8a54;"><b>✓</b>BİTTİ</span>`;
     return `
       <div class="acct-row" data-idx="${idx}">
-        ${badgeHtml}
+        ${circleHtml}
         <div class="name-wrap" style="flex:1;min-width:0;margin-left:12px;">
           <span class="name">${t.desc}</span>
-          <div class="siparis-teslimat-row">${dateStr}${t.kart ? ' · ' + t.kart : ''}</div>
+          <div class="siparis-teslimat-row son-hareket-text">${dateStr}${t.kart ? ' · ' + t.kart : ''}</div>
         </div>
         <span class="amount ${kalan>0 ? 'neg':''}">${fmtWhole(kalan>0 ? kalan*t.taksitTutari : t.taksitTutari*t.taksitSayisi)}</span>
       </div>`;
@@ -4054,24 +4043,8 @@ function renderTaksitOzet(){
   document.getElementById('taksitOzetBuAy').textContent = fmtWhole(buAyOdenecek);
   const ayAdiHam = new Date().toLocaleDateString('tr-TR', { month: 'long' });
   const ayAdi = ayAdiHam.charAt(0).toUpperCase() + ayAdiHam.slice(1);
-  document.getElementById('taksitOzetAyAdi').textContent = ayAdi + ' Ayında Ödenecek';
-  document.getElementById('taksitKartBuAy').textContent = fmtWhole(buAyOdenecek);
-  document.getElementById('taksitKartAlt').textContent = ayAdi + ' ayında ödenecek · Toplam alışveriş ' + fmtWhole(toplamAlisveris);
+  document.getElementById('taksitOzetAyAdi').textContent = (ayAdi + ' Ayında Ödenecek').toUpperCase();
 }
-
-function openTaksitliIslemler(){
-  renderTaksitler();
-  renderTaksitOzet();
-  hideAllScreens();
-  document.getElementById('taksitliIslemlerScreen').classList.add('show');
-  nudge();
-}
-document.getElementById('taksitOzetCard').onclick = () => openTaksitliIslemler();
-document.getElementById('taksitliIslemlerBack').onclick = () => {
-  document.getElementById('taksitliIslemlerScreen').classList.remove('show');
-  document.getElementById('bankaScreen').classList.add('show');
-  renderTaksitOzet();
-};
 
 let taksitDetayIdx = null;
 function openTaksitDetay(idx){
@@ -4094,7 +4067,7 @@ function openTaksitDetay(idx){
 }
 document.getElementById('taksitDetayBack').onclick = () => {
   document.getElementById('taksitDetayScreen').classList.remove('show');
-  document.getElementById('taksitliIslemlerScreen').classList.add('show');
+  document.getElementById('bankaScreen').classList.add('show');
   renderTaksitler();
 };
 
@@ -4102,6 +4075,7 @@ function renderBanka(){
   renderTaksitler();
   renderTaksitOzet();
   document.getElementById('bankaToplam').textContent = fmt(bankaBakiye());
+  document.getElementById('tekIslemToplam').textContent = fmt(bankaBakiye());
 
   const rows = state.banka.transactions.map((t, idx) => ({ t, idx }));
   rows.sort((a,b)=> new Date(b.t.date) - new Date(a.t.date));
