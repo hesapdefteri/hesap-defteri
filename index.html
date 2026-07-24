@@ -4164,7 +4164,9 @@ function renderTaksitler(){
     list.innerHTML = '<div class="sk-empty">Henüz taksitli alışveriş yok</div>';
     return;
   }
-  const devamEden = rows.filter(r => taksitKalan(r.t) > 0);
+  const ARSIV_ESIK = '2026-08';
+  const ayKeyOfTarih = d => new Date(d).getFullYear() + '-' + String(new Date(d).getMonth()+1).padStart(2,'0');
+  const devamEden = rows.filter(r => taksitKalan(r.t) > 0 && ayKeyOfTarih(r.t.tarih) >= ARSIV_ESIK);
   const bitenler = rows.filter(r => taksitKalan(r.t) === 0);
   devamEden.sort((a,b)=> new Date(b.t.tarih) - new Date(a.t.tarih));
 
