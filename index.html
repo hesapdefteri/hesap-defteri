@@ -7632,7 +7632,6 @@ function ensureBonusFlexiCard(){
   const taksitler = [
     { desc:'IYZICO *AMAZON.COM.T', taksitTutari:1079.61, taksitSayisi:6, odenenTaksit:4, tarih:'2026-06-04T00:00:00', kart:'Bonus Flexi Card' },
     { desc:'IYZICO *AMAZON.COM.T', taksitTutari:380.55, taksitSayisi:9, odenenTaksit:4, tarih:'2026-06-06T00:00:00', kart:'Bonus Flexi Card' },
-    { desc:'IYZICO *AMAZON.COM.T', taksitTutari:380.55, taksitSayisi:9, odenenTaksit:4, tarih:'2026-06-06T00:00:01', kart:'Bonus Flexi Card' },
     { desc:'IYZICO *AMAZON.COM.T', taksitTutari:66.02, taksitSayisi:9, odenenTaksit:1, tarih:'2026-06-09T00:00:00', kart:'Bonus Flexi Card' },
     { desc:'IYZICO *AMAZON.COM.T', taksitTutari:49.40, taksitSayisi:6, odenenTaksit:1, tarih:'2026-06-09T00:00:01', kart:'Bonus Flexi Card' },
     { desc:'IYZICO *AMAZON.COM.T', taksitTutari:1089.66, taksitSayisi:3, odenenTaksit:3, tarih:'2026-06-10T00:00:00', kart:'Bonus Flexi Card' },
@@ -7657,6 +7656,22 @@ function ensureBonusFlexiCard(){
   return changed;
 }
 if(ensureBonusFlexiCard()) save();
+
+// Temmuz 2026 (ekstre kontrolü): Haziran 2026 Bonus Flexi ekstresinde İKİNCİ 380,55 satırı
+// "380,55+" şeklinde, yani ALACAK (iade/düzeltme) — harcama DEĞİL. Önceden yanlışlıkla ikinci
+// bir 380,55x9 taksitli alışveriş olarak kaydedilmişti, buradan siliniyor.
+// Doğrulama: 1.079,61 + 380,55 - 380,55 + 66,02 + 49,40 + 1.089,66 + 159,00 + 69,90 + 938,39
+// = 3.451,98 → ekstre "Dönem Harcamaları" toplamıyla birebir aynı.
+// DERS: Garanti ekstrelerinde tutarın sonundaki "+" işareti ALACAK demek (ödeme/iade),
+// harcama satırı değil — ekstre işlerken bu işaret mutlaka kontrol edilmeli.
+function ensureFazlaAmazonTaksidiSilindi(){
+  const once = state.banka.taksitler.length;
+  state.banka.taksitler = state.banka.taksitler.filter(t =>
+    !(t.desc === 'IYZICO *AMAZON.COM.T' && t.taksitTutari === 380.55 && t.tarih === '2026-06-06T00:00:01')
+  );
+  return state.banka.taksitler.length !== once;
+}
+if(ensureFazlaAmazonTaksidiSilindi()) save();
 
 // Temmuz 2026: 20.07.2026 kart harcamaları Banka moduline eklendi.
 function ensure20TemmuzHarcamalari(){
