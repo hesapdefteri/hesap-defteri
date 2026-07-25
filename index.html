@@ -7595,8 +7595,11 @@ function ensureMaviMarketMasrafKalemi(){
 }
 if(ensureMaviMarketMasrafKalemi()) save();
 
-// Temmuz 2026: A101 Kapıda siparişi (24.07.2026, sipariş no 9126072481754130, 905,73₺,
-// kapıda ödeme — henüz Banka'da karşılığı yok) Masraflar moduline "A101" kalemi olarak eklendi.
+// Temmuz 2026: A101 Kapıda siparişi (24.07.2026, sipariş no 9126072481754130) Masraflar
+// moduline "A101" kalemi olarak eklendi. ÖNEMLİ: ilk kayıt "Sipariş Alındı" mailindeki
+// 905,73₺ ile yapılmıştı; "Siparişini Teslim Ettik" mailindeki GERÇEK teslim tutarı
+// 876,32₺ (sepet 824,32 + teslimat 49,00 + poşet 3,00 + indirim 0,00) — kayıt bu tutara
+// düzeltildi. A101 mailleri iki aşamalı geliyor, esas alınacak olan TESLİM maili.
 function ensureA101MasrafKalemi(){
   let changed = false;
   let kalem = state.masrafHesaplari.find(k => normAd(k.name) === normAd('A101'));
@@ -7605,8 +7608,14 @@ function ensureA101MasrafKalemi(){
     state.masrafHesaplari.push(kalem);
     changed = true;
   }
-  if(!kalem.transactions.some(t => t.date === '2026-07-24T15:00:00.000Z' && t.amount === 905.73)){
-    kalem.transactions.push({ desc:'A101 Kapıda sipariş (no: 9126072481754130)', amount:905.73, date:'2026-07-24T15:00:00.000Z' });
+  const eskiKayit = kalem.transactions.find(t => t.date === '2026-07-24T15:00:00.000Z' && t.amount === 905.73);
+  if(eskiKayit){
+    eskiKayit.amount = 876.32;
+    eskiKayit.desc = 'A101 Kapıda sipariş (no: 9126072481754130)';
+    changed = true;
+  }
+  if(!kalem.transactions.some(t => t.date === '2026-07-24T15:00:00.000Z' && t.amount === 876.32)){
+    kalem.transactions.push({ desc:'A101 Kapıda sipariş (no: 9126072481754130)', amount:876.32, date:'2026-07-24T15:00:00.000Z' });
     changed = true;
   }
   return changed;
