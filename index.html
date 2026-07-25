@@ -210,7 +210,7 @@
   .dcard-pager{overflow:hidden;position:relative;}
   .dcard-track{display:flex;width:600%;}
   .dcard-page{flex:0 0 50%;min-width:50%;box-sizing:border-box;}
-  #bankaCardTrack .dcard-page{flex:0 0 25%;min-width:25%;}
+  #bankaCardTrack .dcard-page{flex:0 0 33.3333%;min-width:33.3333%;}
   .bonus-tx-row{display:flex;align-items:flex-start;gap:12px;padding:14px 12px;border-bottom:1px solid rgba(20,40,50,.08);}
   .bonus-tx-row:last-child{border-bottom:none;}
   .bonus-tx-date{flex:0 0 46px;text-align:center;line-height:1.05;}
@@ -1490,18 +1490,65 @@
   <div class="d-list" id="kasaList" style="padding:16px 16px 100px 16px;"></div>
 </div>
 
+<style id="bankaKompaktStil">
+  /* ===== BANKA / BONUS EKRANI — KOMPAKT DÜZEN (sadece #bankaScreen kapsamında) ===== */
+  /* Üst blok: kart + noktalar */
+  #bankaScreen > div:first-child{padding:8px 12px 0 12px !important;}
+  #bankaScreen .cari-card{padding:9px 11px !important;border-radius:14px;}
+  #bankaScreen .cari-card-label{font-size:12px !important;letter-spacing:.4px;}
+  #bankaScreen .cari-card-icon{width:28px;height:28px;border-radius:9px;}
+  #bankaScreen .cari-card-icon svg{width:15px;height:15px;}
+  #bankaScreen .cari-card-balance{font-size:19px;margin-top:5px;}
+  #bankaScreen .cari-card-name{font-size:12px;margin-top:1px;}
+  #bankaScreen .cari-card-bottom{margin-top:6px !important;padding-top:6px !important;gap:6px !important;}
+  #bankaScreen .cari-card-info{line-height:1.25 !important;gap:5px 12px !important;}
+  #bankaScreen .cari-card-info > div{min-width:104px !important;}
+  #bankaScreen .cari-card-info > div > div:first-child{font-size:9.5px !important;letter-spacing:.3px !important;line-height:1.2 !important;}
+  #bankaScreen .cari-card-info > div > div:last-child{font-size:14px !important;margin-top:1px !important;line-height:1.2 !important;}
+  #bankaScreen .dcek-dots{margin-top:5px;}
+
+  /* Liste alanı */
+  #bankaScreen #bankaScrollArea{padding:4px 12px 90px 12px !important;}
+  #bankaScreen .sheet-title{font-size:11px;padding:8px 4px 4px 4px;}
+  #bankaScreen .cari-sub{padding:2px 0 0 0;}
+
+  /* Ay başlıkları — ay adı / kayıt sayısı / ok / tutar tek satırda ortalı */
+  #bankaScreen .kasa-ay-header{padding:7px 8px !important;gap:8px !important;align-items:center !important;}
+  #bankaScreen .kasa-ay-group[style*="eef5ff"]{margin:4px 0 !important;}
+  #bankaScreen .kasa-ay-label{font-size:13px !important;gap:5px;line-height:1.2;align-items:center;}
+  #bankaScreen .kasa-ay-label span{font-size:11px !important;}
+  #bankaScreen .kasa-ay-toplam{font-size:13px !important;line-height:1.2;}
+  #bankaScreen .taksit-ay-chevron-buyuk{width:20px !important;height:20px !important;}
+
+  /* Taksit satırları — 56-60px hedef yükseklik */
+  #bankaScreen .acct-row{padding:8px 12px !important;min-height:58px;}
+  #bankaScreen .acct-row .siparis-date-circle{width:38px !important;height:38px !important;font-size:9.5px !important;}
+  #bankaScreen .acct-row .siparis-date-circle b{font-size:15px;}
+  #bankaScreen .acct-row .name-wrap{margin-left:9px !important;gap:1px;}
+  #bankaScreen .acct-row .name{font-size:15px;}
+  #bankaScreen .acct-row .siparis-teslimat-row{font-size:11px;margin-top:2px;}
+  #bankaScreen .acct-row .amount{font-size:16px;}
+
+  /* Bonus Platinum işlem satırları */
+  #bankaScreen .bonus-tx-row{padding:8px 10px;gap:9px;}
+  #bankaScreen .bonus-tx-date{flex:0 0 40px;}
+  #bankaScreen .bonus-tx-date .g{font-size:17px;}
+  #bankaScreen .bonus-tx-kat{font-size:13px;}
+  #bankaScreen .bonus-tx-yer{font-size:11px;}
+  #bankaScreen .bonus-tx-tutar{font-size:13px;}
+  #bankaScreen .bonus-tx-taksit{font-size:11px;}
+  #bankaScreen .bonus-tx-fis{margin-top:5px;}
+</style>
 <div class="detail-screen" id="bankaScreen">
   <div style="padding:16px 16px 0 16px;flex-shrink:0;">
     <div class="cari-card" id="bankaSummaryCard">
-      <div class="cari-card-top">
-        <span class="cari-card-label" id="bankaKartLabel" style="font-size:15px;">GARANTİ BANKASI</span>
-        <span class="cari-card-icon" id="bankaKartIcon" style="background:linear-gradient(135deg,#5fb946,#1a7a34);"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><g><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(20 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(110 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(200 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(290 12 12)"/></g><path d="M12 13.5 C 13 16.5, 15 18, 17.5 21" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span>
-      </div>
-      <div class="cari-card-balance" id="bankaToplam" style="color:#1a7a34;">0<span style="font-size:0.5em;">,00₺</span></div>
-      <div class="cari-card-name" id="bankaKartName">Güncel Banka Bakiyesi</div>
       <div class="dcard-pager" id="bankaCardPager">
         <div class="dcard-track" id="bankaCardTrack">
           <div class="dcard-page" data-page="0">
+            <div class="cari-card-top">
+              <span class="cari-card-label" style="font-size:15px;">GARANTİ BANKASI</span>
+              <span class="cari-card-icon" style="background:linear-gradient(135deg,#5fb946,#1a7a34);"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><g><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(20 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(110 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(200 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(290 12 12)"/></g><path d="M12 13.5 C 13 16.5, 15 18, 17.5 21" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span>
+            </div>
             <div class="cari-card-bottom" style="align-items:center;">
               <div class="cari-card-info" style="display:flex;flex-wrap:wrap;gap:8px 14px;">
                 <div style="flex:1 1 40%;min-width:110px;">
@@ -1516,6 +1563,10 @@
             </div>
           </div>
           <div class="dcard-page" data-page="1">
+            <div class="cari-card-top">
+              <span class="cari-card-label" style="font-size:15px;">BONUS FLEXİ</span>
+              <span class="cari-card-icon" style="background:linear-gradient(135deg,#5fb946,#1a7a34);"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><g><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(20 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(110 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(200 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(290 12 12)"/></g><path d="M12 13.5 C 13 16.5, 15 18, 17.5 21" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span>
+            </div>
             <div class="cari-card-bottom" style="align-items:center;">
               <div class="cari-card-info" style="display:flex;flex-wrap:wrap;gap:8px 14px;">
                 <div style="flex:1 1 40%;min-width:110px;">
@@ -1530,20 +1581,12 @@
             </div>
           </div>
           <div class="dcard-page" data-page="2">
-            <div class="cari-card-bottom" style="align-items:center;">
-              <div class="cari-card-info" style="display:flex;flex-wrap:wrap;gap:8px 14px;">
-                <div style="flex:1 1 40%;min-width:110px;">
-                  <div style="font-size:12pt;letter-spacing:.3px;color:var(--muted);">İŞLENEN TOPLAM</div>
-                  <div id="islenenOzetToplam" style="font-size:12pt;font-weight:800;color:var(--ink);margin-top:2px;">0,00₺</div>
-                </div>
-                <div style="flex:1 1 40%;min-width:110px;">
-                  <div style="font-size:12pt;letter-spacing:.3px;color:var(--muted);">İŞLEM SAYISI</div>
-                  <div id="islenenOzetSayisi" style="font-size:12pt;font-weight:800;color:var(--green);margin-top:2px;">0</div>
-                </div>
-              </div>
+            <div class="cari-card-top">
+              <span class="cari-card-label" style="font-size:15px;">BONUS PLATINUM TROY</span>
+              <span class="cari-card-icon" style="background:linear-gradient(135deg,#7ec84a,#3f8f22);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="4" fill="#fff"/><text x="12" y="16" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="9" font-weight="700" fill="#4aa72e">bns</text></svg></span>
             </div>
-          </div>
-          <div class="dcard-page" data-page="3">
+            <div class="cari-card-balance bk-balance-bonus" style="color:var(--red);">0<span style="font-size:0.5em;">,00₺</span></div>
+            <div class="cari-card-name">Güncel Kart Borcu</div>
             <div class="cari-card-bottom" style="align-items:center;">
               <div class="cari-card-info" style="display:flex;flex-wrap:wrap;gap:8px 14px;">
                 <div style="flex:1 1 40%;min-width:110px;">
@@ -1568,7 +1611,6 @@
       <span class="dcek-dot" data-i="0"></span>
       <span class="dcek-dot active" data-i="1"></span>
       <span class="dcek-dot" data-i="2"></span>
-      <span class="dcek-dot" data-i="3"></span>
     </div>
   </div>
   <div class="d-list" id="bankaScrollArea" style="padding:14px 16px 100px 16px;">
@@ -1579,10 +1621,6 @@
     <div id="digerBolum">
       <div class="sheet-title">DİĞER HAREKETLER</div>
       <div id="bankaList"></div>
-    </div>
-    <div id="islenenBolum">
-      <div class="sheet-title">İŞLENEN HAREKETLER</div>
-      <div id="bankaIslenenList"></div>
     </div>
     <div id="bonusBolum" style="display:none;">
       <div class="sheet-title">TAKSİTLİ İŞLEMLER</div>
@@ -3536,14 +3574,12 @@ let bankaActivePage = 0;
 function goToBankaCardPage(idx, animate){
   const track = document.getElementById('bankaCardTrack');
   track.style.transition = animate === false ? 'none' : 'transform .25s ease';
-  track.style.transform = `translateX(-${idx * (100/4)}%)`;
+  track.style.transform = `translateX(-${idx * (100/3)}%)`;
   document.querySelectorAll('#bankaDots .dcek-dot').forEach((d,i)=> d.classList.toggle('active', i===idx));
   bankaActivePage = idx;
   document.getElementById('taksitliBolum').style.display = idx === 1 ? '' : 'none';
   document.getElementById('digerBolum').style.display = idx === 0 ? '' : 'none';
-  document.getElementById('islenenBolum').style.display = idx === 2 ? '' : 'none';
-  document.getElementById('bonusBolum').style.display = idx === 3 ? '' : 'none';
-  bankaKartBasligiUygula(idx === 3);
+  document.getElementById('bonusBolum').style.display = idx === 2 ? '' : 'none';
 }
 (function(){
   const pager = document.getElementById('bankaCardPager');
@@ -3560,9 +3596,9 @@ function goToBankaCardPage(idx, animate){
     if(!dragging) return;
     lastX = e.clientX;
     const delta = lastX - startX;
-    const pct = (delta / pager.clientWidth) * (100/4);
-    let x = -(baseIdx * (100/4)) + pct;
-    x = Math.max(-(3 * (100/4)), Math.min(0, x));
+    const pct = (delta / pager.clientWidth) * (100/3);
+    let x = -(baseIdx * (100/3)) + pct;
+    x = Math.max(-(2 * (100/3)), Math.min(0, x));
     track.style.transform = `translateX(${x}%)`;
   });
   function finish(){
@@ -3573,7 +3609,7 @@ function goToBankaCardPage(idx, animate){
     if(Math.abs(delta) > pager.clientWidth * 0.18){
       newIdx = delta < 0 ? baseIdx + 1 : baseIdx - 1;
     }
-    newIdx = Math.max(0, Math.min(3, newIdx));
+    newIdx = Math.max(0, Math.min(2, newIdx));
     goToBankaCardPage(newIdx, true);
   }
   pager.addEventListener('pointerup', finish);
@@ -4222,40 +4258,24 @@ const BONUS_PLATINUM_OZET = {
   ]
 };
 const BONUS_LOGO_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="4" fill="#fff"/><text x="12" y="16" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="9" font-weight="700" fill="#4aa72e">bns</text></svg>';
-const GARANTI_LOGO_SVG = document.getElementById('bankaKartIcon') ? document.getElementById('bankaKartIcon').innerHTML : '';
 
-// Üst kartın başlık/ikon/büyük rakam bloğu — tasarım aynı, sadece içerik değişiyor.
-function bankaKartBasligiUygula(bonusMu){
-  const label = document.getElementById('bankaKartLabel');
-  const icon  = document.getElementById('bankaKartIcon');
-  const name  = document.getElementById('bankaKartName');
-  const tut   = document.getElementById('bankaToplam');
-  if(!label) return;
-  if(bonusMu){
-    label.textContent = 'BONUS PLATINUM';
-    icon.style.background = 'linear-gradient(135deg,#7ec84a,#3f8f22)';
-    icon.innerHTML = BONUS_LOGO_SVG;
-    name.textContent = 'Güncel Kart Borcu';
-    const [m, c] = fmtPlain(BONUS_PLATINUM_OZET.guncelBorc).split(',');
-    tut.innerHTML = m + '<span style="font-size:0.5em;">,' + c + '₺</span>';
-    tut.style.color = 'var(--red)';
-  } else {
-    label.textContent = 'GARANTİ BANKASI';
-    icon.style.background = 'linear-gradient(135deg,#5fb946,#1a7a34)';
-    icon.innerHTML = GARANTI_LOGO_SVG;
-    name.textContent = 'Güncel Banka Bakiyesi';
-    const [m, c] = fmtPlain(bankaBakiye()).split(',');
-    tut.innerHTML = m + '<span style="font-size:0.5em;">,' + c + '₺</span>';
-    tut.style.color = '#1a7a34';
-  }
+// Her sayfa artık kendi başlık/ikon/bakiye bloğunu taşıyor (swipe ile birlikte kayıyor);
+// bu fonksiyon sadece rakamları günceller, başlık/ikon metinleri HTML'de sabit.
+function bankaKartBakiyeGuncelle(){
+  const [mG, cG] = fmtPlain(bankaBakiye()).split(',');
+  document.querySelectorAll('.bk-balance-garanti').forEach(el=>{
+    el.innerHTML = mG + '<span style="font-size:0.5em;">,' + cG + '₺</span>';
+  });
+  const [mB, cB] = fmtPlain(BONUS_PLATINUM_OZET.guncelBorc).split(',');
+  document.querySelectorAll('.bk-balance-bonus').forEach(el=>{
+    el.innerHTML = mB + '<span style="font-size:0.5em;">,' + cB + '₺</span>';
+  });
 }
 
 const BONUS_FIS_IKON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16b8a8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h3"/><path d="M9 9h5M9 12.5h5M9 16h3"/></svg>';
 
 function bonusHareketlerHtml(a){
-  if(!a.hareketler || !a.hareketler.length){
-    return '<div class="sk-empty" style="padding:10px 12px;">' + a.kayit + ' taksit · ' + fmt(a.tutar) + '</div>';
-  }
+  if(!a.hareketler || !a.hareketler.length) return '';
   return a.hareketler.map(h => `
     <div class="bonus-tx-row">
       <div class="bonus-tx-date">
@@ -4282,22 +4302,25 @@ function renderBonusKart(){
   document.getElementById('bonusGelecek').textContent = fmt(BONUS_PLATINUM_OZET.gelecekDonem);
   document.getElementById('bonusToplamTaksitli').textContent = fmt(BONUS_PLATINUM_OZET.toplamTaksitli);
 
-  // Taksitli İşlemler — mevcut ay akordeonuyla (kasa-ay-group) birebir aynı yapı
+  // Taksitli İşlemler — mevcut ay akordeonuyla (kasa-ay-group) birebir aynı yapı.
+  // Sadece hareket dökümü olan aylar (şu an: sadece açık ay) açılabilir; diğerlerinde
+  // ok işareti ve tıklama yok, çünkü başlıktakinin tekrarından başka gösterecek bir şey yok.
   const list = document.getElementById('bonusKartList');
   if(!list) return;
   list.innerHTML = BONUS_PLATINUM_OZET.aylar.map(a=>{
     const acik = a.key === BONUS_PLATINUM_OZET.acikAy;
+    const detayVar = !!(a.hareketler && a.hareketler.length);
     const [gMain, gCents] = fmtPlain(a.tutar).split(',');
     return `
       <div class="kasa-ay-group" style="${acik ? 'background:#eef5ff;border-radius:14px;margin:6px 0;' : ''}">
-        <div class="kasa-ay-header" data-bonus-key="${a.key}" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;${acik ? 'padding:14px 12px;' : ''}">
+        <div class="kasa-ay-header" ${detayVar ? `data-bonus-key="${a.key}"` : ''} style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;${acik ? 'padding:14px 12px;' : ''}${detayVar ? '' : 'cursor:default;'}">
           <div class="kasa-ay-label" style="flex:1;${acik ? 'color:#2f6690;font-size:16px;' : ''}">${a.label} <span style="font-weight:500;color:#8a94a3;font-size:13px;">(${a.kayit} kayıt)</span></div>
-          <svg class="taksit-ay-chevron-buyuk" width="32" height="32" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;transition:transform .2s;${acik ? 'transform:rotate(180deg);' : ''}">
+          ${detayVar ? `<svg class="taksit-ay-chevron-buyuk" width="32" height="32" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;transition:transform .2s;${acik ? 'transform:rotate(180deg);' : ''}">
             <path d="M6 9l6 6 6-6" stroke="#2f6690" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          </svg>` : '<span></span>'}
           <div class="kasa-ay-toplam neg" style="text-align:right;">${gMain}<span class="cents">,${gCents}</span></div>
         </div>
-        <div class="kasa-ay-body${acik ? '' : ' hidden'}" id="bonusAy-${a.key}">${bonusHareketlerHtml(a)}</div>
+        ${detayVar ? `<div class="kasa-ay-body${acik ? '' : ' hidden'}" id="bonusAy-${a.key}">${bonusHareketlerHtml(a)}</div>` : ''}
       </div>`;
   }).join('');
 
@@ -4485,7 +4508,7 @@ function renderBanka(){
   renderTaksitler();
   renderTaksitOzet();
   {
-    bankaKartBasligiUygula(bankaActivePage === 3);
+    bankaKartBakiyeGuncelle();
   }
   document.getElementById('tekIslemToplam').textContent = fmt(bankaBakiye());
   document.getElementById('tekIslemSayisi').textContent = state.banka.transactions.length;
@@ -4493,7 +4516,6 @@ function renderBanka(){
   const rows = state.banka.transactions.map((t, idx) => ({ t, idx })).filter(({t}) => !t.islendi);
   rows.sort((a,b)=> new Date(b.t.date) - new Date(a.t.date));
   const list = document.getElementById('bankaList');
-  renderBankaIslenen();
   if(!rows.length){
     list.innerHTML = '<div class="empty-tx">Henüz banka hareketi yok</div>';
     updateBankaBadge();
