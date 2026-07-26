@@ -141,8 +141,10 @@
   .cv2-txcard{display:flex;align-items:center;gap:12px;background:#f8fafa;border-radius:15px;padding:11px 13px;
     margin-bottom:8px;cursor:pointer;transition:transform .14s ease,background .14s ease;}
   .cv2-txcard:active{transform:scale(.98);background:#f0f3f4;}
-  .cv2-txico{width:38px;height:38px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(16,24,32,.08);
-    display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+  .cv2-txico{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
+  .cv2-txico.debt{background:var(--red);}
+  .cv2-txico.credit{background:var(--green);}
+  .cv2-txico.zero{background:#c7ced1;}
   .cv2-txmid{flex:1;min-width:0;}
   .cv2-txtype{font-size:13.5px;font-weight:800;color:var(--ink);}
   .cv2-txdesc{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px;overflow:hidden;text-overflow:ellipsis;
@@ -163,8 +165,6 @@
   .cv2-qbtn.satis{background:#2f6690;box-shadow:0 5px 12px rgba(47,102,144,.28);}
   .cv2-qbtn.alis{background:#b5650d;box-shadow:0 5px 12px rgba(181,101,13,.28);}
   .cv2-txdetail{padding-top:2px;}
-  .cv2-txdetail-ico{width:52px;height:52px;border-radius:50%;background:var(--accent-soft);display:flex;
-    align-items:center;justify-content:center;font-size:24px;margin:2px auto 10px auto;}
   .cv2-txdetail-amt{font-size:24px;font-weight:800;text-align:center;letter-spacing:-.6px;margin-bottom:10px;}
   .cv2-txdetail-amt.debt{color:var(--red);} .cv2-txdetail-amt.credit{color:var(--green);} .cv2-txdetail-amt.zero{color:var(--ink);}
   .cv2-txdetail-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);
@@ -4753,9 +4753,7 @@ function renderCariV2(){
 }
 
 /* ---------- ikon/etiket haritası (hareket tipi) ---------- */
-const CV2_TX_ICON  = { 'ALIŞ':'🛒', 'SATIŞ':'📦', 'TAHSİLAT':'💰', 'ÖDEME':'💸', 'AÇILIŞ':'📂', 'ALIŞ İADE':'↩️' };
 const CV2_TX_LABEL = { 'ALIŞ':'Alış', 'SATIŞ':'Satış', 'TAHSİLAT':'Tahsilat', 'ÖDEME':'Ödeme', 'AÇILIŞ':'Açılış', 'ALIŞ İADE':'Alış İade' };
-function cv2TxIcon(type){ return CV2_TX_ICON[type] || '💳'; }
 function cv2TxLabel(type){ return CV2_TX_LABEL[type] || type; }
 
 /* Cari (müşteri) için Satış/Tahsilat, tedarikçi için Alış/Ödeme toplamları */
@@ -4811,7 +4809,7 @@ function cv2Hareketler(id, tur){
       const amt = signedAmount(t);
       const acls = cv2BalClass(amt);
       html += '<div class="cv2-txcard" data-idx="' + i + '">' +
-        '<div class="cv2-txico">' + cv2TxIcon(t.type) + '</div>' +
+        '<div class="cv2-txico ' + acls + '"></div>' +
         '<div class="cv2-txmid">' +
           '<div class="cv2-txtype">' + cv2TxLabel(t.type) + '</div>' +
           (t.desc ? '<div class="cv2-txdesc">' + t.desc + '</div>' : '') +
@@ -4925,7 +4923,6 @@ function cv2TxAc(tur, id, idx){
   const d = new Date(t.date);
   const detay =
     '<div class="cv2-txdetail">' +
-      '<div class="cv2-txdetail-ico">' + cv2TxIcon(t.type) + '</div>' +
       '<div class="cv2-txdetail-amt ' + cls + '">' + fmtWhole(amt) + '</div>' +
       '<div class="cv2-txdetail-row"><span>Tür</span><b>' + cv2TxLabel(t.type) + '</b></div>' +
       '<div class="cv2-txdetail-row"><span>Tarih</span><b>' + (isNaN(d) ? '—' : cv2TR(d)) + '</b></div>' +
