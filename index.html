@@ -42,6 +42,116 @@
   #anaMenu{min-height:100vh;background:linear-gradient(160deg,#0b1a3d 0%, #1c3566 45%, #0f2350 100%);padding:6px 18px 26px 18px;display:flex;flex-direction:column;justify-content:center;}
   .am-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px 6px;margin-top:-110px;}
 
+
+  /* ================= CARİ HESAP V2 (yeni, paralel modül — eski Cari Hesaplar ekranına dokunmaz) ================= */
+  #cv2Screen, #cv2Sheet, #cv2Modal{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  #cv2Screen{background:#f4f7f8;}
+  #cv2Screen .cv2-head{flex-shrink:0;padding:16px 18px 10px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  #cv2Screen .cv2-head h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-.5px;color:var(--ink);}
+  .cv2-addbtn{border:none;border-radius:14px;padding:10px 16px;font-size:13.5px;font-weight:800;color:#fff;
+    background:linear-gradient(135deg,#2f6690,#1c3566);box-shadow:0 5px 14px rgba(28,53,102,.28);
+    font-family:inherit;cursor:pointer;transition:transform .15s ease;white-space:nowrap;flex-shrink:0;}
+  .cv2-addbtn:active{transform:scale(.94);}
+
+  .cv2-summary{margin:0 16px 12px 16px;border-radius:20px;padding:16px;flex-shrink:0;
+    background:rgba(255,255,255,.72);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.6);box-shadow:0 8px 24px rgba(16,24,32,.08);}
+  .cv2-sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 10px;}
+  .cv2-sum-it .l{font-size:10.5px;color:var(--muted);font-weight:700;letter-spacing:.2px;}
+  .cv2-sum-it .v{font-size:19px;font-weight:800;color:var(--ink);margin-top:4px;letter-spacing:-.5px;}
+  .cv2-sum-it.debt .v{color:var(--red);}
+  .cv2-sum-it.credit .v{color:var(--green);}
+
+  .cv2-listpane{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+    padding:0 16px 24px 16px;touch-action:pan-y;}
+  .cv2-list{display:flex;flex-direction:column;gap:10px;}
+  .cv2-empty{padding:40px 18px;text-align:center;color:#a7b0b4;font-size:13px;font-weight:600;}
+
+  .cv2-wrap{position:relative;border-radius:18px;overflow:hidden;box-shadow:0 2px 12px rgba(16,24,32,.06);}
+  .cv2-actions{position:absolute;top:0;bottom:0;display:flex;z-index:1;}
+  .cv2-actions.left{left:0;width:222px;}
+  .cv2-actions.right{right:0;width:222px;}
+  .cv2-abtn{flex:1;border:none;background:none;font-family:inherit;font-size:11.5px;font-weight:800;color:#fff;
+    display:flex;align-items:center;justify-content:center;text-align:center;padding:0 4px;cursor:pointer;
+    letter-spacing:-.1px;line-height:1.25;}
+  .cv2-abtn.tahsilat{background:#1f9d64;}
+  .cv2-abtn.odeme{background:#c0392b;}
+  .cv2-abtn.duzenle{background:#5b7083;}
+  .cv2-abtn.hareketler{background:#2f6690;}
+  .cv2-abtn.ekstre{background:#3d5a80;}
+  .cv2-abtn.daha{background:#8a94a0;}
+
+  .cv2-card{position:relative;z-index:2;background:#fff;border-radius:18px;padding:14px 16px;
+    display:flex;align-items:center;gap:12px;cursor:pointer;touch-action:pan-y;will-change:transform;}
+  .cv2-card.cv2-pressed{transform:scale(.985);transition:transform .12s ease;}
+  .cv2-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+  .cv2-dot.debt{background:var(--red);} .cv2-dot.credit{background:var(--green);} .cv2-dot.zero{background:#c7ced1;}
+  .cv2-mid{flex:1;min-width:0;}
+  .cv2-name{font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .cv2-date{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:3px;}
+  .cv2-bal{font-size:16px;font-weight:800;letter-spacing:-.4px;white-space:nowrap;flex-shrink:0;}
+  .cv2-bal.debt{color:var(--red);} .cv2-bal.credit{color:var(--green);} .cv2-bal.zero{color:var(--ink);}
+
+  /* ---- Hareketler bottom sheet ---- */
+  #cv2Sheet{position:fixed;inset:0;z-index:820;display:none;}
+  #cv2Sheet.show{display:block;}
+  #cv2SheetBg{position:absolute;inset:0;background:rgba(18,22,26,.4);
+    -webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px);opacity:0;transition:opacity .3s ease;}
+  #cv2Sheet.in #cv2SheetBg{opacity:1;}
+  #cv2SheetPanel{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:24px 24px 0 0;max-height:80vh;
+    display:flex;flex-direction:column;transform:translateY(101%);transition:transform .4s cubic-bezier(.32,.72,0,1);
+    box-shadow:0 -10px 40px rgba(0,0,0,.18);}
+  #cv2Sheet.in #cv2SheetPanel{transform:translateY(0);}
+  .cv2-grab{width:36px;height:5px;border-radius:3px;background:#dfe4e7;margin:9px auto 2px auto;flex-shrink:0;}
+  .cv2-sh-head{flex-shrink:0;padding:8px 20px 12px 20px;border-bottom:1px solid var(--line);}
+  .cv2-sh-head .t{font-size:17px;font-weight:800;color:var(--ink);}
+  .cv2-sh-head .s{font-size:12.5px;color:var(--muted);font-weight:700;margin-top:4px;}
+  .cv2-sh-body{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:6px 20px 8px 20px;}
+  .cv2-hrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);}
+  .cv2-hrow:last-child{border-bottom:none;}
+  .cv2-hrow .tp{font-size:13px;font-weight:800;color:var(--ink);}
+  .cv2-hrow .dt{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px;}
+  .cv2-hrow .am{font-size:14.5px;font-weight:800;white-space:nowrap;}
+  .cv2-hrow .am.debt{color:var(--red);} .cv2-hrow .am.credit{color:var(--green);} .cv2-hrow .am.zero{color:var(--ink);}
+  .cv2-sh-foot{flex-shrink:0;padding:12px 20px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);}
+
+  /* ---- küçük onay/form penceresi ---- */
+  #cv2Modal{position:fixed;inset:0;z-index:920;display:none;align-items:center;justify-content:center;padding:22px;}
+  #cv2Modal.show{display:flex;}
+  #cv2ModalBg{position:absolute;inset:0;background:rgba(18,22,26,.4);
+    -webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px);opacity:0;transition:opacity .24s ease;}
+  #cv2Modal.in #cv2ModalBg{opacity:1;}
+  #cv2ModalCard{position:relative;width:100%;max-width:340px;background:#fff;border-radius:22px;padding:20px;
+    box-shadow:0 18px 50px rgba(0,0,0,.24);opacity:0;transform:scale(.94) translateY(10px);
+    transition:opacity .24s ease,transform .24s ease;}
+  #cv2Modal.in #cv2ModalCard{opacity:1;transform:none;}
+  #cv2ModalCard .t{font-size:17px;font-weight:800;color:var(--ink);letter-spacing:-.4px;}
+  #cv2ModalCard .m{font-size:13px;color:var(--muted);font-weight:600;margin-top:7px;line-height:1.5;}
+  #cv2ModalCard .b{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px;}
+  .cv2-field{margin-top:14px;}
+  .cv2-field label{display:block;font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.2px;}
+  .cv2-field input{width:100%;margin-top:6px;border:1.5px solid var(--line);border-radius:13px;padding:11px 13px;
+    font-size:15px;font-weight:700;color:var(--ink);font-family:inherit;background:#fff;outline:none;
+    transition:border-color .2s ease;}
+  .cv2-field input:focus{border-color:var(--accent);}
+  .cv2-btn{border:none;border-radius:14px;padding:13px 10px;font-size:13.5px;font-weight:800;cursor:pointer;
+    font-family:inherit;transition:transform .15s ease,opacity .15s ease;}
+  .cv2-btn:active{transform:scale(.97);opacity:.85;}
+  .cv2-btn.primary{background:var(--accent);color:#fff;box-shadow:0 5px 14px rgba(47,102,144,.28);}
+  .cv2-btn.ghost{background:#eef1f3;color:var(--ink);}
+  .cv2-btn.danger{background:#fdecec;color:var(--red);}
+  .cv2-btn.wide{width:100%;background:#eef1f3;color:var(--muted);}
+
+  @media(min-width:700px){
+    #cv2Screen .cv2-head{padding:20px 24px 10px 24px;}
+    .cv2-summary{margin:0 22px 14px 22px;}
+    .cv2-listpane{padding:0 22px 24px 22px;}
+    #cv2SheetPanel{max-width:440px;left:50%;transform:translate(-50%,101%);}
+    #cv2Sheet.in #cv2SheetPanel{transform:translate(-50%,0);}
+  }
+
   /* ================= KREDİ KARTI HESABIM ================= */
   #kkScreen, #kkSheet, #kkModal{
     --kkGreen:#15a05c; --kkGreenS:#e8f6ee;
@@ -280,7 +390,8 @@
   .am-badge.b-satis{background:linear-gradient(135deg,#4ec98a,#1f8a54);}
   .am-badge.b-alis{background:linear-gradient(135deg,#a586ef,#6845d1);}
   .am-badge.b-masraf{background:linear-gradient(135deg,#f4877c,#d6453b);}
-    .am-badge.b-kk{background:linear-gradient(135deg,#4cc873,#0f8a4d);}
+    .am-badge.b-cariv2{background:linear-gradient(135deg,#22b8a0,#0f7d6c);}
+  .am-badge.b-kk{background:linear-gradient(135deg,#4cc873,#0f8a4d);}
   .am-badge.b-rapor{background:linear-gradient(135deg,#f0cb5e,#c99a1e);}
   .am-badge.b-siparis{background:linear-gradient(135deg,#63e070,#1fac47);}
   .am-badge.b-ayarlar{background:linear-gradient(135deg,#9aa8b8,#6d7c8d);}
@@ -764,6 +875,7 @@
     <div class="am-tile" data-mod="kasa"><div class="am-badge b-masraf"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="13" rx="2"/><path d="M2.5 10h19"/><circle cx="12" cy="14.2" r="2.3"/></svg></div><div class="am-label">KASA &amp; ÇEK</div></div>
     <div class="am-tile" data-mod="banka"><div class="am-badge b-banka"><svg viewBox="0 0 24 24" fill="#fff"><g><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(20 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(110 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(200 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(290 12 12)"/></g><path d="M12 13.5 C 13 16.5, 15 18, 17.5 21" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg><div class="am-badge-balance" id="amBankaBadge" style="display:none;"></div></div><div class="am-label">GARANTİ BANKASI</div></div>
     <div class="am-tile" data-mod="krediKarti"><div class="am-badge b-kk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.8"/><path d="M2 9.8h20"/><path d="M5.5 15h4"/></svg></div><div class="am-label">KREDİ KARTI</div></div>
+    <div class="am-tile" data-mod="cariV2"><div class="am-badge b-cariv2" style="position:relative;"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><circle cx="8.5" cy="11" r="2"/><path d="M5.3 16c.5-1.8 1.8-2.7 3.2-2.7s2.7.9 3.2 2.7"/><path d="M15 9.5h4M15 13h4"/></svg><span style="position:absolute;top:-5px;right:-7px;background:#fff;color:#0f7d6c;font-size:9px;font-weight:800;border-radius:8px;padding:1px 4px;box-shadow:0 2px 5px rgba(0,0,0,.25);letter-spacing:.2px;">V2</span></div><div class="am-label">CARİ HESAP V2</div></div>
     <div class="am-tile" data-mod="raporlar"><div class="am-badge b-rapor"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6" fill="#fff" stroke="none"/><rect x="12" y="8" width="3" height="10" fill="#fff" stroke="none"/><rect x="17" y="5" width="3" height="13" fill="#fff" stroke="none"/></svg></div><div class="am-label">FİNANSAL RAPOR</div></div>
     <div class="am-tile" data-mod="ayarlar"><div class="am-badge b-ayarlar"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13a7.9 7.9 0 0 0 0-2l1.9-1.5-2-3.4-2.3.8a8 8 0 0 0-1.7-1L15 3.5h-6l-.3 2.4a8 8 0 0 0-1.7 1l-2.3-.8-2 3.4L4.6 11a7.9 7.9 0 0 0 0 2l-1.9 1.5 2 3.4 2.3-.8a8 8 0 0 0 1.7 1L9 20.5h6l.3-2.4a8 8 0 0 0 1.7-1l2.3.8 2-3.4z"/></svg></div><div class="am-label">AYARLAR</div></div>
     <div class="am-tile" data-mod="iletisim"><div class="am-badge b-iletisim"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><path d="M4 13a2 2 0 0 1 2-2h1v5H6a2 2 0 0 1-2-2z"/><path d="M20 13a2 2 0 0 0-2-2h-1v5h1a2 2 0 0 0 2-2z"/><path d="M16 17.5v.5a2 2 0 0 1-2 2h-1.5"/></svg></div><div class="am-label">İLETİŞİM</div></div>
@@ -1905,6 +2017,50 @@
     <div class="b">
       <button class="kk-btn ghost" id="kkModalNo">Vazgeç</button>
       <button class="kk-btn primary" id="kkModalYes">Onayla</button>
+    </div>
+  </div>
+</div>
+
+<div class="detail-screen" id="cv2Screen">
+  <div class="cv2-head">
+    <h1>Cari Hesap V2</h1>
+    <button class="cv2-addbtn" id="cv2AddBtn">+ Cari</button>
+  </div>
+  <div class="cv2-summary">
+    <div class="cv2-sum-grid">
+      <div class="cv2-sum-it"><div class="l">NET BAKİYE</div><div class="v" id="cv2Net">—</div></div>
+      <div class="cv2-sum-it"><div class="l">NAKİT (KASA)</div><div class="v" id="cv2Nakit">—</div></div>
+      <div class="cv2-sum-it debt"><div class="l">TOPLAM BORÇ</div><div class="v" id="cv2Borc">—</div></div>
+      <div class="cv2-sum-it credit"><div class="l">TOPLAM ALACAK</div><div class="v" id="cv2Alacak">—</div></div>
+    </div>
+  </div>
+  <div class="cv2-listpane" id="cv2ListPane">
+    <div class="cv2-list" id="cv2List"></div>
+  </div>
+</div>
+
+<div id="cv2Sheet">
+  <div id="cv2SheetBg"></div>
+  <div id="cv2SheetPanel">
+    <div class="cv2-grab"></div>
+    <div class="cv2-sh-head">
+      <div class="t" id="cv2ShTitle">—</div>
+      <div class="s" id="cv2ShSub"></div>
+    </div>
+    <div class="cv2-sh-body" id="cv2ShBody"></div>
+    <div class="cv2-sh-foot"><button class="cv2-btn wide" id="cv2ShClose">Kapat</button></div>
+  </div>
+</div>
+
+<div id="cv2Modal">
+  <div id="cv2ModalBg"></div>
+  <div id="cv2ModalCard">
+    <div class="t" id="cv2ModalTitle">—</div>
+    <div class="m" id="cv2ModalMsg"></div>
+    <div id="cv2ModalForm"></div>
+    <div class="b">
+      <button class="cv2-btn ghost" id="cv2ModalNo">Vazgeç</button>
+      <button class="cv2-btn primary" id="cv2ModalYes">Onayla</button>
     </div>
   </div>
 </div>
@@ -4292,6 +4448,9 @@ function hideAllScreens(){
   document.getElementById('bankaScreen').classList.remove('show');
   document.getElementById('taksitDetayScreen').classList.remove('show');
   document.getElementById('kkScreen').classList.remove('show');
+  document.getElementById('cv2Screen').classList.remove('show');
+  if(typeof cv2CloseSheet === 'function') cv2CloseSheet(true);
+  if(typeof cv2ModalKapat === 'function') cv2ModalKapat();
   if(typeof closeKkSheet === 'function') closeKkSheet(true);
   if(typeof kkModalKapat === 'function') kkModalKapat();
   document.getElementById('masrafScreen').classList.remove('show');
@@ -4372,6 +4531,11 @@ document.getElementById('anaMenu').querySelectorAll('.am-tile').forEach(tile=>{
       goToBankaCardPage(1, false);
       hideAllScreens();
       document.getElementById('bankaScreen').classList.add('show');
+      nudge();
+    } else if(mod === 'cariV2'){
+      renderCariV2();
+      hideAllScreens();
+      document.getElementById('cv2Screen').classList.add('show');
       nudge();
     } else if(mod === 'krediKarti'){
       renderKrediKarti();
@@ -4621,6 +4785,341 @@ function renderBonusKart(){
     };
   });
 }
+
+// ================= CARİ HESAP V2 (yeni, paralel modül) =================
+// Eski "Cari Hesaplar" ekranına (renderCariHesaplar, musteriScreen, swipe-wrap...)
+// HİÇ dokunulmuyor; bu modül sadece aynı state.cari/state.tedarikci verisini
+// okuyup kendi bağımsız ekranında gösteriyor. "+ Cari" butonu, veriyi bozmamak
+// için mevcut openYeniCari() akışını (aynı formu) çağırır — sadece bu ekrandan
+// açıldığında kayıt sonrası V2 listesi de tazelenir (aşağıdaki ek dinleyici).
+
+let cv2OpenId = null;
+const CV2_PANEL = 222;
+
+function cv2TR(d){
+  if(!d) return '';
+  return String(d.getDate()).padStart(2,'0') + ' ' + KK_AY_ADLARI[d.getMonth()] + ' ' + d.getFullYear();
+}
+function cv2BalClass(bal){ return bal > 0.005 ? 'credit' : (bal < -0.005 ? 'debt' : 'zero'); }
+function cv2Find(id, tur){
+  const arr = tur === 'tedarikci' ? state.tedarikci : state.cari;
+  return arr.find(x=>x.id===id);
+}
+function cv2Liste(){
+  const musteriler = state.cari.map(c=>({c, tur:'cari'}));
+  const tedarikciler = state.tedarikci.map(c=>({c, tur:'tedarikci'}));
+  const combined = [...musteriler, ...tedarikciler];
+  combined.sort((a,b)=>{
+    const da = sonHareketTarihi(a.c), db = sonHareketTarihi(b.c);
+    if(da && db) return db - da;
+    if(da) return -1;
+    if(db) return 1;
+    return a.c.name.localeCompare(b.c.name, 'tr');
+  });
+  return combined;
+}
+
+/* ---------- CariCardV2 ---------- */
+function CariCardV2(c, tur){
+  const bal = cariBalance(c);
+  const cls = cv2BalClass(bal);
+  const sh = sonHareketTarihi(c);
+  const tarihTxt = sh ? cv2TR(sh) : 'Henüz hareket yok';
+  const uid = tur + ':' + c.id;
+  return `
+  <div class="cv2-wrap" data-uid="${uid}">
+    <div class="cv2-actions left">
+      <button class="cv2-abtn tahsilat" data-act="tahsilat" data-uid="${uid}">Tahsilat</button>
+      <button class="cv2-abtn odeme" data-act="odeme" data-uid="${uid}">Ödeme</button>
+      <button class="cv2-abtn duzenle" data-act="duzenle" data-uid="${uid}">Düzenle</button>
+    </div>
+    <div class="cv2-actions right">
+      <button class="cv2-abtn hareketler" data-act="hareketler" data-uid="${uid}">Hareketler</button>
+      <button class="cv2-abtn ekstre" data-act="ekstre" data-uid="${uid}">Ekstre</button>
+      <button class="cv2-abtn daha" data-act="daha" data-uid="${uid}">Daha Fazla</button>
+    </div>
+    <div class="cv2-card" data-uid="${uid}" data-id="${c.id}" data-tur="${tur}">
+      <span class="cv2-dot ${cls}"></span>
+      <div class="cv2-mid">
+        <div class="cv2-name">${c.name}</div>
+        <div class="cv2-date">${tarihTxt}</div>
+      </div>
+      <div class="cv2-bal ${cls}">${fmtWhole(bal)}</div>
+    </div>
+  </div>`;
+}
+
+/* ---------- TransactionList (V2) ---------- */
+function cv2CloseOpen(exceptUid){
+  document.querySelectorAll('.cv2-wrap').forEach(w=>{
+    if(exceptUid && w.dataset.uid === exceptUid) return;
+    const card = w.querySelector('.cv2-card');
+    card.style.transition = 'transform .22s cubic-bezier(.22,.9,.3,1)';
+    card.style.transform = 'translateX(0px)';
+    card.dataset.tx = '0';
+    card.classList.remove('cv2-pressed');
+  });
+  if(!exceptUid) cv2OpenId = null;
+}
+
+function cv2BindCards(){
+  document.querySelectorAll('.cv2-card').forEach(card=>{
+    let startX=0, startY=0, curX=0, dragging=false, decided=false, horizontal=false;
+    const uid = card.dataset.uid;
+
+    card.addEventListener('pointerdown', e=>{
+      if(e.pointerType === 'mouse' && e.button !== 0) return;
+      startX = e.clientX; startY = e.clientY;
+      curX = parseFloat(card.dataset.tx || '0');
+      dragging = true; decided = false; horizontal = false;
+      card.style.transition = 'none';
+      card.classList.add('cv2-pressed');
+    });
+
+    card.addEventListener('pointermove', e=>{
+      if(!dragging) return;
+      const dx = e.clientX - startX, dy = e.clientY - startY;
+      if(!decided){
+        if(Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+        decided = true;
+        horizontal = Math.abs(dx) > Math.abs(dy);
+        if(horizontal){
+          try{ card.setPointerCapture(e.pointerId); }catch(err){}
+          cv2CloseOpen(uid);
+        } else {
+          dragging = false;
+          card.classList.remove('cv2-pressed');
+          return;
+        }
+      }
+      if(!horizontal) return;
+      let x = curX + dx;
+      x = Math.max(-CV2_PANEL, Math.min(CV2_PANEL, x));
+      card.style.transform = 'translateX(' + x + 'px)';
+      card.dataset.tx = String(x);
+    });
+
+    const finish = () => {
+      card.classList.remove('cv2-pressed');
+      if(!dragging) return;
+      dragging = false;
+      if(!horizontal) return;
+      const x = parseFloat(card.dataset.tx || '0');
+      card.style.transition = 'transform .22s cubic-bezier(.22,.9,.3,1)';
+      if(x > CV2_PANEL/2){ card.style.transform = 'translateX(' + CV2_PANEL + 'px)'; card.dataset.tx = String(CV2_PANEL); cv2OpenId = uid; }
+      else if(x < -CV2_PANEL/2){ card.style.transform = 'translateX(-' + CV2_PANEL + 'px)'; card.dataset.tx = String(-CV2_PANEL); cv2OpenId = uid; }
+      else { card.style.transform = 'translateX(0px)'; card.dataset.tx = '0'; if(cv2OpenId === uid) cv2OpenId = null; }
+    };
+    card.addEventListener('pointerup', finish);
+    card.addEventListener('pointercancel', finish);
+
+    card.addEventListener('click', () => {
+      const tx = parseFloat(card.dataset.tx || '0');
+      if(Math.abs(tx) > 4){ cv2CloseOpen(null); return; }
+      cv2Hareketler(card.dataset.id, card.dataset.tur);
+    });
+  });
+
+  document.querySelectorAll('.cv2-abtn').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      e.stopPropagation();
+      const uid = btn.dataset.uid;
+      const sep = uid.indexOf(':');
+      const tur = uid.slice(0, sep), id = uid.slice(sep + 1);
+      const act = btn.dataset.act;
+      cv2CloseOpen(null);
+      if(act === 'tahsilat') cv2Tahsilat(id, tur);
+      else if(act === 'odeme') cv2Odeme(id, tur);
+      else if(act === 'duzenle') cv2Duzenle(id, tur);
+      else if(act === 'hareketler') cv2Hareketler(id, tur);
+      else if(act === 'ekstre') cv2Ekstre(id, tur);
+      else if(act === 'daha') cv2DahaFazla(id, tur);
+    });
+  });
+}
+
+/* ---------- ekran ---------- */
+function renderCariV2(){
+  const list = cv2Liste();
+  const total  = list.reduce((s,x)=> s + cariBalance(x.c), 0);
+  const borc   = list.reduce((s,x)=> s + Math.min(cariBalance(x.c), 0), 0);
+  const alacak = list.reduce((s,x)=> s + Math.max(cariBalance(x.c), 0), 0);
+
+  const netEl = document.getElementById('cv2Net');
+  netEl.textContent = fmtWhole(total);
+  netEl.className = 'v ' + cv2BalClass(total);
+  document.getElementById('cv2Borc').textContent = fmtWhole(Math.abs(borc));
+  document.getElementById('cv2Alacak').textContent = fmtWhole(alacak);
+  document.getElementById('cv2Nakit').textContent = fmtWhole(state.cash);
+
+  const wrap = document.getElementById('cv2List');
+  cv2OpenId = null;
+  if(!list.length){
+    wrap.innerHTML = '<div class="cv2-empty">Henüz cari hesap yok</div>';
+    return;
+  }
+  wrap.innerHTML = list.map(({c,tur}) => CariCardV2(c,tur)).join('');
+  cv2BindCards();
+}
+
+/* ---------- TransactionDetailBottomSheet (V2: Hareketler) ---------- */
+function cv2Hareketler(id, tur){
+  const c = cv2Find(id, tur); if(!c) return;
+  const bal = cariBalance(c);
+  document.getElementById('cv2ShTitle').textContent = c.name;
+  document.getElementById('cv2ShSub').textContent = (bal < 0 ? 'Borç ' : (bal > 0 ? 'Alacak ' : 'Bakiye ')) + fmtWhole(Math.abs(bal));
+  const rows = (c.transactions || []).slice().sort((a,b)=> new Date(b.date) - new Date(a.date));
+  document.getElementById('cv2ShBody').innerHTML = rows.length ? rows.map(t=>{
+    const amt = signedAmount(t);
+    const cls = cv2BalClass(amt);
+    return '<div class="cv2-hrow"><div><div class="tp">' + t.type + '</div><div class="dt">' + cv2TR(new Date(t.date)) + '</div></div>' +
+           '<div class="am ' + cls + '">' + fmtWhole(amt) + '</div></div>';
+  }).join('') : '<div class="cv2-empty" style="padding:24px 8px;">Hareket yok</div>';
+  const sh = document.getElementById('cv2Sheet');
+  sh.classList.add('show');
+  requestAnimationFrame(()=> requestAnimationFrame(()=> sh.classList.add('in')));
+}
+function cv2CloseSheet(hemen){
+  const sh = document.getElementById('cv2Sheet');
+  if(!sh) return;
+  sh.classList.remove('in');
+  if(hemen){ sh.classList.remove('show'); return; }
+  setTimeout(()=>{ if(!sh.classList.contains('in')) sh.classList.remove('show'); }, 380);
+}
+
+/* ---------- küçük onay/form penceresi (V2) ---------- */
+let cv2ModalAksiyon = null;
+function cv2ModalAc(baslik, mesaj, formHtml, onayMetni, onaySinif, aksiyon){
+  document.getElementById('cv2ModalTitle').textContent = baslik;
+  document.getElementById('cv2ModalMsg').innerHTML = mesaj || '';
+  document.getElementById('cv2ModalForm').innerHTML = formHtml || '';
+  const yes = document.getElementById('cv2ModalYes');
+  yes.textContent = onayMetni || 'Onayla';
+  yes.className = 'cv2-btn ' + (onaySinif || 'primary');
+  cv2ModalAksiyon = aksiyon;
+  const m = document.getElementById('cv2Modal');
+  m.classList.add('show');
+  requestAnimationFrame(()=> requestAnimationFrame(()=> m.classList.add('in')));
+}
+function cv2ModalKapat(){
+  const m = document.getElementById('cv2Modal');
+  if(!m) return;
+  m.classList.remove('in');
+  cv2ModalAksiyon = null;
+  setTimeout(()=>{ if(!m.classList.contains('in')) m.classList.remove('show'); }, 260);
+}
+
+/* ---------- Tahsilat / Ödeme / Düzenle / Ekstre / Daha Fazla ---------- */
+function cv2Tahsilat(id, tur){
+  const c = cv2Find(id, tur); if(!c) return;
+  cv2ModalAc('Tahsilat', c.name,
+    '<div class="cv2-field"><label>TUTAR (TL)</label><input id="cv2Tutar" type="text" inputmode="decimal" placeholder="0,00"></div>',
+    'Kaydet', 'primary',
+    function(){
+      const ham = (document.getElementById('cv2Tutar').value || '').trim();
+      const v = parseFloat(ham.replace(/\./g,'').replace(',','.'));
+      cv2ModalKapat();
+      if(!isNaN(v) && v > 0){
+        showIslemYapiliyor(()=>{
+          c.transactions.push({ type:'TAHSİLAT', desc:'Tahsilat (Cari Hesap V2)', amount:v, date:new Date().toISOString() });
+          save();
+          renderCariV2();
+        }, 2000);
+      }
+    }
+  );
+}
+function cv2Odeme(id, tur){
+  const c = cv2Find(id, tur); if(!c) return;
+  cv2ModalAc('Ödeme', c.name,
+    '<div class="cv2-field"><label>TUTAR (TL)</label><input id="cv2Tutar" type="text" inputmode="decimal" placeholder="0,00"></div>',
+    'Kaydet', 'primary',
+    function(){
+      const ham = (document.getElementById('cv2Tutar').value || '').trim();
+      const v = parseFloat(ham.replace(/\./g,'').replace(',','.'));
+      cv2ModalKapat();
+      if(!isNaN(v) && v > 0){
+        showIslemYapiliyor(()=>{
+          c.transactions.push({ type:'ÖDEME', desc:'Ödeme (Cari Hesap V2)', amount:v, date:new Date().toISOString() });
+          save();
+          renderCariV2();
+        }, 2000);
+      }
+    }
+  );
+}
+function cv2Duzenle(id, tur){
+  const c = cv2Find(id, tur); if(!c) return;
+  cv2ModalAc('Cariyi Düzenle', '',
+    '<div class="cv2-field"><label>FİRMA ADI</label><input id="cv2Ad" type="text" value="' + c.name.replace(/"/g,'&quot;') + '"></div>',
+    'Kaydet', 'primary',
+    function(){
+      const yeni = (document.getElementById('cv2Ad').value || '').trim();
+      cv2ModalKapat();
+      if(yeni){
+        showIslemYapiliyor(()=>{
+          c.name = yeni;
+          save();
+          renderCariV2();
+        }, 2000);
+      }
+    }
+  );
+}
+function cv2Ekstre(id, tur){
+  // Mevcut, dokunulmamış ekstre görünümünü açar (salt okunur, veriyi değiştirmez)
+  openCariEkstrePopup(id, tur);
+}
+function cv2DahaFazla(id, tur){
+  const c = cv2Find(id, tur); if(!c) return;
+  cv2ModalAc('Daha Fazla', c.name + '<br>Bu cariyi listeden silmek istiyor musun?', '', 'Sil', 'danger',
+    function(){
+      cv2ModalKapat();
+      const arr = tur === 'tedarikci' ? state.tedarikci : state.cari;
+      const idx = arr.findIndex(x=>x.id===id);
+      if(idx > -1){
+        showIslemYapiliyor(()=>{
+          arr.splice(idx, 1);
+          save();
+          renderCariV2();
+        }, 2000);
+      }
+    }
+  );
+}
+
+/* ---------- olaylar (V2) ---------- */
+(function cv2Bind(){
+  const addBtn = document.getElementById('cv2AddBtn');
+  if(addBtn) addBtn.addEventListener('click', () => openYeniCari());
+
+  // Mevcut "Yeni Cari" formuyla eklenen kayıt V2 listesine de yansısın diye
+  // ncSave üzerine EK bir dinleyici (mevcut onclick'e hiç dokunmadan).
+  const ncSaveBtn = document.getElementById('ncSave');
+  if(ncSaveBtn) ncSaveBtn.addEventListener('click', () => {
+    const scr = document.getElementById('cv2Screen');
+    if(scr && scr.classList.contains('show')) renderCariV2();
+  });
+
+  const pane = document.getElementById('cv2ListPane');
+  if(pane) pane.addEventListener('pointerdown', e => {
+    if(!cv2OpenId) return;
+    const wrap = e.target.closest('.cv2-wrap');
+    if(!wrap || wrap.dataset.uid !== cv2OpenId) cv2CloseOpen(null);
+  }, true);
+
+  const shBg = document.getElementById('cv2SheetBg');
+  if(shBg) shBg.addEventListener('click', () => cv2CloseSheet());
+  const shClose = document.getElementById('cv2ShClose');
+  if(shClose) shClose.addEventListener('click', () => cv2CloseSheet());
+
+  const mBg = document.getElementById('cv2ModalBg');
+  if(mBg) mBg.addEventListener('click', () => cv2ModalKapat());
+  const mNo = document.getElementById('cv2ModalNo');
+  if(mNo) mNo.addEventListener('click', () => cv2ModalKapat());
+  const mYes = document.getElementById('cv2ModalYes');
+  if(mYes) mYes.addEventListener('click', () => { if(cv2ModalAksiyon) cv2ModalAksiyon(); });
+})();
 
 // ================= KREDİ KARTI HESABIM =================
 // Bileşenler: MonthSidebar · TransactionList · TransactionCard · TransactionDetailBottomSheet
