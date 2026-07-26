@@ -4718,12 +4718,17 @@ function cv2ModalAc(baslik, mesaj, formHtml, onayMetni, onaySinif, aksiyon, ikin
   // iOS Safari'de, altındaki alan kaydırılırken açılan position:fixed pencereler
   // bazen yerinden oynayıp listenin içine gömülü gibi görünebiliyor — bunu önlemek
   // için modal açıkken arka plan sayfayı sabitliyoruz (kapanınca eski konuma dönülür).
-  cv2ModalScrollY = window.scrollY || document.documentElement.scrollTop || 0;
-  document.body.style.position = 'fixed';
-  document.body.style.top = '-' + cv2ModalScrollY + 'px';
-  document.body.style.left = '0';
-  document.body.style.right = '0';
-  document.body.style.width = '100%';
+  // NOT: bu kilitleme bir sonraki frame'e ERTELENİYOR — aynı anda (satırı kapatan)
+  // bir CSS transition da başlamış olabiliyor; body'nin position'ını hemen değiştirmek
+  // o transition'ı bazı gerçek cihazlarda yarıda kesip satırın açık görünmesine yol açıyordu.
+  requestAnimationFrame(()=>{
+    cv2ModalScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+    document.body.style.position = 'fixed';
+    document.body.style.top = '-' + cv2ModalScrollY + 'px';
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+  });
   document.getElementById('cv2ModalTitle').textContent = baslik;
   document.getElementById('cv2ModalMsg').innerHTML = mesaj || '';
   document.getElementById('cv2ModalForm').innerHTML = formHtml || '';
