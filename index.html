@@ -8068,31 +8068,6 @@ function ensureSanalKuruTemizlemeTahsilati(){
 }
 if(ensureSanalKuruTemizlemeTahsilati()) save();
 
-// Temmuz 2026: Garanti BBVA "Gelen Para Transferi" — Eray Taşkın 5.000₺ (23.07.2026 10:25,
-// yeni müşteri) ve Murat Bey/Nişantaşı Kuru Temizleme 11.150₺ (23.07.2026 16:05, mevcut
-// hesaptan düşülecek TAHSİLAT) gönderdi. İkisi de banka hesabına geldiği için Kasa'ya değil
-// Banka moduline (Para Yatır) işlendi — önceki Şanal Kuru Temizleme kararıyla tutarlı.
-function ensureErayVeNisantasiTahsilat(){
-  let changed = false;
-  let eray = state.cari.find(c => normAd(c.name) === normAd('Eray Taşkın'));
-  if(!eray){
-    state.cari.push({ id:'eraytaskin', name:'Eray Taşkın', transactions: [
-      {type:'TAHSİLAT', desc:'Garanti BBVA havale', amount:5000.00, date:'2026-07-23T10:25:27.000Z'}
-    ]});
-    changed = true;
-  } else if(!eray.transactions.some(t => t.date === '2026-07-23T10:25:27.000Z' && t.amount === 5000 && t.type === 'TAHSİLAT')){
-    eray.transactions.push({type:'TAHSİLAT', desc:'Garanti BBVA havale', amount:5000.00, date:'2026-07-23T10:25:27.000Z'});
-    changed = true;
-  }
-  const nisantasi = state.cari.find(c => normAd(c.name) === normAd('Nişantaşı Kuru Temizleme'));
-  if(nisantasi && !nisantasi.transactions.some(t => t.date === '2026-07-23T16:05:18.000Z' && t.amount === 11150 && t.type === 'TAHSİLAT')){
-    nisantasi.transactions.push({type:'TAHSİLAT', desc:'Garanti BBVA havale (Murat Bey)', amount:11150.00, date:'2026-07-23T16:05:18.000Z'});
-    changed = true;
-  }
-  return changed;
-}
-if(ensureErayVeNisantasiTahsilat()) save();
-
 // Temmuz 2026: Kalan Garanti BBVA hareketleri — (1) Şanal Kuru Temizleme'nin 14.07.2026
 // tarihli 3.500₺'lik ikinci havalesi (ilk 2.000₺ havale zaten işlenmişti, bu eksikti),
 // (2) 23.07.2026 giden 10.000₺ transfer (alıcı adı mailde yok, sadece Banka hareketi),
