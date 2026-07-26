@@ -436,7 +436,6 @@
   .am-badge.b-siparis{background:linear-gradient(135deg,#63e070,#1fac47);}
   .am-badge.b-ayarlar{background:linear-gradient(135deg,#9aa8b8,#6d7c8d);}
   .am-badge.b-iletisim{background:linear-gradient(135deg,#6dd0c8,#2f9c8f);}
-  .am-badge.b-banka{background:linear-gradient(135deg,#5fb946,#1a7a34);}
   .am-badge-balance{position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);background:#1c2b30;color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.25);border:2px solid #fff;}
 
   .urun-search-bar{display:flex;align-items:center;gap:10px;background:#fff;padding:22px 16px 14px 16px;flex-shrink:0;border-bottom:1px solid var(--line);}
@@ -499,7 +498,7 @@
   .taksit-detay-card .gg-row .lbl{font-size:15px;}
   .taksit-detay-card .gg-row .val{font-size:17px;}
     .cari-card{background:#fff;border-radius:16px;padding:14px;color:var(--ink);position:relative;overflow:hidden;flex-shrink:0;box-shadow:0 2px 8px rgba(20,40,50,.06);}
-  #cariSummaryCard, #bankaSummaryCard{box-shadow:0 8px 16px rgba(20,40,50,.12);flex-shrink:0;}
+  #cariSummaryCard{box-shadow:0 8px 16px rgba(20,40,50,.12);flex-shrink:0;}
   .acct-card.cari-sub{box-shadow:0 8px 16px rgba(20,40,50,.12);}
   .cari-card-top{display:flex;align-items:center;justify-content:space-between;}
   .cari-card-label{font-size:10px;font-weight:700;letter-spacing:.6px;color:var(--muted);text-transform:uppercase;}
@@ -543,7 +542,6 @@
   .swipe-btn-tamamlandi{width:96px;border:none;background:#2e8b57;color:#fff;font-weight:700;font-size:12px;cursor:pointer;padding:0 4px;text-align:center;}
   .swipe-btn-tamamlandi.disabled{background:#b8c0c2;color:rgba(255,255,255,.75);cursor:default;}
     .swipe-btn{width:84px;border:none;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:6px;font-size:12.5px;font-weight:600;color:#fff;cursor:pointer;padding:0;}
-    #bankaList .swipe-btn, #bankaIslenenList .swipe-btn{width:58px;font-size:10.5px;padding:0 2px;}
   .swipe-btn .ico{font-size:16px;display:inline-flex;align-items:center;}
   .swipe-btn.act-satis{background:#2f6690;}
   .swipe-btn.act-tahsilat{background:#1f9d64;}
@@ -588,20 +586,6 @@
   .dcard-pager{overflow:hidden;position:relative;}
   .dcard-track{display:flex;width:600%;}
   .dcard-page{flex:0 0 50%;min-width:50%;box-sizing:border-box;}
-  #bankaCardTrack .dcard-page{flex:0 0 33.3333%;min-width:33.3333%;}
-  .bonus-tx-row{display:flex;align-items:flex-start;gap:12px;padding:14px 12px;border-bottom:1px solid rgba(20,40,50,.08);}
-  .bonus-tx-row:last-child{border-bottom:none;}
-  .bonus-tx-date{flex:0 0 46px;text-align:center;line-height:1.05;}
-  .bonus-tx-date .g{font-size:22px;font-weight:800;color:#3d4a55;}
-  .bonus-tx-date .a{display:block;font-size:10px;font-weight:700;color:#8a94a3;letter-spacing:.4px;margin-top:2px;}
-  .bonus-tx-date .y{display:block;font-size:10px;color:#8a94a3;}
-  .bonus-tx-mid{flex:1;min-width:0;}
-  .bonus-tx-kat{font-size:15px;font-weight:700;color:#1f2b36;}
-  .bonus-tx-yer{font-size:13px;color:#6d7885;margin-top:2px;word-break:break-word;}
-  .bonus-tx-right{text-align:right;flex-shrink:0;}
-  .bonus-tx-tutar{font-size:15px;font-weight:800;color:#1f2b36;white-space:nowrap;}
-  .bonus-tx-taksit{font-size:13px;color:#6d7885;margin-top:2px;white-space:nowrap;}
-  .bonus-tx-fis{margin-top:8px;display:flex;justify-content:flex-end;}
   .dcek-dot.active{background:var(--accent);width:16px;border-radius:3px;}
   .overlay.show{display:flex;}
   .modal{background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:20px 20px 26px 20px;}
@@ -913,7 +897,6 @@
     <div class="am-tile" data-mod="alislar"><div class="am-badge b-alis"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v17"/><path d="M7.5 20h9"/><path d="M4 7h5.5M14.5 7H20"/><path d="M2 7l2.6 5.2a2.5 2.5 0 0 0 4.8 0L7 7"/><path d="M16.6 7l2.6 5.2a2.5 2.5 0 0 0 4.8 0L21.4 7"/></svg></div><div class="am-label">ALIŞLAR</div></div>
     <div class="am-tile" data-mod="masraflar"><div class="am-badge b-masraf"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2.2"/><circle cx="12" cy="12" r="3"/><path d="M6 12h.01M18 12h.01"/></svg></div><div class="am-label">MASRAFLAR</div></div>
     <div class="am-tile" data-mod="kasa"><div class="am-badge b-masraf"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="13" rx="2"/><path d="M2.5 10h19"/><circle cx="12" cy="14.2" r="2.3"/></svg></div><div class="am-label">KASA &amp; ÇEK</div></div>
-    <div class="am-tile" data-mod="banka"><div class="am-badge b-banka"><svg viewBox="0 0 24 24" fill="#fff"><g><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(20 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(110 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(200 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(290 12 12)"/></g><path d="M12 13.5 C 13 16.5, 15 18, 17.5 21" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg><div class="am-badge-balance" id="amBankaBadge" style="display:none;"></div></div><div class="am-label">GARANTİ BANKASI</div></div>
     <div class="am-tile" data-mod="krediKarti"><div class="am-badge b-kk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.8"/><path d="M2 9.8h20"/><path d="M5.5 15h4"/></svg></div><div class="am-label">KREDİ KARTI</div></div>
     <div class="am-tile" data-mod="cariV2"><div class="am-badge b-cariv2" style="position:relative;"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><circle cx="8.5" cy="11" r="2"/><path d="M5.3 16c.5-1.8 1.8-2.7 3.2-2.7s2.7.9 3.2 2.7"/><path d="M15 9.5h4M15 13h4"/></svg><span style="position:absolute;top:-5px;right:-7px;background:#fff;color:#0f7d6c;font-size:9px;font-weight:800;border-radius:8px;padding:1px 4px;box-shadow:0 2px 5px rgba(0,0,0,.25);letter-spacing:.2px;">V2</span></div><div class="am-label">CARİ HESAP V2</div></div>
     <div class="am-tile" data-mod="raporlar"><div class="am-badge b-rapor"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6" fill="#fff" stroke="none"/><rect x="12" y="8" width="3" height="10" fill="#fff" stroke="none"/><rect x="17" y="5" width="3" height="13" fill="#fff" stroke="none"/></svg></div><div class="am-label">FİNANSAL RAPOR</div></div>
@@ -1870,97 +1853,6 @@
   <div class="d-list" id="kasaList" style="padding:16px 16px 100px 16px;"></div>
 </div>
 
-<div class="detail-screen" id="bankaScreen">
-  <div style="padding:16px 16px 0 16px;flex-shrink:0;">
-    <div class="cari-card" id="bankaSummaryCard">
-      <div class="dcard-pager" id="bankaCardPager">
-        <div class="dcard-track" id="bankaCardTrack">
-          <div class="dcard-page" data-page="0">
-            <div class="cari-card-top">
-              <span class="cari-card-label" style="font-size:15px;">GARANTİ BANKASI</span>
-              <span class="cari-card-icon" style="background:linear-gradient(135deg,#5fb946,#1a7a34);"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><g><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(20 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(110 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(200 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(290 12 12)"/></g><path d="M12 13.5 C 13 16.5, 15 18, 17.5 21" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span>
-            </div>
-            <div class="cari-card-bottom" style="align-items:center;">
-              <div class="cari-card-info" style="display:flex;flex-wrap:wrap;gap:8px 14px;">
-                <div style="flex:1 1 40%;min-width:110px;">
-                  <div style="font-size:12pt;letter-spacing:.3px;color:var(--muted);">TEK İŞLEMLİ TOPLAM</div>
-                  <div id="tekIslemToplam" style="font-size:12pt;font-weight:800;color:var(--accent);margin-top:2px;">0,00₺</div>
-                </div>
-                <div style="flex:1 1 40%;min-width:110px;">
-                  <div style="font-size:12pt;letter-spacing:.3px;color:var(--muted);">İŞLEM SAYISI</div>
-                  <div id="tekIslemSayisi" style="font-size:12pt;font-weight:800;color:var(--ink);margin-top:2px;">0</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="dcard-page" data-page="1">
-            <div class="cari-card-top">
-              <span class="cari-card-label" style="font-size:15px;">BONUS FLEXİ</span>
-              <span class="cari-card-icon" style="background:linear-gradient(135deg,#5fb946,#1a7a34);"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><g><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(20 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(110 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(200 12 12)"/><path d="M 12 12 A 5 5 0 0 1 12 3 A 5 5 0 0 1 12 12 Z" transform="rotate(290 12 12)"/></g><path d="M12 13.5 C 13 16.5, 15 18, 17.5 21" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span>
-            </div>
-            <div class="cari-card-bottom" style="align-items:center;">
-              <div class="cari-card-info" style="display:flex;flex-wrap:wrap;gap:8px 14px;">
-                <div style="flex:1 1 40%;min-width:110px;">
-                  <div style="font-size:12pt;letter-spacing:.3px;color:var(--muted);">TOPLAM ALIŞVERİŞ</div>
-                  <div id="taksitOzetToplam" style="font-size:12pt;font-weight:800;color:var(--ink);margin-top:2px;">0,00₺</div>
-                </div>
-                <div style="flex:1 1 40%;min-width:110px;">
-                  <div style="font-size:12pt;letter-spacing:.3px;color:var(--muted);" id="taksitOzetAyAdi">BU AY ÖDENECEK</div>
-                  <div id="taksitOzetBuAy" style="font-size:12pt;font-weight:800;color:var(--red);margin-top:2px;">0,00₺</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="dcard-page" data-page="2">
-            <div class="cari-card-top">
-              <span class="cari-card-label" style="font-size:15px;">BONUS PLATINUM TROY</span>
-              <span class="cari-card-icon" style="background:linear-gradient(135deg,#7ec84a,#3f8f22);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="4" fill="#fff"/><text x="12" y="16" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="9" font-weight="700" fill="#4aa72e">bns</text></svg></span>
-            </div>
-            <div class="cari-card-balance bk-balance-bonus" style="color:var(--red);">0<span style="font-size:0.5em;">,00₺</span></div>
-            <div class="cari-card-name">Güncel Kart Borcu</div>
-            <div class="cari-card-bottom" style="align-items:center;">
-              <div class="cari-card-info" style="display:flex;flex-wrap:wrap;gap:8px 14px;">
-                <div style="flex:1 1 40%;min-width:110px;">
-                  <div style="font-size:12pt;letter-spacing:.3px;color:var(--muted);">BU EKSTREDE ÖDENECEK</div>
-                  <div id="bonusBuEkstre" style="font-size:12pt;font-weight:800;color:var(--red);margin-top:2px;">0,00₺</div>
-                </div>
-                <div style="flex:1 1 40%;min-width:110px;">
-                  <div style="font-size:12pt;letter-spacing:.3px;color:var(--muted);">GELECEK DÖNEM BORCU</div>
-                  <div id="bonusGelecek" style="font-size:12pt;font-weight:800;color:var(--ink);margin-top:2px;">0,00₺</div>
-                </div>
-                <div style="flex:1 1 40%;min-width:110px;">
-                  <div style="font-size:12pt;letter-spacing:.3px;color:var(--muted);">TOPLAM TAKSİTLİ BORÇ</div>
-                  <div id="bonusToplamTaksitli" style="font-size:12pt;font-weight:800;color:var(--ink);margin-top:2px;">0,00₺</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="dcek-dots" id="bankaDots">
-      <span class="dcek-dot" data-i="0"></span>
-      <span class="dcek-dot active" data-i="1"></span>
-      <span class="dcek-dot" data-i="2"></span>
-    </div>
-  </div>
-  <div class="d-list" id="bankaScrollArea" style="padding:14px 16px 100px 16px;">
-    <div id="taksitliBolum">
-      <div class="sheet-title">TAKSİTLİ İŞLEMLER</div>
-      <div class="acct-card cari-sub" id="taksitCard"></div>
-    </div>
-    <div id="digerBolum">
-      <div class="sheet-title">DİĞER HAREKETLER</div>
-      <div id="bankaList"></div>
-    </div>
-    <div id="bonusBolum" style="display:none;">
-      <div class="sheet-title">TAKSİTLİ İŞLEMLER</div>
-      <div class="acct-card cari-sub" id="bonusKartList"></div>
-    </div>
-  </div>
-</div>
-
-
 <div class="detail-screen" id="kkScreen">
   <div class="kk-head"><h1>Kredi Kartı Hesabım</h1></div>
 
@@ -2117,69 +2009,6 @@
   </div>
 </div>
 
-<div class="detail-screen" id="taksitDetayScreen">
-  <div class="d-header">
-    <button class="urun-back" id="taksitDetayBack">‹</button>
-    <div class="d-title" id="taksitDetayTitle">Alışveriş Detayı</div>
-    <span style="width:28px;"></span>
-  </div>
-  <div style="padding:16px;">
-    <div class="cari-card">
-      <div class="cari-card-top">
-        <span class="cari-card-label" id="taksitDetayKartTag">TAKSİTLİ ALIŞVERİŞ</span>
-      </div>
-      <div class="cari-card-balance" id="taksitDetayTutar" style="color:#1f7fae;">0,00₺</div>
-      <div class="cari-card-name" id="taksitDetayTarih">—</div>
-    </div>
-    <div class="acct-card taksit-detay-card" style="margin-top:16px;">
-      <div class="gg-row"><span class="lbl">Taksit Tutarı</span><span class="val" id="taksitDetayTaksitTutari">—</span></div>
-      <div class="gg-row"><span class="lbl">Toplam Taksit</span><span class="val" id="taksitDetayToplamSayi">—</span></div>
-      <div class="gg-row"><span class="lbl">Ödenen Taksit</span><span class="val" id="taksitDetayOdenen">—</span></div>
-      <div class="gg-row"><span class="lbl">Kalan Taksit</span><span class="val" id="taksitDetayKalan">—</span></div>
-      <div class="gg-row"><span class="lbl">Kalan Tutar</span><span class="val neg" id="taksitDetayKalanTutar">—</span></div>
-    </div>
-  </div>
-</div>
-
-<div class="overlay" id="bankaOverlay">
-  <div class="modal">
-    <h3>Banka Hareketi</h3>
-    <div class="ios-card">
-      <div class="field-ios">
-        <label>Açıklama</label>
-        <input type="text" id="bankaDesc" placeholder="Örn: Havale, EFT, kredi ödemesi">
-      </div>
-      <div class="field-ios">
-        <label>Tutar (₺)</label>
-        <input type="number" id="bankaAmount" placeholder="0,00" inputmode="decimal">
-      </div>
-      <div class="field-ios">
-        <label>Tarih</label>
-        <input type="date" id="bankaTarih">
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-cancel" id="bankaCancelBtn">Vazgeç</button>
-      <button class="btn-save" id="bankaSaveBtn">Kaydet</button>
-    </div>
-  </div>
-</div>
-
-<div class="overlay" id="bankaBilgiOverlay">
-  <div class="modal">
-    <h3>Banka Hareketi</h3>
-    <div class="acct-card" style="padding:4px 14px;margin:0;">
-      <div class="gg-row"><span class="lbl">Açıklama</span><span class="val" id="bankaBilgiDesc">—</span></div>
-      <div class="gg-row"><span class="lbl">Tür</span><span class="val" id="bankaBilgiTur">—</span></div>
-      <div class="gg-row"><span class="lbl">Tutar</span><span class="val" id="bankaBilgiTutar">—</span></div>
-      <div class="gg-row"><span class="lbl">Tarih</span><span class="val" id="bankaBilgiTarih">—</span></div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-save" id="bankaBilgiKapatBtn" style="width:100%;">Kapat</button>
-    </div>
-  </div>
-</div>
-
 <div class="detail-screen" id="kasaCekScreen">
   <div class="d-header">
     <div class="d-title">Gelen Çekler</div>
@@ -2197,51 +2026,6 @@
     <button id="cekCikisIptal" style="margin-top:12px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
   </div>
 </div>
-
-<div class="overlay" id="bankaTahsilatSecOverlay" style="z-index:95;align-items:center;">
-  <div class="modal" style="padding-bottom:14px;border-radius:20px;max-height:80vh;overflow-y:auto;">
-    <h3 style="margin-bottom:4px;">Tahsilat — Cari Seç</h3>
-    <p style="color:var(--muted);font-size:13px;margin:0 0 14px 0;" id="bankaTahsilatAciklama"></p>
-    <div id="bankaTahsilatMusteriList" style="max-height:48vh;overflow-y:auto;"></div>
-    <button type="button" id="bankaTahsilatYeniMusteriBtn" style="width:100%;text-align:center;padding:13px 12px;border:1.5px dashed var(--accent);border-radius:12px;background:none;font-weight:700;font-size:14px;color:var(--accent);cursor:pointer;margin-top:4px;">＋ Yeni Müşteri Ekle</button>
-    <button id="bankaTahsilatIptal" style="margin-top:12px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
-  </div>
-</div>
-
-<div class="overlay" id="bankaOdemeSecOverlay" style="z-index:95;align-items:center;">
-  <div class="modal" style="padding-bottom:14px;border-radius:20px;max-height:80vh;overflow-y:auto;">
-    <h3 style="margin-bottom:4px;">Ödeme — Cari Seç</h3>
-    <p style="color:var(--muted);font-size:13px;margin:0 0 14px 0;" id="bankaOdemeAciklama"></p>
-    <div id="bankaOdemeTedarikciList" style="max-height:48vh;overflow-y:auto;"></div>
-    <button type="button" id="bankaOdemeYeniTedarikciBtn" style="width:100%;text-align:center;padding:13px 12px;border:1.5px dashed var(--accent);border-radius:12px;background:none;font-weight:700;font-size:14px;color:var(--accent);cursor:pointer;margin-top:4px;">＋ Yeni Tedarikçi Ekle</button>
-    <button id="bankaOdemeIptal" style="margin-top:12px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
-  </div>
-</div>
-
-<div class="overlay" id="bankaMasrafSecOverlay" style="z-index:95;align-items:center;">
-  <div class="modal" style="padding-bottom:14px;border-radius:20px;max-height:80vh;overflow-y:auto;">
-    <h3 style="margin-bottom:4px;">Masraf — Kalem Seç</h3>
-    <p style="color:var(--muted);font-size:13px;margin:0 0 14px 0;" id="bankaMasrafAciklama"></p>
-    <div id="bankaMasrafKalemList" style="max-height:48vh;overflow-y:auto;"></div>
-    <button type="button" id="bankaMasrafYeniKalemBtn" style="width:100%;text-align:center;padding:13px 12px;border:1.5px dashed var(--accent);border-radius:12px;background:none;font-weight:700;font-size:14px;color:var(--accent);cursor:pointer;margin-top:4px;">＋ Yeni Masraf Kalemi Ekle</button>
-    <button id="bankaMasrafIptal" style="margin-top:12px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
-  </div>
-</div>
-
-<div class="overlay" id="bankaTasiOverlay" style="z-index:95;align-items:center;">
-  <div class="modal" style="padding-bottom:14px;border-radius:20px;max-height:85vh;overflow-y:auto;">
-    <h3 style="margin-bottom:4px;">Taşı — Çoklu Kayıt</h3>
-    <p style="color:var(--muted);font-size:13px;margin:0 0 14px 0;" id="bankaTasiAciklama"></p>
-    <div style="font-weight:700;font-size:13px;color:var(--ink);margin:10px 0 6px 0;">Cari Hesaplar</div>
-    <div id="bankaTasiCariList" style="max-height:22vh;overflow-y:auto;"></div>
-    <div style="font-weight:700;font-size:13px;color:var(--ink);margin:10px 0 6px 0;">Tedarikçiler</div>
-    <div id="bankaTasiTedarikciList" style="max-height:22vh;overflow-y:auto;"></div>
-    <div style="font-weight:700;font-size:13px;color:var(--ink);margin:10px 0 6px 0;">Masraf Kalemleri</div>
-    <div id="bankaTasiMasrafList" style="max-height:22vh;overflow-y:auto;"></div>
-    <button id="bankaTasiKapat" style="margin-top:12px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Kapat</button>
-  </div>
-</div>
-
 
 <div class="receipt-overlay" id="receiptOverlay">
   <div class="receipt-card">
@@ -2425,9 +2209,6 @@ if(!state.siparisFisleri) state.siparisFisleri = [];
 if(!state.cariFilter) state.cariFilter = 'tumu';
 if(!state.masrafKategorileri) state.masrafKategorileri = [];
 if(!state.masrafHesaplari) state.masrafHesaplari = [];
-if(!state.banka) state.banka = { transactions: [] };
-if(!state.banka.transactions) state.banka.transactions = [];
-
 let activeLedger = 'cari';
 function getLedger(){ return state[activeLedger]; }
 
@@ -4058,55 +3839,6 @@ function goToCardPage(idx, animate){
   dActivePage = idx;
 }
 
-let bankaActivePage = 0;
-function goToBankaCardPage(idx, animate){
-  const track = document.getElementById('bankaCardTrack');
-  track.style.transition = animate === false ? 'none' : 'transform .25s ease';
-  track.style.transform = `translateX(-${idx * (100/3)}%)`;
-  document.querySelectorAll('#bankaDots .dcek-dot').forEach((d,i)=> d.classList.toggle('active', i===idx));
-  bankaActivePage = idx;
-  document.getElementById('taksitliBolum').style.display = idx === 1 ? '' : 'none';
-  document.getElementById('digerBolum').style.display = idx === 0 ? '' : 'none';
-  document.getElementById('bonusBolum').style.display = idx === 2 ? '' : 'none';
-}
-(function(){
-  const pager = document.getElementById('bankaCardPager');
-  const track = document.getElementById('bankaCardTrack');
-  const dots = document.querySelectorAll('#bankaDots .dcek-dot');
-  let startX = 0, lastX = 0, dragging = false, baseIdx = 0;
-  pager.addEventListener('pointerdown', (e)=>{
-    dragging = true;
-    startX = e.clientX; lastX = e.clientX;
-    baseIdx = bankaActivePage;
-    track.style.transition = 'none';
-  });
-  pager.addEventListener('pointermove', (e)=>{
-    if(!dragging) return;
-    lastX = e.clientX;
-    const delta = lastX - startX;
-    const pct = (delta / pager.clientWidth) * (100/3);
-    let x = -(baseIdx * (100/3)) + pct;
-    x = Math.max(-(2 * (100/3)), Math.min(0, x));
-    track.style.transform = `translateX(${x}%)`;
-  });
-  function finish(){
-    if(!dragging) return;
-    dragging = false;
-    const delta = lastX - startX;
-    let newIdx = baseIdx;
-    if(Math.abs(delta) > pager.clientWidth * 0.18){
-      newIdx = delta < 0 ? baseIdx + 1 : baseIdx - 1;
-    }
-    newIdx = Math.max(0, Math.min(2, newIdx));
-    goToBankaCardPage(newIdx, true);
-  }
-  pager.addEventListener('pointerup', finish);
-  pager.addEventListener('pointercancel', finish);
-  dots.forEach(dot=>{
-    dot.onclick = () => goToBankaCardPage(parseInt(dot.dataset.i, 10), true);
-  });
-})();
-
 (function(){
   const pager = document.getElementById('dCardPager');
   const track = document.getElementById('dCardTrack');
@@ -4497,8 +4229,6 @@ function hideAllScreens(){
   document.getElementById('ayarlarScreen').classList.remove('show');
   kasaScreen.classList.remove('show');
   document.getElementById('kasaCekScreen').classList.remove('show');
-  document.getElementById('bankaScreen').classList.remove('show');
-  document.getElementById('taksitDetayScreen').classList.remove('show');
   document.getElementById('kkScreen').classList.remove('show');
   document.getElementById('cv2Screen').classList.remove('show');
   if(typeof cv2CloseSheet === 'function') cv2CloseSheet(true);
@@ -4523,24 +4253,12 @@ function updateSiparisBadge(){
   }
 }
 
-function bankaBakiye(){
-  return (state.banka.transactions||[]).reduce((s,t)=> s + (t.type === 'YATIR' ? t.amount : -t.amount), 0);
-}
-
-function updateBankaBadge(){
-  const badge = document.getElementById('amBankaBadge');
-  if(!badge) return;
-  badge.textContent = fmtWhole(bankaBakiye());
-  badge.style.display = 'flex';
-}
-
 function showAnaMenu(){
   hideAllScreens();
   anaMenu.style.display = 'flex';
   anaMenu.style.visibility = 'visible';
   document.getElementById('anaMenuFloatBtn').style.display = 'none';
   updateSiparisBadge();
-  updateBankaBadge();
   nudge();
 }
 document.getElementById('anaMenuFloatBtn').onclick = () => showAnaMenu();
@@ -4577,12 +4295,6 @@ document.getElementById('anaMenu').querySelectorAll('.am-tile').forEach(tile=>{
       renderKasa();
       hideAllScreens();
       kasaScreen.classList.add('show');
-      nudge();
-    } else if(mod === 'banka'){
-      renderBanka();
-      goToBankaCardPage(1, false);
-      hideAllScreens();
-      document.getElementById('bankaScreen').classList.add('show');
       nudge();
     } else if(mod === 'cariV2'){
       renderCariV2();
@@ -4723,117 +4435,6 @@ function renderKasa(){
       const body = document.getElementById('kasaAy-' + key);
       body.classList.toggle('hidden');
       header.querySelector('.kasa-ay-chevron').textContent = body.classList.contains('hidden') ? '▾' : '▴';
-    };
-  });
-}
-
-// ---------- Banka — ayrı, kendi bakiyesi olan basit bir hareket defteri
-// (Kasa/nakit ile karışmaz). Para Yatır bakiyeyi artırır, Para Çek azaltır;
-// bakiye her zaman transactions'tan hesaplanır (ayrı bir sayaç tutulmaz). ----------
-// ---------- Taksitli Alışverişler — her taksitli kredi kartı alışverişi, cari hesap gibi
-// dokunulabilir bir satır. Satıra dokununca alışveriş içeriği (tutar, taksit sayısı, ödenen/
-// kalan) detay ekranında açılır; satırın yanındaki yuvarlak rozet kalan taksit sayısını gösterir. ----------
-if(!state.banka.taksitler) state.banka.taksitler = [];
-function taksitKalan(t){ return Math.max(0, (t.taksitSayisi||1) - (t.odenenTaksit||0)); }
-const BONUS_PLATINUM_KART = 'Bonus Platinum Troy';
-// BONUS PLATINUM TROY kartının toplam borcu = o karta ait taksitlerin ÖDENMEMİŞ kısmı
-function bonusPlatinumBorc(){
-  return (state.banka.taksitler || [])
-    .filter(t => t.kart === BONUS_PLATINUM_KART)
-    .reduce((s, t) => s + taksitKalan(t) * (t.taksitTutari || 0), 0);
-}
-// BONUS PLATINUM — ekstre özet rakamları (Garanti BBVA ekstresinden birebir)
-const BONUS_PLATINUM_OZET = {
-  guncelBorc: 36730.00,
-  buEkstre: 5586.00,
-  gelecekDonem: 4055.64,
-  toplamTaksitli: 36730.00,
-  acikAy: '2026-08',
-  aylar: [
-    { key:'2026-08', label:'Ağustos 2026', kayit:12, tutar:8113.32, hareketler:[
-        { gun:'05', ay:'AĞU', yil:'2026', kategori:'Giyim / Aksesuar', yer:'U.S. POLO BULVAR SAMSUN', tutar:999.98, taksit:'(3/3) Taksit' },
-        { gun:'20', ay:'AĞU', yil:'2026', kategori:'Vergi', yer:'34287-NAKİL VASITALARI VE', tutar:1527.83, taksit:'(2/3) Taksit' },
-        { gun:'20', ay:'EYL', yil:'2026', kategori:'Vergi', yer:'34287-NAKİL VASITALARI VE', tutar:1527.83, taksit:'(3/3) Taksit' }
-      ] },
-    { key:'2026-09', label:'Eylül 2026',   kayit:11, tutar:7493.32 },
-    { key:'2026-10', label:'Ekim 2026',    kayit:8,  tutar:5037.35 },
-    { key:'2026-11', label:'Kasım 2026',   kayit:7,  tutar:3509.52 },
-    { key:'2026-12', label:'Aralık 2026',  kayit:7,  tutar:3509.52 }
-  ]
-};
-const BONUS_LOGO_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="4" fill="#fff"/><text x="12" y="16" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="9" font-weight="700" fill="#4aa72e">bns</text></svg>';
-
-// Her sayfa artık kendi başlık/ikon/bakiye bloğunu taşıyor (swipe ile birlikte kayıyor);
-// bu fonksiyon sadece rakamları günceller, başlık/ikon metinleri HTML'de sabit.
-function bankaKartBakiyeGuncelle(){
-  const [mG, cG] = fmtPlain(bankaBakiye()).split(',');
-  document.querySelectorAll('.bk-balance-garanti').forEach(el=>{
-    el.innerHTML = mG + '<span style="font-size:0.5em;">,' + cG + '₺</span>';
-  });
-  const [mB, cB] = fmtPlain(BONUS_PLATINUM_OZET.guncelBorc).split(',');
-  document.querySelectorAll('.bk-balance-bonus').forEach(el=>{
-    el.innerHTML = mB + '<span style="font-size:0.5em;">,' + cB + '₺</span>';
-  });
-}
-
-const BONUS_FIS_IKON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16b8a8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h3"/><path d="M9 9h5M9 12.5h5M9 16h3"/></svg>';
-
-function bonusHareketlerHtml(a){
-  if(!a.hareketler || !a.hareketler.length) return '';
-  return a.hareketler.map(h => `
-    <div class="bonus-tx-row">
-      <div class="bonus-tx-date">
-        <span class="g">${h.gun}</span>
-        <span class="a">${h.ay}</span>
-        <span class="y">${h.yil}</span>
-      </div>
-      <div class="bonus-tx-mid">
-        <div class="bonus-tx-kat">${h.kategori}</div>
-        <div class="bonus-tx-yer">${h.yer}</div>
-      </div>
-      <div class="bonus-tx-right">
-        <div class="bonus-tx-tutar">-${fmtPlain(h.tutar)} TL</div>
-        <div class="bonus-tx-taksit">${h.taksit}</div>
-        <div class="bonus-tx-fis">${BONUS_FIS_IKON}</div>
-      </div>
-    </div>`).join('');
-}
-
-function renderBonusKart(){
-  const el = document.getElementById('bonusBuEkstre');
-  if(!el) return;
-  el.textContent = fmt(BONUS_PLATINUM_OZET.buEkstre);
-  document.getElementById('bonusGelecek').textContent = fmt(BONUS_PLATINUM_OZET.gelecekDonem);
-  document.getElementById('bonusToplamTaksitli').textContent = fmt(BONUS_PLATINUM_OZET.toplamTaksitli);
-
-  // Taksitli İşlemler — mevcut ay akordeonuyla (kasa-ay-group) birebir aynı yapı.
-  // Sadece hareket dökümü olan aylar (şu an: sadece açık ay) açılabilir; diğerlerinde
-  // ok işareti ve tıklama yok, çünkü başlıktakinin tekrarından başka gösterecek bir şey yok.
-  const list = document.getElementById('bonusKartList');
-  if(!list) return;
-  list.innerHTML = BONUS_PLATINUM_OZET.aylar.map(a=>{
-    const acik = a.key === BONUS_PLATINUM_OZET.acikAy;
-    const detayVar = !!(a.hareketler && a.hareketler.length);
-    const [gMain, gCents] = fmtPlain(a.tutar).split(',');
-    return `
-      <div class="kasa-ay-group" style="${acik ? 'background:#eef5ff;border-radius:14px;margin:6px 0;' : ''}">
-        <div class="kasa-ay-header" ${detayVar ? `data-bonus-key="${a.key}"` : ''} style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;${acik ? 'padding:14px 12px;' : ''}${detayVar ? '' : 'cursor:default;'}">
-          <div class="kasa-ay-label" style="flex:1;${acik ? 'color:#2f6690;font-size:16px;' : ''}">${a.label} <span style="font-weight:500;color:#8a94a3;font-size:13px;">(${a.kayit} kayıt)</span></div>
-          ${detayVar ? `<svg class="taksit-ay-chevron-buyuk" width="32" height="32" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;transition:transform .2s;${acik ? 'transform:rotate(180deg);' : ''}">
-            <path d="M6 9l6 6 6-6" stroke="#2f6690" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>` : '<span></span>'}
-          <div class="kasa-ay-toplam neg" style="text-align:right;">${gMain}<span class="cents">,${gCents}</span></div>
-        </div>
-        ${detayVar ? `<div class="kasa-ay-body${acik ? '' : ' hidden'}" id="bonusAy-${a.key}">${bonusHareketlerHtml(a)}</div>` : ''}
-      </div>`;
-  }).join('');
-
-  list.querySelectorAll('.kasa-ay-header[data-bonus-key]').forEach(header=>{
-    header.onclick = () => {
-      const body = document.getElementById('bonusAy-' + header.dataset.bonusKey);
-      body.classList.toggle('hidden');
-      const ch = header.querySelector('.taksit-ay-chevron-buyuk');
-      ch.style.transform = body.classList.contains('hidden') ? '' : 'rotate(180deg)';
     };
   });
 }
@@ -5751,676 +5352,6 @@ function renderKrediKarti(){
   }
 })();
 
-function renderTaksitler(){
-  const list = document.getElementById('taksitCard');
-  const rows = state.banka.taksitler.map((t, idx)=>({t, idx}));
-  if(!rows.length){
-    list.innerHTML = '<div class="sk-empty">Henüz taksitli alışveriş yok</div>';
-    return;
-  }
-
-  const rowHtml = ({t, idx, k, odendi, satinAlma}) => {
-    if(satinAlma){
-      const dateStr = new Date(t.tarih).toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'});
-      return `
-        <div class="acct-row" data-idx="${idx}">
-          <div style="position:relative;flex-shrink:0;">
-            <span class="siparis-date-circle son-hareket" style="width:44px;height:44px;background:#5b6b73;font-size:9px;">SATIN<br>ALMA</span>
-          </div>
-          <div class="name-wrap" style="flex:1;min-width:0;margin-left:12px;">
-            <span class="name">${t.desc}</span>
-            <div class="siparis-teslimat-row son-hareket-text">${dateStr}${t.kart ? ' · ' + t.kart : ''} · ${t.taksitSayisi} taksit</div>
-          </div>
-          <span class="amount">${fmtWhole(t.taksitTutari * t.taksitSayisi)}</span>
-        </div>`;
-    }
-    const renk = odendi ? '#1f8a54' : '#c0392b';
-    return `
-      <div class="acct-row" data-idx="${idx}">
-        <div style="position:relative;flex-shrink:0;">
-          <span class="siparis-date-circle son-hareket" style="width:44px;height:44px;background:${renk};font-size:11px;">${odendi ? '<b>✓</b>ÖDENDİ' : k + '/' + t.taksitSayisi}</span>
-        </div>
-        <div class="name-wrap" style="flex:1;min-width:0;margin-left:12px;">
-          <span class="name">${t.desc}</span>
-          <div class="siparis-teslimat-row son-hareket-text">${k}. taksit${t.kart ? ' · ' + t.kart : ''}${odendi ? '' : ' · henüz ödenmedi'}</div>
-        </div>
-        <span class="amount ${odendi ? '' : 'neg'}">${fmtWhole(t.taksitTutari)}</span>
-      </div>`;
-  };
-
-  // Tek birleşik aylık liste: Haziran'dan Aralık'a kadar her ay, o ayda düşen HER taksit
-  // ayrı satır olarak (kesim tarihi 4'ü: ilk taksit alışveriş ayından sonraki ayda kesilir).
-  // Şu anki ay "DEVAM EDENLER" olarak vurgulanır; gelecek aylar üstte, geçmiş aylar altta.
-  const keyOf = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-  const BASLANGIC_KEY = '2026-06', BITIS_KEY = '2026-12';
-  const gercekSuankiKey = keyOf(new Date());
-  const groups = new Map();
-  rows.forEach(({t, idx})=>{
-    for(let k=1; k<=t.taksitSayisi; k++){
-      const d = new Date(t.tarih);
-      d.setMonth(d.getMonth() + k); // kesim tarihi 4'ü: ilk taksit alışveriş ayından sonraki ayda
-      const key = keyOf(d);
-      if(key < BASLANGIC_KEY || key > BITIS_KEY) continue;
-      if(!groups.has(key)) groups.set(key, { label: d.toLocaleDateString('tr-TR', {month:'long', year:'numeric'}), items: [], total: 0 });
-      const g = groups.get(key);
-      const odendi = k <= (t.odenenTaksit || 0);
-      g.items.push({ t, idx, k, odendi });
-      g.total += t.taksitTutari;
-    }
-  });
-
-  // Haziran 2026: taksit faturalanması bu ayda başlamıyor (kesim 4'ü, ilk fatura Temmuz'da) ama
-  // asıl SATIN ALMA hareketleri bu ayda oldu — bu yüzden ayrı bir "satın alma" grubu olarak,
-  // her zaman en altta, aynı şerit görünümüyle burada gösteriliyor.
-  const hazirandaAlinanlar = rows.filter(r => keyOf(new Date(r.t.tarih)) === '2026-06');
-  if(hazirandaAlinanlar.length){
-    groups.set('2026-06', {
-      label: 'Haziran 2026',
-      total: hazirandaAlinanlar.reduce((s,r)=> s + r.t.taksitTutari * r.t.taksitSayisi, 0),
-      items: hazirandaAlinanlar.map(r => ({ t: r.t, idx: r.idx, k: 0, odendi: true, satinAlma: true }))
-    });
-  }
-
-  // "Devam Edenler" = ödenmemiş taksidi olan, bugüne en yakın ay (gerçek şu anki ay ödenmişse
-  // bir sonraki aya kayar) — yoksa ödenmiş bir ayı yanlışlıkla "devam ediyor" göstermiş oluruz.
-  const anahtarlarArtan = [...groups.keys()].sort((a,b)=> a.localeCompare(b));
-  const suankiKey = anahtarlarArtan.find(k => k >= gercekSuankiKey && groups.get(k).items.some(i => !i.odendi))
-    || anahtarlarArtan.find(k => groups.get(k).items.some(i => !i.odendi));
-  const sortedKeys = [...groups.keys()].sort((a,b)=> b.localeCompare(a)); // gelecek üstte, geçmiş altta
-  const groupsHtml = sortedKeys.map(key=>{
-    const g = groups.get(key);
-    const suanki = key === suankiKey;
-    const itemsHtml = g.items.map(rowHtml).join('');
-    const [gMain, gCents] = fmtPlain(g.total).split(',');
-    const baslik = suanki ? 'DEVAM EDENLER' : g.label;
-    return `
-      <div class="kasa-ay-group" style="${suanki ? 'background:#eef5ff;border-radius:14px;margin:6px 0;' : ''}">
-        <div class="kasa-ay-header" data-taksit-key="${key}" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;${suanki ? 'padding:14px 12px;' : ''}">
-          <div class="kasa-ay-label" style="flex:1;${suanki ? 'color:#2f6690;font-size:16px;' : ''}">${baslik}${suanki ? ` <span style="font-weight:500;color:#5b8bf5;font-size:12px;">(${g.label})</span>` : ''} <span style="font-weight:500;color:#8a94a3;font-size:13px;">(${g.items.length} kayıt)</span></div>
-          <svg class="taksit-ay-chevron-buyuk" width="32" height="32" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;transition:transform .2s;">
-            <path d="M6 9l6 6 6-6" stroke="#2f6690" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <div class="kasa-ay-toplam neg" style="text-align:right;">${gMain}<span class="cents">,${gCents}</span></div>
-        </div>
-        <div class="kasa-ay-body${suanki ? '' : ' hidden'}" id="taksitAy-${key}">${itemsHtml}</div>
-      </div>`;
-  }).join('');
-
-  list.innerHTML = groupsHtml || '<div class="sk-empty">Henüz taksitli alışveriş yok</div>';
-
-  list.querySelectorAll('.acct-row[data-idx]').forEach(el=>{
-    el.onclick = () => openTaksitDetay(parseInt(el.dataset.idx, 10));
-  });
-  list.querySelectorAll('.kasa-ay-header[data-taksit-key]').forEach(header=>{
-    const key = header.dataset.taksitKey;
-    if(key === suankiKey){
-      header.querySelector('.taksit-ay-chevron-buyuk').style.transform = 'rotate(180deg)';
-    }
-    header.onclick = () => {
-      const body = document.getElementById('taksitAy-' + key);
-      body.classList.toggle('hidden');
-      header.querySelector('.taksit-ay-chevron-buyuk').style.transform = body.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
-    };
-  });
-}
-
-// Bir taksitli alışverişin bir sonraki (henüz ödenmemiş) taksidinin düşeceği ay:
-// hesap kesim tarihi her ayın 4'ü olduğu için ilk fatura, alışveriş ayından SONRAKİ ayda kesilir
-// (+1), sonrasına o ana kadar ödenmiş taksit sayısı kadar ay daha eklenir.
-function taksitSonrakiOdemeTarihi(t){
-  const d = new Date(t.tarih);
-  d.setMonth(d.getMonth() + 1 + (t.odenenTaksit || 0));
-  return d;
-}
-function taksitOzetHesapla(){
-  const now = new Date();
-  now.setMonth(now.getMonth() + 1); // bir sonraki ay (şu an: Ağustos) için hesapla
-  let toplamAlisveris = 0, buAyOdenecek = 0;
-  (state.banka.taksitler || []).forEach(t=>{
-    toplamAlisveris += (t.taksitTutari || 0) * (t.taksitSayisi || 1);
-    if(taksitKalan(t) > 0){
-      const sonraki = taksitSonrakiOdemeTarihi(t);
-      if(sonraki.getFullYear() === now.getFullYear() && sonraki.getMonth() === now.getMonth()){
-        buAyOdenecek += t.taksitTutari;
-      }
-    }
-  });
-  return { toplamAlisveris, buAyOdenecek, ay: now };
-}
-function renderTaksitOzet(){
-  const { toplamAlisveris, buAyOdenecek, ay } = taksitOzetHesapla();
-  document.getElementById('taksitOzetToplam').textContent = fmtWhole(toplamAlisveris);
-  document.getElementById('taksitOzetBuAy').textContent = fmtWhole(buAyOdenecek);
-  const ayAdiHam = ay.toLocaleDateString('tr-TR', { month: 'long' });
-  const ayAdi = ayAdiHam.charAt(0).toUpperCase() + ayAdiHam.slice(1);
-  document.getElementById('taksitOzetAyAdi').textContent = (ayAdi + '\'ta Ödenecek').toUpperCase();
-}
-
-let taksitDetayIdx = null;
-function openTaksitDetay(idx){
-  taksitDetayIdx = idx;
-  const t = state.banka.taksitler[idx];
-  const kalan = taksitKalan(t);
-  document.getElementById('taksitDetayTitle').textContent = t.desc;
-  document.getElementById('taksitDetayKartTag').textContent = t.kart ? t.kart.toUpperCase() : 'TAKSİTLİ ALIŞVERİŞ';
-  document.getElementById('taksitDetayTutar').textContent = fmt(kalan > 0 ? kalan * t.taksitTutari : t.taksitTutari * t.taksitSayisi);
-  document.getElementById('taksitDetayTutar').style.color = kalan > 0 ? '#c0392b' : '#1f8a54';
-  document.getElementById('taksitDetayTarih').textContent = new Date(t.tarih).toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'}) + (kalan > 0 ? ' · Kalan Tutar' : ' · Ödeme Tamamlandı');
-  document.getElementById('taksitDetayTaksitTutari').textContent = fmt(t.taksitTutari);
-  document.getElementById('taksitDetayToplamSayi').textContent = t.taksitSayisi;
-  document.getElementById('taksitDetayOdenen').textContent = t.odenenTaksit;
-  document.getElementById('taksitDetayKalan').textContent = kalan;
-  document.getElementById('taksitDetayKalanTutar').textContent = fmt(kalan * t.taksitTutari);
-  hideAllScreens();
-  document.getElementById('taksitDetayScreen').classList.add('show');
-  nudge();
-}
-document.getElementById('taksitDetayBack').onclick = () => {
-  document.getElementById('taksitDetayScreen').classList.remove('show');
-  document.getElementById('bankaScreen').classList.add('show');
-  renderTaksitler();
-};
-
-function renderBanka(){
-  renderBonusKart();
-  renderTaksitler();
-  renderTaksitOzet();
-  {
-    bankaKartBakiyeGuncelle();
-  }
-  document.getElementById('tekIslemToplam').textContent = fmt(bankaBakiye());
-  document.getElementById('tekIslemSayisi').textContent = state.banka.transactions.length;
-
-  const rows = state.banka.transactions.map((t, idx) => ({ t, idx })).filter(({t}) => !t.islendi);
-  rows.sort((a,b)=> new Date(b.t.date) - new Date(a.t.date));
-  const list = document.getElementById('bankaList');
-  if(!rows.length){
-    list.innerHTML = '<div class="empty-tx">Henüz banka hareketi yok</div>';
-    updateBankaBadge();
-    return;
-  }
-
-  const keyOf = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-  const groups = new Map();
-  rows.forEach(({t, idx})=>{
-    const d = new Date(t.date);
-    const key = keyOf(d);
-    if(!groups.has(key)) groups.set(key, { label: d.toLocaleDateString('tr-TR', {month:'long', year:'numeric'}), rows: [], total: 0 });
-    const g = groups.get(key);
-    const signed = t.type === 'YATIR' ? t.amount : -t.amount;
-    g.total += signed;
-    g.rows.push({ t, idx });
-  });
-  const sortedKeys = [...groups.keys()].sort((a,b)=> b.localeCompare(a));
-
-  list.innerHTML = sortedKeys.map((key, gi)=>{
-    const g = groups.get(key);
-    const isOpen = gi === 0;
-    const rowsHtml = g.rows.map(({t, idx})=>{
-      const neg = t.type === 'CEK';
-      const dateStr = new Date(t.date).toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'})
-        + ', ' + new Date(t.date).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
-      const [main, cents] = fmtPlain(t.amount).split(',');
-      return `
-        <div class="swipe-wrap">
-          <div class="swipe-actions-left">
-            <button class="swipe-btn sip-list-sil banka-sil" data-idx="${idx}">Sil</button>
-            <button class="swipe-btn sip-list-tasi banka-tasi" data-idx="${idx}">Taşı</button>
-          </div>
-          <div class="swipe-actions">
-            <button class="swipe-btn sip-list-duzenle banka-duzenle" data-idx="${idx}">Değiştir</button>
-            <button class="swipe-btn sip-list-masraf banka-masraf" data-idx="${idx}">Masraf</button>
-            <button class="swipe-btn sip-list-odeme banka-odeme" data-idx="${idx}">Ödeme</button>
-            <button class="swipe-btn sip-list-tahsilat banka-tahsilat" data-idx="${idx}">Tahsilat</button>
-          </div>
-          <div class="tx-row swipe-content" data-idx="${idx}">
-            <span class="tx-date-circle yeni"><b>${new Date(t.date).getDate()}</b>${new Date(t.date).toLocaleDateString('tr-TR', {month:'short'}).toUpperCase().replace('.', '')}</span>
-            <div class="tx-left">
-              <div class="tx-type ${neg ? 'neg' : 'pos'}"><span class="tx-date">${dateStr}</span></div>
-              ${t.desc ? `<div class="tx-desc">${t.desc}</div>` : ''}
-              ${t.mpTargets && t.mpTargets.length ? `<div class="tx-desc" style="color:#2f8a8a;font-weight:700;">🔗 Çoklu İşlem${t.mpNo ? ' #' + t.mpNo : ''} (${fmt(bankaCokluDagitilan(t))} / ${fmt(Math.abs(t.amount))})</div>` : ''}
-            </div>
-            <div class="tx-amount ${neg ? 'neg' : ''}">${neg ? '-' : ''}${main}<span class="cents">,${cents}</span></div>
-          </div>
-        </div>`;
-    }).join('');
-    const [gMain, gCents] = fmtPlain(g.total).split(',');
-    return `
-      <div class="kasa-ay-group">
-        <div class="kasa-ay-header" data-key="${key}">
-          <div class="kasa-ay-label"><span class="kasa-ay-chevron">${isOpen ? '▴' : '▾'}</span> ${g.label}</div>
-          <div class="kasa-ay-toplam ${g.total<0?'neg':''}">${gMain}<span class="cents">,${gCents}</span></div>
-        </div>
-        <div class="kasa-ay-body${isOpen ? '' : ' hidden'}" id="bankaAy-${key}">${rowsHtml}</div>
-      </div>`;
-  }).join('');
-
-  list.querySelectorAll('.kasa-ay-header').forEach(header=>{
-    header.onclick = () => {
-      const key = header.dataset.key;
-      const body = document.getElementById('bankaAy-' + key);
-      body.classList.toggle('hidden');
-      header.querySelector('.kasa-ay-chevron').textContent = body.classList.contains('hidden') ? '▾' : '▴';
-    };
-  });
-  list.querySelectorAll('.banka-tahsilat').forEach(btn=>{
-    btn.onclick = (e) => { e.stopPropagation(); openBankaTahsilatSec(parseInt(btn.dataset.idx, 10)); };
-  });
-  list.querySelectorAll('.banka-odeme').forEach(btn=>{
-    btn.onclick = (e) => { e.stopPropagation(); openBankaOdemeSec(parseInt(btn.dataset.idx, 10)); };
-  });
-  list.querySelectorAll('.banka-masraf').forEach(btn=>{
-    btn.onclick = (e) => { e.stopPropagation(); openBankaMasrafSec(parseInt(btn.dataset.idx, 10)); };
-  });
-  list.querySelectorAll('.banka-duzenle').forEach(btn=>{
-    btn.onclick = (e) => { e.stopPropagation(); openBankaForm(parseInt(btn.dataset.idx, 10)); };
-  });
-  list.querySelectorAll('.banka-tasi').forEach(btn=>{
-    btn.onclick = (e) => { e.stopPropagation(); openBankaTasi(parseInt(btn.dataset.idx, 10)); };
-  });
-  list.querySelectorAll('.banka-sil').forEach(btn=>{
-    btn.onclick = (e) => {
-      e.stopPropagation();
-      const idx = parseInt(btn.dataset.idx, 10);
-      openConfirm('Bu hareketi sil', 'Bu işlem geri alınamaz. Emin misin?', () => {
-        state.banka.transactions.splice(idx, 1);
-        save();
-        renderBanka();
-      });
-    };
-  });
-  list.querySelectorAll('.swipe-content[data-idx]').forEach(el=>{
-    el.onclick = () => {
-      if(el.__isSwipeMoved && el.__isSwipeMoved()) return;
-      if(el.classList.contains('swiped')){ el.style.transform=''; el.classList.remove('swiped'); return; }
-      openBankaBilgi(parseInt(el.dataset.idx, 10));
-    };
-  });
-  enableSwipeRows(list);
-  updateBankaBadge();
-}
-
-function renderBankaIslenen(){
-  const rows = state.banka.transactions.map((t, idx) => ({ t, idx })).filter(({t}) => t.islendi);
-  rows.sort((a,b)=> new Date(b.t.date) - new Date(a.t.date));
-  const islenenToplam = rows.reduce((s,{t})=> s + Math.abs(t.amount), 0);
-  document.getElementById('islenenOzetToplam').textContent = fmt(islenenToplam);
-  document.getElementById('islenenOzetSayisi').textContent = rows.length;
-  const list = document.getElementById('bankaIslenenList');
-  if(!rows.length){
-    list.innerHTML = '<div class="empty-tx">Henüz işlenen hareket yok</div>';
-    return;
-  }
-  list.innerHTML = rows.map(({t, idx})=>{
-    const neg = t.type === 'CEK';
-    const dateStr = new Date(t.date).toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'})
-      + ', ' + new Date(t.date).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
-    const [main, cents] = fmtPlain(t.amount).split(',');
-    return `
-      <div class="swipe-wrap">
-        <div class="swipe-actions">
-          <button class="swipe-btn sip-list-duzenle banka-geri-al" data-idx="${idx}">Geri Al</button>
-        </div>
-        <div class="tx-row swipe-content" data-idx="${idx}">
-          <span class="tx-date-circle islendi"><b>${new Date(t.date).getDate()}</b>${new Date(t.date).toLocaleDateString('tr-TR', {month:'short'}).toUpperCase().replace('.', '')}</span>
-          <div class="tx-left">
-            <div class="tx-type ${neg ? 'neg' : 'pos'}"><span class="tx-date">${dateStr}</span></div>
-            ${t.desc ? `<div class="tx-desc">${t.desc}</div>` : ''}
-          </div>
-          <div class="tx-amount ${neg ? 'neg' : ''}">${neg ? '-' : ''}${main}<span class="cents">,${cents}</span></div>
-        </div>
-      </div>`;
-  }).join('');
-  list.querySelectorAll('.banka-geri-al').forEach(btn=>{
-    btn.onclick = (e) => {
-      e.stopPropagation();
-      const idx = parseInt(btn.dataset.idx, 10);
-      const t = state.banka.transactions[idx];
-      openConfirm('Geri Al', 'Bu hareket tekrar "Diğer Hareketler" listesine dönecek. Emin misin?', () => {
-        t.islendi = false;
-        save();
-        renderBanka();
-      }, 'Evet, Geri Al');
-    };
-  });
-  list.querySelectorAll('.swipe-content[data-idx]').forEach(el=>{
-    el.onclick = () => {
-      if(el.__isSwipeMoved && el.__isSwipeMoved()) return;
-      if(el.classList.contains('swiped')){ el.style.transform=''; el.classList.remove('swiped'); return; }
-      openBankaBilgi(parseInt(el.dataset.idx, 10));
-    };
-  });
-  enableSwipeRows(list);
-}
-
-function openBankaBilgi(idx){
-  const t = state.banka.transactions[idx];
-  if(!t) return;
-  document.getElementById('bankaBilgiDesc').textContent = t.desc || '—';
-  document.getElementById('bankaBilgiTur').textContent = t.type === 'YATIR' ? 'Para Yatır' : 'Para Çek';
-  const tutarEl = document.getElementById('bankaBilgiTutar');
-  tutarEl.textContent = fmt(t.amount);
-  tutarEl.classList.toggle('neg', t.type === 'CEK');
-  tutarEl.classList.toggle('pos', t.type === 'YATIR');
-  document.getElementById('bankaBilgiTarih').textContent = new Date(t.date).toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'});
-  document.getElementById('bankaBilgiOverlay').classList.add('show');
-}
-document.getElementById('bankaBilgiKapatBtn').onclick = () => { document.getElementById('bankaBilgiOverlay').classList.remove('show'); };
-document.getElementById('bankaBilgiOverlay').onclick = (e) => {
-  if(e.target.id === 'bankaBilgiOverlay') document.getElementById('bankaBilgiOverlay').classList.remove('show');
-};
-
-let bankaTahsilatIdx = null;
-function openBankaTahsilatSec(idx){
-  bankaTahsilatIdx = idx;
-  const t = state.banka.transactions[idx];
-  const [main, cents] = fmtPlain(Math.abs(t.amount)).split(',');
-  document.getElementById('bankaTahsilatAciklama').textContent =
-    (t.desc ? t.desc + ' — ' : '') + main + ',' + cents + '₺ tutarındaki hareketi hangi müşterinin cari hesabına tahsilat olarak işleyelim?';
-  const listEl = document.getElementById('bankaTahsilatMusteriList');
-  if(!state.cari.length){
-    listEl.innerHTML = '<div class="empty-tx">Müşteri kaydı yok</div>';
-  } else {
-    listEl.innerHTML = state.cari.map(c=>{
-      const harf = (c.name || '?').trim().charAt(0).toUpperCase();
-      return `<button type="button" class="banka-tahsilat-musteri-btn" data-id="${c.id}" style="width:100%;display:flex;align-items:center;gap:10px;text-align:left;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;font-weight:600;font-size:14px;color:var(--ink);cursor:pointer;margin-bottom:8px;">
-        <span style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;background:linear-gradient(135deg,#5b8bf5,#2e56c9);">${harf}</span>
-        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.name}</span>
-      </button>`;
-    }).join('');
-    listEl.querySelectorAll('.banka-tahsilat-musteri-btn').forEach(btn=>{
-      btn.onclick = () => {
-        const c = state.cari.find(x=>x.id===btn.dataset.id);
-        const adi = c ? c.name : '';
-        openConfirm('Tahsilat Onayı', main + ',' + cents + '₺ ' + adi + ' cari hesabına tahsilat olarak işlenecek. Onaylıyor musunuz?', () => {
-          bankaTahsilatiUygula(btn.dataset.id);
-        }, 'Evet, İşle');
-      };
-    });
-  }
-  document.getElementById('bankaTahsilatSecOverlay').classList.add('show');
-}
-function bankaTahsilatiUygula(cariId){
-  const t = state.banka.transactions[bankaTahsilatIdx];
-  const c = state.cari.find(x=>x.id===cariId);
-  if(!t || !c) return;
-  c.transactions.push({ type:'TAHSİLAT', desc: t.desc ? ('Banka: ' + t.desc) : 'Banka havalesi', amount: Math.abs(t.amount), date: t.date });
-  t.desc = (t.desc ? t.desc + ' — ' : '') + c.name + ' cari hesabına işlendi';
-  t.islendi = true;
-  save();
-  document.getElementById('bankaTahsilatSecOverlay').classList.remove('show');
-  renderBanka();
-}
-document.getElementById('bankaTahsilatYeniMusteriBtn').onclick = () => {
-  document.getElementById('bankaTahsilatSecOverlay').classList.remove('show');
-  openYeniCari();
-  if(document.getElementById('ncTurAlici')) document.getElementById('ncTurAlici').click();
-};
-document.getElementById('bankaTahsilatIptal').onclick = () => { document.getElementById('bankaTahsilatSecOverlay').classList.remove('show'); };
-document.getElementById('bankaTahsilatSecOverlay').onclick = (e) => { if(e.target === document.getElementById('bankaTahsilatSecOverlay')) document.getElementById('bankaTahsilatSecOverlay').classList.remove('show'); };
-
-let bankaOdemeIdx = null;
-function openBankaOdemeSec(idx){
-  bankaOdemeIdx = idx;
-  const t = state.banka.transactions[idx];
-  const [main, cents] = fmtPlain(Math.abs(t.amount)).split(',');
-  document.getElementById('bankaOdemeAciklama').textContent =
-    (t.desc ? t.desc + ' — ' : '') + main + ',' + cents + '₺ tutarındaki hareketi hangi tedarikçinin cari hesabına ödeme olarak işleyelim?';
-  const listEl = document.getElementById('bankaOdemeTedarikciList');
-  if(!state.tedarikci.length){
-    listEl.innerHTML = '<div class="empty-tx">Tedarikçi kaydı yok</div>';
-  } else {
-    listEl.innerHTML = state.tedarikci.map(td=>{
-      const harf = (td.name || '?').trim().charAt(0).toUpperCase();
-      return `<button type="button" class="banka-odeme-tedarikci-btn" data-id="${td.id}" style="width:100%;display:flex;align-items:center;gap:10px;text-align:left;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;font-weight:600;font-size:14px;color:var(--ink);cursor:pointer;margin-bottom:8px;">
-        <span style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;background:linear-gradient(135deg,#5b6b73,#38454b);">${harf}</span>
-        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${td.name}</span>
-      </button>`;
-    }).join('');
-    listEl.querySelectorAll('.banka-odeme-tedarikci-btn').forEach(btn=>{
-      btn.onclick = () => {
-        const td = state.tedarikci.find(x=>x.id===btn.dataset.id);
-        const adi = td ? td.name : '';
-        openConfirm('Ödeme Onayı', main + ',' + cents + '₺ ' + adi + ' cari hesabına ödeme olarak işlenecek. Onaylıyor musunuz?', () => {
-          bankaOdemesiUygula(btn.dataset.id);
-        }, 'Evet, İşle');
-      };
-    });
-  }
-  document.getElementById('bankaOdemeSecOverlay').classList.add('show');
-}
-function bankaOdemesiUygula(tedarikciId){
-  const t = state.banka.transactions[bankaOdemeIdx];
-  const td = state.tedarikci.find(x=>x.id===tedarikciId);
-  if(!t || !td) return;
-  td.transactions.push({ type:'ÖDEME', desc: t.desc ? ('Banka: ' + t.desc) : 'Banka havalesi', amount: Math.abs(t.amount), date: t.date });
-  t.desc = (t.desc ? t.desc + ' — ' : '') + td.name + ' cari hesabına işlendi';
-  t.islendi = true;
-  save();
-  document.getElementById('bankaOdemeSecOverlay').classList.remove('show');
-  renderBanka();
-}
-document.getElementById('bankaOdemeYeniTedarikciBtn').onclick = () => {
-  document.getElementById('bankaOdemeSecOverlay').classList.remove('show');
-  openYeniCari();
-  if(document.getElementById('ncTurTedarikci')) document.getElementById('ncTurTedarikci').click();
-};
-document.getElementById('bankaOdemeIptal').onclick = () => { document.getElementById('bankaOdemeSecOverlay').classList.remove('show'); };
-document.getElementById('bankaOdemeSecOverlay').onclick = (e) => { if(e.target === document.getElementById('bankaOdemeSecOverlay')) document.getElementById('bankaOdemeSecOverlay').classList.remove('show'); };
-
-let bankaMasrafIdx = null;
-function openBankaMasrafSec(idx){
-  bankaMasrafIdx = idx;
-  const t = state.banka.transactions[idx];
-  const [main, cents] = fmtPlain(Math.abs(t.amount)).split(',');
-  document.getElementById('bankaMasrafAciklama').textContent =
-    (t.desc ? t.desc + ' — ' : '') + main + ',' + cents + '₺ tutarındaki hareketi hangi masraf kalemine işleyelim?';
-  const listEl = document.getElementById('bankaMasrafKalemList');
-  if(!state.masrafHesaplari.length){
-    listEl.innerHTML = '<div class="empty-tx">Masraf kalemi yok</div>';
-  } else {
-    listEl.innerHTML = state.masrafHesaplari.map(k=>{
-      const harf = (k.name || '?').trim().charAt(0).toUpperCase();
-      return `<button type="button" class="banka-masraf-kalem-btn" data-id="${k.id}" style="width:100%;display:flex;align-items:center;gap:10px;text-align:left;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;font-weight:600;font-size:14px;color:var(--ink);cursor:pointer;margin-bottom:8px;">
-        <span style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;background:linear-gradient(135deg,#a586ef,#6845d1);">${harf}</span>
-        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${k.name}</span>
-      </button>`;
-    }).join('');
-    listEl.querySelectorAll('.banka-masraf-kalem-btn').forEach(btn=>{
-      btn.onclick = () => {
-        const k = state.masrafHesaplari.find(x=>x.id===btn.dataset.id);
-        const adi = k ? k.name : '';
-        openConfirm('Masraf Onayı', main + ',' + cents + '₺ ' + adi + ' masraf kalemine işlenecek. Onaylıyor musunuz?', () => {
-          bankaMasrafiUygula(btn.dataset.id);
-        }, 'Evet, İşle');
-      };
-    });
-  }
-  document.getElementById('bankaMasrafSecOverlay').classList.add('show');
-}
-function bankaMasrafiUygula(kalemId){
-  const t = state.banka.transactions[bankaMasrafIdx];
-  const k = state.masrafHesaplari.find(x=>x.id===kalemId);
-  if(!t || !k) return;
-  if(!k.transactions) k.transactions = [];
-  k.transactions.push({ desc: t.desc ? ('Banka: ' + t.desc) : 'Banka havalesi', amount: Math.abs(t.amount), date: t.date });
-  t.desc = (t.desc ? t.desc + ' — ' : '') + k.name + ' masrafına işlendi';
-  t.islendi = true;
-  save();
-  document.getElementById('bankaMasrafSecOverlay').classList.remove('show');
-  renderBanka();
-}
-let bankaMasrafYeniKalemBekliyor = false;
-document.getElementById('bankaMasrafYeniKalemBtn').onclick = () => {
-  document.getElementById('bankaMasrafSecOverlay').classList.remove('show');
-  bankaMasrafYeniKalemBekliyor = true;
-  document.getElementById('mkAd').value = '';
-  document.getElementById('masrafYeniKalemOverlay').classList.add('show');
-};
-document.getElementById('bankaMasrafIptal').onclick = () => { document.getElementById('bankaMasrafSecOverlay').classList.remove('show'); };
-document.getElementById('bankaMasrafSecOverlay').onclick = (e) => { if(e.target === document.getElementById('bankaMasrafSecOverlay')) document.getElementById('bankaMasrafSecOverlay').classList.remove('show'); };
-
-// Temmuz 2026: "Taşı" — bir Banka hareketinin tutarını birden fazla cari/masraf kalemine
-// bölüştürme (çoklu kayıt / multi-posting) özelliği. Her hareket ilk hedefi eklendiğinde
-// benzersiz bir mpNo (işlem no) alır, tüm hedef kayıtların desc'ine bu no eklenir. Aynı
-// hedef (type+id) bir banka hareketine SADECE BİR KEZ eklenebilir (mükerrer engellenir).
-// Dağıtılan toplam, hareketin tutarına ulaşınca hareket otomatik "İşlenen" listesine geçer.
-let bankaTasiIdx = null;
-function generateIslemNo(){
-  return 'IK-' + Date.now().toString(36).toUpperCase() + '-' + Math.floor(Math.random()*900+100);
-}
-function bankaCokluDagitilan(t){
-  return (t.mpTargets||[]).reduce((s,x)=> s + x.amount, 0);
-}
-function bankaCokluKalan(t){
-  const kalan = Math.abs(t.amount) - bankaCokluDagitilan(t);
-  return kalan > 0 ? kalan : 0;
-}
-function openBankaTasi(idx){
-  bankaTasiIdx = idx;
-  const t = state.banka.transactions[idx];
-  if(!t) return;
-  if(!t.mpTargets) t.mpTargets = [];
-  const toplam = Math.abs(t.amount);
-  const dagitilan = bankaCokluDagitilan(t);
-  const kalan = bankaCokluKalan(t);
-  document.getElementById('bankaTasiAciklama').innerHTML =
-    (t.desc ? t.desc + ' — ' : '') + fmt(toplam) + ' tutarındaki hareketi birden fazla cari/masraf kalemine bölüştür.'
-    + '<br><b>Dağıtılan: ' + fmt(dagitilan) + ' · Kalan: ' + fmt(kalan) + '</b>'
-    + (t.mpNo ? ' · İşlem No: ' + t.mpNo : '');
-
-  const yapilan = (type, id) => t.mpTargets.find(x => x.type === type && x.id === id);
-
-  const renderGrup = (list, type, renkGradient) => {
-    if(!list || !list.length) return '<div class="empty-tx" style="padding:6px 0;">Kayıt yok</div>';
-    return list.map(item=>{
-      const harf = (item.name || '?').trim().charAt(0).toUpperCase();
-      const yapildi = yapilan(type, item.id);
-      if(yapildi){
-        return `<div style="display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#f4f4f7;margin-bottom:8px;">
-          <span style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;background:${renkGradient};">${harf}</span>
-          <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;font-size:14px;color:var(--ink);">${item.name}</span>
-          <span style="font-weight:700;font-size:13px;color:#1f9d64;white-space:nowrap;">${fmt(yapildi.amount)} ✓</span>
-          <button type="button" class="banka-tasi-kaldir" data-type="${type}" data-id="${item.id}" style="border:none;background:none;color:#c0392b;font-weight:700;font-size:12px;cursor:pointer;padding:4px 6px;">Kaldır</button>
-        </div>`;
-      }
-      return `<div style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;margin-bottom:8px;">
-        <span style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;background:${renkGradient};">${harf}</span>
-        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;font-size:14px;color:var(--ink);">${item.name}</span>
-        <input type="number" step="0.01" class="banka-tasi-tutar" data-type="${type}" data-id="${item.id}" placeholder="Tutar" style="width:80px;text-align:right;padding:7px 8px;border:1px solid var(--line);border-radius:8px;font-size:13px;">
-        <button type="button" class="banka-tasi-ekle" data-type="${type}" data-id="${item.id}" style="border:none;background:#2f8a8a;color:#fff;font-weight:700;font-size:12px;cursor:pointer;padding:7px 10px;border-radius:8px;white-space:nowrap;">Ekle</button>
-      </div>`;
-    }).join('');
-  };
-
-  document.getElementById('bankaTasiCariList').innerHTML = renderGrup(state.cari, 'cari', 'linear-gradient(135deg,#5b8bf5,#2e56c9)');
-  document.getElementById('bankaTasiTedarikciList').innerHTML = renderGrup(state.tedarikci, 'tedarikci', 'linear-gradient(135deg,#5b6b73,#38454b)');
-  document.getElementById('bankaTasiMasrafList').innerHTML = renderGrup(state.masrafHesaplari, 'masraf', 'linear-gradient(135deg,#a586ef,#6845d1)');
-
-  const wireGrup = (containerId) => {
-    const el = document.getElementById(containerId);
-    el.querySelectorAll('.banka-tasi-ekle').forEach(btn=>{
-      btn.onclick = () => {
-        const type = btn.dataset.type, id = btn.dataset.id;
-        const row = btn.closest('div');
-        const input = row.querySelector('.banka-tasi-tutar');
-        const tutar = parseFloat((input.value || '').replace(',', '.'));
-        if(!tutar || tutar <= 0){ input.focus(); return; }
-        bankaTasiHedefEkle(type, id, tutar);
-      };
-    });
-    el.querySelectorAll('.banka-tasi-kaldir').forEach(btn=>{
-      btn.onclick = () => bankaTasiHedefKaldir(btn.dataset.type, btn.dataset.id);
-    });
-  };
-  wireGrup('bankaTasiCariList');
-  wireGrup('bankaTasiTedarikciList');
-  wireGrup('bankaTasiMasrafList');
-
-  document.getElementById('bankaTasiOverlay').classList.add('show');
-}
-function bankaTasiHedefEkle(type, id, tutar){
-  const t = state.banka.transactions[bankaTasiIdx];
-  if(!t) return;
-  if(!t.mpTargets) t.mpTargets = [];
-  if(t.mpTargets.some(x => x.type === type && x.id === id)) return; // mükerrer engelle
-  let hedef, kayitTuru;
-  if(type === 'cari'){ hedef = state.cari.find(x=>x.id===id); kayitTuru = 'TAHSİLAT'; }
-  else if(type === 'tedarikci'){ hedef = state.tedarikci.find(x=>x.id===id); kayitTuru = 'ÖDEME'; }
-  else { hedef = state.masrafHesaplari.find(x=>x.id===id); kayitTuru = null; }
-  if(!hedef) return;
-  if(!t.mpNo) t.mpNo = generateIslemNo();
-  const desc = (t.desc ? 'Banka: ' + t.desc : 'Banka hareketi') + ' [Çoklu İşlem #' + t.mpNo + ']';
-  if(type === 'masraf'){
-    if(!hedef.transactions) hedef.transactions = [];
-    hedef.transactions.push({ desc, amount: tutar, date: t.date });
-  } else {
-    hedef.transactions.push({ type: kayitTuru, desc, amount: tutar, date: t.date });
-  }
-  t.mpTargets.push({ type, id, name: hedef.name, amount: tutar });
-  if(bankaCokluKalan(t) <= 0) t.islendi = true;
-  save();
-  openBankaTasi(bankaTasiIdx);
-  renderBanka();
-}
-function bankaTasiHedefKaldir(type, id){
-  const t = state.banka.transactions[bankaTasiIdx];
-  if(!t || !t.mpTargets) return;
-  const kayit = t.mpTargets.find(x => x.type === type && x.id === id);
-  if(!kayit) return;
-  openConfirm('Kaldır', kayit.name + ' hedefine yapılan ' + fmt(kayit.amount) + ' kaydı silinsin mi?', () => {
-    let hedef;
-    if(type === 'cari') hedef = state.cari.find(x=>x.id===id);
-    else if(type === 'tedarikci') hedef = state.tedarikci.find(x=>x.id===id);
-    else hedef = state.masrafHesaplari.find(x=>x.id===id);
-    if(hedef && hedef.transactions && t.mpNo){
-      const marker = '[Çoklu İşlem #' + t.mpNo + ']';
-      const i = hedef.transactions.findIndex(x => x.amount === kayit.amount && (x.desc||'').includes(marker));
-      if(i > -1) hedef.transactions.splice(i, 1);
-    }
-    t.mpTargets = t.mpTargets.filter(x => !(x.type === type && x.id === id));
-    if(bankaCokluKalan(t) > 0) t.islendi = false;
-    save();
-    openBankaTasi(bankaTasiIdx);
-    renderBanka();
-  });
-}
-document.getElementById('bankaTasiKapat').onclick = () => { document.getElementById('bankaTasiOverlay').classList.remove('show'); renderBanka(); };
-document.getElementById('bankaTasiOverlay').onclick = (e) => { if(e.target === document.getElementById('bankaTasiOverlay')){ document.getElementById('bankaTasiOverlay').classList.remove('show'); renderBanka(); } };
-
-let bankaEditIdx = null;
-let bankaSegTur = 'CEK';
-function openBankaForm(idx){
-  bankaEditIdx = (idx === undefined) ? null : idx;
-  const t = (bankaEditIdx !== null) ? state.banka.transactions[bankaEditIdx] : null;
-  bankaSegTur = t ? t.type : 'CEK';
-  document.getElementById('bankaDesc').value = t ? (t.desc || '') : '';
-  document.getElementById('bankaAmount').value = t ? t.amount : '';
-  document.getElementById('bankaTarih').value = t ? new Date(t.date).toISOString().slice(0,10) : new Date().toISOString().slice(0,10);
-  document.getElementById('bankaOverlay').classList.add('show');
-}
-document.getElementById('bankaCancelBtn').onclick = () => { document.getElementById('bankaOverlay').classList.remove('show'); };
-document.getElementById('bankaOverlay').onclick = (e) => {
-  if(e.target.id === 'bankaOverlay') document.getElementById('bankaOverlay').classList.remove('show');
-};
-document.getElementById('bankaSaveBtn').onclick = () => {
-  const desc = document.getElementById('bankaDesc').value.trim();
-  const amount = parseFloat(document.getElementById('bankaAmount').value);
-  const tarihVal = document.getElementById('bankaTarih').value;
-  if(!amount || amount <= 0){ alertBox('Lütfen geçerli bir tutar gir.'); return; }
-  const date = tarihVal ? new Date(tarihVal + 'T12:00:00.000Z').toISOString() : new Date().toISOString();
-  const tx = { type: bankaSegTur, desc, amount, date };
-  if(bankaEditIdx !== null){
-    state.banka.transactions[bankaEditIdx] = tx;
-  } else {
-    state.banka.transactions.push(tx);
-  }
-  save();
-  document.getElementById('bankaOverlay').classList.remove('show');
-  renderBanka();
-};
-
-
 // Kasada duran çekler buradan bir tedarikçiye "Çıkışa Ver" ile ödeme olarak devredilebilir;
 // orijinal Tahsilat hareketi ve Kasa'daki kaydı hiç değişmeden kalır, sadece durum güncellenir. ----------
 document.getElementById('gelenCeklerCard').onclick = () => {
@@ -6849,12 +5780,7 @@ document.getElementById('mkSave').onclick = () => {
   state.masrafHesaplari.push(yeniKalem);
   save();
   document.getElementById('masrafYeniKalemOverlay').classList.remove('show');
-  if(bankaMasrafYeniKalemBekliyor){
-    bankaMasrafYeniKalemBekliyor = false;
-    bankaMasrafiUygula(yeniKalem.id);
-  } else {
-    renderMasrafScreen();
-  }
+  renderMasrafScreen();
 };
 
 // Bir kaleme hızlı hareket (masraf) ekleme
@@ -8497,8 +7423,6 @@ document.getElementById('ayarGeriYukleInput').onchange = (e) => {
       if(!state.tedarikci) state.tedarikci = [];
       if(!state.stokKartlari) state.stokKartlari = [];
       if(!state.transactions) state.transactions = [];
-      if(!state.banka) state.banka = { transactions: [] };
-      if(!state.banka.transactions) state.banka.transactions = [];
       if(!state.sayaclar) state.sayaclar = { alis:0, satis:0, stok:0, siparis:0 };
       if(state.sayaclar.siparis === undefined) state.sayaclar.siparis = 0;
       if(!state.alisFisleri) state.alisFisleri = [];
@@ -8522,7 +7446,6 @@ document.getElementById('ayarHareketSifirlaBtn').onclick = () => {
     state.satisFisleri = [];
     state.siparisFisleri = [];
     state.transactions = [];
-    state.banka.transactions = [];
     state.sayaclar.alis = 0;
     state.sayaclar.satis = 0;
     state.sayaclar.siparis = 0;
@@ -8546,7 +7469,6 @@ document.getElementById('sifirlaEvet').onclick = () => {
       tedarikci: [],
       stokKartlari: [],
       transactions: [],
-      banka: { transactions: [] },
       sayaclar: { alis:0, satis:0, stok:0, siparis:0 },
       alisFisleri: [],
       satisFisleri: [],
@@ -8895,11 +7817,6 @@ function ensureSanalKuruTemizlemeTahsilati(){
     dogruHesap.transactions.push({type:'TAHSİLAT', desc:'Garanti BBVA havale (Murat Şanal)', amount:2000.00, date:'2026-07-23T06:45:20.000Z'});
     changed = true;
   }
-  const bankaVarMi = state.banka.transactions.some(t => t.date === '2026-07-23T06:45:20.000Z' && t.amount === 2000 && t.type === 'YATIR');
-  if(!bankaVarMi){
-    state.banka.transactions.push({ type:'YATIR', desc:'Şanal Kuru Temizleme (Murat Şanal) — Garanti BBVA havale', amount:2000.00, date:'2026-07-23T06:45:20.000Z' });
-    changed = true;
-  }
   return changed;
 }
 if(ensureSanalKuruTemizlemeTahsilati()) save();
@@ -8925,14 +7842,6 @@ function ensureErayVeNisantasiTahsilat(){
     nisantasi.transactions.push({type:'TAHSİLAT', desc:'Garanti BBVA havale (Murat Bey)', amount:11150.00, date:'2026-07-23T16:05:18.000Z'});
     changed = true;
   }
-  if(!state.banka.transactions.some(t => t.date === '2026-07-23T10:25:27.000Z' && t.amount === 5000 && t.type === 'YATIR')){
-    state.banka.transactions.push({ type:'YATIR', desc:'Eray Taşkın — Garanti BBVA havale', amount:5000.00, date:'2026-07-23T10:25:27.000Z' });
-    changed = true;
-  }
-  if(!state.banka.transactions.some(t => t.date === '2026-07-23T16:05:18.000Z' && t.amount === 11150 && t.type === 'YATIR')){
-    state.banka.transactions.push({ type:'YATIR', desc:'Nişantaşı Kuru Temizleme (Murat Bey) — Garanti BBVA havale', amount:11150.00, date:'2026-07-23T16:05:18.000Z' });
-    changed = true;
-  }
   return changed;
 }
 if(ensureErayVeNisantasiTahsilat()) save();
@@ -8949,38 +7858,14 @@ function ensureKalanGarantiHareketleri(){
     sanal.transactions.push({type:'TAHSİLAT', desc:'Garanti BBVA havale', amount:3500.00, date:'2026-07-14T09:42:06.000Z'});
     changed = true;
   }
-  if(!state.banka.transactions.some(t => t.date === '2026-07-14T09:42:06.000Z' && t.amount === 3500 && t.type === 'YATIR')){
-    state.banka.transactions.push({ type:'YATIR', desc:'Şanal Kuru Temizleme — Garanti BBVA havale', amount:3500.00, date:'2026-07-14T09:42:06.000Z' });
-    changed = true;
-  }
-  if(!state.banka.transactions.some(t => t.date === '2026-07-23T19:11:55.000Z' && t.amount === 10000 && t.type === 'CEK')){
-    state.banka.transactions.push({ type:'CEK', desc:'Göçtürk Plastik (Orhan) — giden transfer', amount:10000.00, date:'2026-07-23T19:11:55.000Z' });
-    changed = true;
-  }
   const goctuk = state.cari.find(c => normAd(c.name) === normAd('Göçtürk Plastik')) || state.tedarikci?.find?.(c => normAd(c.name) === normAd('Göçtürk Plastik'));
   if(goctuk && !goctuk.transactions.some(t => t.date === '2026-07-23T19:11:55.000Z' && t.amount === 10000 && t.type === 'ÖDEME')){
     goctuk.transactions.push({type:'ÖDEME', desc:'Garanti BBVA havale (Orhan)', amount:10000.00, date:'2026-07-23T19:11:55.000Z'});
     changed = true;
   }
-  if(!state.banka.transactions.some(t => t.date === '2026-07-23T19:11:55.000Z' && t.amount === 16.76 && t.type === 'CEK')){
-    state.banka.transactions.push({ type:'CEK', desc:'Banka kesintisi (Garanti BBVA)', amount:16.76, date:'2026-07-23T19:11:55.000Z' });
-    changed = true;
-  }
   return changed;
 }
 if(ensureKalanGarantiHareketleri()) save();
-
-// Temmuz 2026: Garanti BBVA günlük hesap hareketleri maili — MAVI MARKET / YASEMIN AC
-// kart harcamaları (2 adet, 22.07.2026). Kullanıcı onayıyla masraf olarak, banka
-// hesabından düştüğü için Banka modülüne "Para Çek" olarak işlendi (Kasa'ya dokunulmadı).
-function ensureGarantiMasraflarTemmuz2026(){
-  const already = state.banka.transactions.some(t => t.date === '2026-07-22T14:13:30.000Z' && t.desc.indexOf('MAVI MARKET') > -1);
-  if(already) return false;
-  state.banka.transactions.push({ type:'CEK', desc:'MAVI MARKET / YASEMIN AC (Garanti BBVA kart harcaması)', amount:185.00, date:'2026-07-22T14:13:30.000Z' });
-  state.banka.transactions.push({ type:'CEK', desc:'MAVI MARKET / YASEMIN AC (Garanti BBVA kart harcaması)', amount:465.00, date:'2026-07-22T20:19:21.000Z' });
-  return true;
-}
-if(ensureGarantiMasraflarTemmuz2026()) save();
 
 // Temmuz 2026: Kullanıcı "market alışverişi masrafları var, onları masrafa yaz" dedi —
 // Garanti BBVA'dan zaten Banka moduline (Para Çek) işlenmiş MAVI MARKET harcamaları
@@ -9023,119 +7908,6 @@ function ensureA101MasrafKalemi(){
   return changed;
 }
 if(ensureA101MasrafKalemi()) save();
-
-// Temmuz 2026: Bonus Flexi Card ekstresi (Haziran 2026 dönemi, son ödeme 13 Temmuz 2026)
-// IYZICO *AMAZON.COM.T / *AMAZONPRİMET taksitli harcamaları Banka > Taksitler'e "Bonus Flexi
-// Card" kartıyla eklendi (mevcut Bonus Platinum kayıtlarından ayrı tutuluyor). Taksit numarası
-// ekstrede görünmeyen 66,02₺ ve 49,40₺ kalemleri 1.Taksit kabul edildi — ekstrede net görünmüyorsa
-// kontrol edilmeli. Taksitsiz (peşin) 159,00₺ ve 69,90₺ kalemleri Banka hareketlerine CEK olarak eklendi.
-function ensureBonusFlexiCard(){
-  let changed = false;
-  const taksitler = [
-    { desc:'IYZICO *AMAZON.COM.T', taksitTutari:1079.61, taksitSayisi:6, odenenTaksit:4, tarih:'2026-06-04T00:00:00', kart:'Bonus Flexi Card' },
-    { desc:'IYZICO *AMAZON.COM.T', taksitTutari:380.55, taksitSayisi:9, odenenTaksit:4, tarih:'2026-06-06T00:00:00', kart:'Bonus Flexi Card' },
-    { desc:'IYZICO *AMAZON.COM.T', taksitTutari:380.55, taksitSayisi:9, odenenTaksit:4, tarih:'2026-06-06T00:00:01', kart:'Bonus Flexi Card' },
-    { desc:'IYZICO *AMAZON.COM.T', taksitTutari:66.02, taksitSayisi:9, odenenTaksit:1, tarih:'2026-06-09T00:00:00', kart:'Bonus Flexi Card' },
-    { desc:'IYZICO *AMAZON.COM.T', taksitTutari:49.40, taksitSayisi:6, odenenTaksit:1, tarih:'2026-06-09T00:00:01', kart:'Bonus Flexi Card' },
-    { desc:'IYZICO *AMAZON.COM.T', taksitTutari:1089.66, taksitSayisi:3, odenenTaksit:3, tarih:'2026-06-10T00:00:00', kart:'Bonus Flexi Card' },
-    { desc:'IYZICO *AMAZON.COM.T', taksitTutari:938.39, taksitSayisi:6, odenenTaksit:6, tarih:'2026-06-18T00:00:00', kart:'Bonus Flexi Card' }
-  ];
-  taksitler.forEach(tk=>{
-    if(!state.banka.taksitler.some(x => x.tarih === tk.tarih && x.taksitTutari === tk.taksitTutari && x.desc === tk.desc)){
-      state.banka.taksitler.push(tk);
-      changed = true;
-    }
-  });
-  const tekSeferlik = [
-    { type:'CEK', desc:'IYZICO *AMAZON.COM.T (Bonus Flexi Card)', amount:159.00, date:'2026-06-11T00:00:00' },
-    { type:'CEK', desc:'IYZICO *AMAZONPRİMET (Bonus Flexi Card)', amount:69.90, date:'2026-06-13T00:00:00' }
-  ];
-  tekSeferlik.forEach(t=>{
-    if(!state.banka.transactions.some(x => x.date === t.date && x.amount === t.amount && x.desc === t.desc)){
-      state.banka.transactions.push(t);
-      changed = true;
-    }
-  });
-  return changed;
-}
-if(ensureBonusFlexiCard()) save();
-
-// Temmuz 2026: 20.07.2026 kart harcamaları Banka moduline eklendi.
-function ensure20TemmuzHarcamalari(){
-  let changed = false;
-  const yeni = [
-    { type:'CEK', desc:'PAYTR ODEME /VIKTORIPRO (Ev / Dekorasyon)', amount:2615.00, date:'2026-07-20T00:00:00' },
-    { type:'CEK', desc:'ANTHROPIC* CLAUDE SUB (Elektronik)', amount:972.57, date:'2026-07-20T00:00:01' }
-  ];
-  yeni.forEach(t=>{
-    if(!state.banka.transactions.some(x => x.date === t.date && x.amount === t.amount && x.desc === t.desc)){
-      state.banka.transactions.push(t);
-      changed = true;
-    }
-  });
-  return changed;
-}
-if(ensure20TemmuzHarcamalari()) save();
-
-// Temmuz 2026: Bonus Flexi Card "Gelecek Dönem" ekranından gerçek taksit ilerlemesi görüldü,
-// önceden tahmin edilen odenenTaksit değerleri düzeltildi + yeni "34287-Nakil Vasıtaları" (Vergi)
-// taksitli kaydı eklendi (Ağustos 2/3, Eylül 3/3 görünüyor → şu an 1 taksit ödenmiş demek).
-function ensureTaksitDuzeltmeleriTemmuz2026(){
-  let changed = false;
-  const duzeltmeler = [
-    { desc:'DESA DERİ', yeniOdenen:2 },
-    { desc:'U.S POLO BULVAR SAMSUN', yeniOdenen:2 },
-    { desc:'IYZICO *AMAZON.COM.T', taksitTutari:66.02, yeniOdenen:5 },
-    { desc:'IYZICO *AMAZON.COM.T', taksitTutari:49.40, yeniOdenen:5 },
-    { desc:'IYZICO *AMAZON.COM.T', taksitTutari:380.55, yeniOdenen:5 }
-  ];
-  duzeltmeler.forEach(d=>{
-    state.banka.taksitler.filter(x => x.desc === d.desc && (d.taksitTutari === undefined || x.taksitTutari === d.taksitTutari)).forEach(t=>{
-      if(t.odenenTaksit < d.yeniOdenen){ t.odenenTaksit = d.yeniOdenen; changed = true; }
-    });
-  });
-  if(!state.banka.taksitler.some(x => x.desc === '34287-NAKİL VASITALARI VE (Vergi)')){
-    state.banka.taksitler.push({ desc:'34287-NAKİL VASITALARI VE (Vergi)', taksitTutari:1527.83, taksitSayisi:3, odenenTaksit:1, tarih:'2026-07-20T00:00:00', kart:'Bonus Flexi Card' });
-    changed = true;
-  }
-  return changed;
-}
-if(ensureTaksitDuzeltmeleriTemmuz2026()) save();
-
-// Ağustos 2026 kart ödemesi gerçekleşti — o ayda taksidi düşen kalemler bir taksit ilerletildi.
-// (desc+tutar ile eşleştirilir, tam tarih damgasına bağlı değildir — eski cihaz verisiyle de çalışır)
-function ensureAgustosOdemesi2026(){
-  let changed = false;
-  const ilerlet = [
-    { desc:'IYZICO *AMAZON.COM.T', taksitTutari:49.40, yeniOdenen:6 },
-    { desc:'IYZICO *AMAZON.COM.T', taksitTutari:66.02, yeniOdenen:6 },
-    { desc:'IYZICO *AMAZON.COM.T', taksitTutari:380.55, yeniOdenen:6 }
-  ];
-  ilerlet.forEach(d=>{
-    state.banka.taksitler.filter(x => x.desc === d.desc && (d.taksitTutari === undefined || x.taksitTutari === d.taksitTutari)).forEach(t=>{
-      if(t.odenenTaksit < d.yeniOdenen){ t.odenenTaksit = d.yeniOdenen; changed = true; }
-    });
-  });
-  return changed;
-}
-if(ensureAgustosOdemesi2026()) save();
-
-// DÜZELTME (kullanıcı onayıyla): Hesap kesim tarihi her ayın 4'ü. Haziran ayındaki tüm
-// alışverişler (4'ünden sonra yapıldığı için) ilk kez TEMMUZ kapanışında faturalandı.
-// Temmuz ödendi → bunların hepsi şu an sadece 1. taksitte. Önceki (ekstre ekran görüntülerinden
-// yanlış çıkarılan) ileri taksit sayıları bu yüzden geçersiz — gerçek kesim tarihine göre sıfırlanıyor.
-// Vergi (34287) 20 Temmuz'da alındığı için ilk faturası Ağustos kapanışında, henüz ödenmedi (0).
-function ensureKesimTarihiDuzeltmesi(){
-  let changed = false;
-  const haziranSerileri = ['DESA DERİ', 'Ankara Anonim Türk Sigorta', 'TRENDYOL.COM', 'IYZICO *AMAZON.COM.T'];
-  state.banka.taksitler.forEach(t=>{
-    if(haziranSerileri.includes(t.desc) && new Date(t.tarih) < new Date('2026-07-01')){
-      if(t.odenenTaksit !== 1){ t.odenenTaksit = 1; changed = true; }
-    }
-  });
-  return changed;
-}
-if(ensureKesimTarihiDuzeltmesi()) save();
 
 // Kullanıcının gönderdiği ekstre ekran görüntülerinden (Drysan Kuru Temizleme, Temmuz 2023
 // - Haziran 2026 arası) elle işlendi. Toplam 199.110,00 satış / -198.860,00 tahsilat = 250,00
@@ -9278,111 +8050,6 @@ function ensureCagatayTicaret(){
   return false;
 }
 if(ensureCagatayTicaret()) save();
-
-// Bonus Platinum kredi kartı ekstresinden (910-20260704053219205095, Haziran-Temmuz 2026
-// dönemi) banka hesabından kredi kartına yapılan ödemeler Banka modülüne ÇEK (para çek)
-// hareketi olarak işlendi.
-function ensureBonusKartOdemeleriTemmuz2026(){
-  const odemeler = [
-    { desc:'Bonus Platinum kredi kartı ödemesi', amount:2533.00, date:'2026-06-03T00:00:00' },
-    { desc:'Bonus Platinum kredi kartı ödemesi', amount:3797.55, date:'2026-06-06T00:00:00' },
-    { desc:'Bonus Platinum kredi kartı ödemesi', amount:7000.00, date:'2026-06-23T00:00:00' },
-    { desc:'Bonus Platinum kredi kartı ödemesi', amount:3000.00, date:'2026-06-27T00:00:00' },
-    { desc:'Bonus Platinum kredi kartı ödemesi', amount:11500.00, date:'2026-07-01T00:00:00' }
-  ];
-  let added = false;
-  odemeler.forEach(o=>{
-    const varMi = state.banka.transactions.some(t =>
-      t.type === 'CEK' && t.amount === o.amount && t.date.slice(0,10) === o.date.slice(0,10)
-    );
-    if(!varMi){
-      state.banka.transactions.push({ type:'CEK', desc:o.desc, amount:o.amount, date:o.date });
-      added = true;
-    }
-  });
-  return added;
-}
-if(ensureBonusKartOdemeleriTemmuz2026()) save();
-
-// Bonus Platinum kredi kartı ekstresindeki (910-20260704053219205095) tüm dönem içi
-// harcama kalemleri (asıl kart 5016 + ek kart 2039) Banka modülüne CEK hareketi olarak
-// işlendi. Taksitli işlemlerde açıklamaya (ödenen taksit / toplam taksit) bilgisi eklendi.
-// 16 kalemin toplamı 17.792,57 TL olup ekstredeki "Dönem Harcamaları" tutarıyla birebir
-// eşleşmektedir.
-function ensureBonusKartHarcamalariTemmuz2026(){
-  const harcamalar = [
-    { desc:'DEFACTO - SAMSUN BULVAR A', amount:504.99, date:'2026-06-05T00:00:02' },
-    { desc:'HGS-34DBE393', amount:500.00, date:'2026-06-11T00:00:00' },
-    { desc:'MAHBEZ NAMLI', amount:205.00, date:'2026-06-06T00:00:00' },
-    { desc:'LATİFOĞLU EKMEK FIRINI', amount:90.00, date:'2026-06-15T00:00:00' },
-    { desc:'Fatura ödemesi (0005723784 1801672723 202)', amount:670.00, date:'2026-06-15T00:00:01' },
-    { desc:'Otomatik fatura işlem faizi', amount:27.37, date:'2026-06-15T00:00:02' },
-    { desc:'İDO İSTANBUL (ek kart)', amount:2190.00, date:'2026-06-03T00:00:00' },
-    { desc:'TRENDYOL.COM (ek kart)', amount:75.00, date:'2026-06-16T00:00:00' },
-    { desc:'Apple Online Store (ek kart)', amount:10499.00, date:'2026-06-05T00:00:04' },
-    { desc:'HepsiPay-Hep*Hepsiburada (ek kart)', amount:69.90, date:'2026-06-24T00:00:00' },
-    { desc:'Lidio /Asis (Bilgisayar)', amount:150.00, date:'2026-06-04T00:00:00' },
-    { desc:'Lidio /Asis (Bilgisayar)', amount:209.99, date:'2026-06-04T00:00:01' }
-  ];
-  let added = false;
-  harcamalar.forEach(h=>{
-    const varMi = state.banka.transactions.some(t =>
-      t.type === 'CEK' && t.amount === h.amount && t.desc === h.desc && t.date.slice(0,10) === h.date.slice(0,10)
-    );
-    if(!varMi){
-      state.banka.transactions.push({ type:'CEK', desc:h.desc, amount:h.amount, date:h.date });
-      added = true;
-    }
-  });
-  return added;
-}
-if(ensureBonusKartHarcamalariTemmuz2026()) save();
-
-// Bonus Platinum ekstresindeki (910-20260704053219205095) 4 taksitli alışveriş, düz harcama
-// listesinden çıkarılıp Taksitli Alışverişler'e (cari hesap mantığıyla, dokununca detay açılan,
-// kalan taksit sayısını rozette gösteren) ayrı kayıt olarak işlendi.
-function ensureBonusKartTaksitleriTemmuz2026(){
-  const taksitler = [
-    { desc:'DESA DERİ', taksitTutari:620.00, taksitSayisi:2, odenenTaksit:1, tarih:'2026-06-05T00:00:00', kart:'Asıl Kart' },
-    { desc:'U.S POLO BULVAR SAMSUN', taksitTutari:999.99, taksitSayisi:3, odenenTaksit:1, tarih:'2026-06-05T00:00:01', kart:'Asıl Kart' },
-    { desc:'Ankara Anonim Türk Sigorta', taksitTutari:615.00, taksitSayisi:6, odenenTaksit:2, tarih:'2026-06-05T00:00:03', kart:'Ek Kart' },
-    { desc:'TRENDYOL.COM', taksitTutari:366.33, taksitSayisi:3, odenenTaksit:3, tarih:'2026-06-07T00:00:00', kart:'Ek Kart' }
-  ];
-  let added = false;
-  taksitler.forEach(tk=>{
-    const varMi = state.banka.taksitler.some(t => t.desc === tk.desc && t.tarih === tk.tarih);
-    if(!varMi){
-      state.banka.taksitler.push(tk);
-      added = true;
-    }
-  });
-  return added;
-}
-if(ensureBonusKartTaksitleriTemmuz2026()) save();
-
-// Temmuz 2026: BONUS PLATINUM TROY (9792 **** **** 5016) "Gelecek Dönem" ekranından birebir:
-//   05.08.2026  U.S POLO BULVAR SAMSUN        999,98  (3/3)
-//   20.08.2026  34287-NAKİL VASITALARI (Vergi) 1.527,83 (2/3)
-//   20.09.2026  34287-NAKİL VASITALARI (Vergi) 1.527,83 (3/3)
-// Toplam kalan kart borcu = 4.055,64₺. Bu blok EN SONDA çalışır ve önceki tahmini
-// düzeltmeleri (Ağustos ödemesi / kesim tarihi) geçersiz kılar.
-function ensureBonusPlatinumTroy2026(){
-  let changed = false;
-  const hedef = [
-    { match: t => t.desc === 'U.S POLO BULVAR SAMSUN', taksitTutari:999.98, taksitSayisi:3, odenenTaksit:2 },
-    { match: t => t.desc === '34287-NAKİL VASITALARI VE (Vergi)', taksitTutari:1527.83, taksitSayisi:3, odenenTaksit:1 }
-  ];
-  hedef.forEach(h=>{
-    state.banka.taksitler.filter(h.match).forEach(t=>{
-      if(t.kart !== BONUS_PLATINUM_KART){ t.kart = BONUS_PLATINUM_KART; changed = true; }
-      if(t.taksitTutari !== h.taksitTutari){ t.taksitTutari = h.taksitTutari; changed = true; }
-      if(t.taksitSayisi !== h.taksitSayisi){ t.taksitSayisi = h.taksitSayisi; changed = true; }
-      if(t.odenenTaksit !== h.odenenTaksit){ t.odenenTaksit = h.odenenTaksit; changed = true; }
-    });
-  });
-  return changed;
-}
-if(ensureBonusPlatinumTroy2026()) save();
 
 render();
 </script>
