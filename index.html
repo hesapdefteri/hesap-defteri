@@ -4832,9 +4832,11 @@ function cv2Hareketler(id, tur){
     ? '<button class="cv2-qbtn alis" id="cv2QLeft">Alış</button><button class="cv2-qbtn odeme" id="cv2QRight">Ödeme</button>'
     : '<button class="cv2-qbtn tahsilat" id="cv2QLeft">Tahsilat</button><button class="cv2-qbtn satis" id="cv2QRight">Satış</button>';
   document.getElementById('cv2QLeft').addEventListener('click', () => {
+    cv2CloseSheet(true);
     if(tur === 'tedarikci') cv2Alis(id, tur); else openQuickTx(id, tur, 'TAHSİLAT');
   });
   document.getElementById('cv2QRight').addEventListener('click', () => {
+    cv2CloseSheet(true);
     if(tur === 'tedarikci') openQuickTx(id, tur, 'ÖDEME'); else cv2Satis(id, tur);
   });
 
