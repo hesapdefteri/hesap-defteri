@@ -4751,6 +4751,7 @@ function cv2ModalKapat(){
   m.classList.remove('in');
   cv2ModalAksiyon = null;
   cv2ModalIkinciAksiyon = null;
+  if(typeof cv2CloseOpen === 'function') cv2CloseOpen(null);
   document.body.style.position = '';
   document.body.style.top = '';
   document.body.style.left = '';
