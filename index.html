@@ -4515,6 +4515,21 @@ function cv2CloseOpen(exceptUid){
   if(!exceptUid) cv2OpenId = null;
 }
 
+// Aksiyon butonlarından (Tahsilat/Ödeme/Düzenle/Hareketler/Ekstre/Daha Fazla) sonra
+// bir modal/sheet açılacaksa, satırı ANİMASYONSUZ kapatıyoruz — böylece açılan
+// pencerenin tetiklediği layout değişikliği kesecek bir animasyon hiç olmuyor
+// (gerçek cihazlarda animasyonun yarıda kesilip satırın açık kalması ihtimalini tamamen ortadan kaldırır).
+function cv2CloseOpenInstant(){
+  document.querySelectorAll('.cv2-wrap').forEach(w=>{
+    const card = w.querySelector('.cv2-card');
+    card.style.transition = 'none';
+    card.style.transform = 'translateX(0px)';
+    card.dataset.tx = '0';
+    card.classList.remove('cv2-pressed');
+  });
+  cv2OpenId = null;
+}
+
 function cv2BindCards(){
   document.querySelectorAll('.cv2-card').forEach(card=>{
     let startX=0, startY=0, curX=0, dragging=false, decided=false, horizontal=false;
@@ -4580,7 +4595,7 @@ function cv2BindCards(){
       const sep = uid.indexOf(':');
       const tur = uid.slice(0, sep), id = uid.slice(sep + 1);
       const act = btn.dataset.act;
-      cv2CloseOpen(null);
+      cv2CloseOpenInstant();
       if(act === 'tahsilat') cv2Tahsilat(id, tur);
       else if(act === 'odeme') cv2Odeme(id, tur);
       else if(act === 'duzenle') cv2Duzenle(id, tur);
@@ -4756,7 +4771,7 @@ function cv2ModalKapat(){
   m.classList.remove('in');
   cv2ModalAksiyon = null;
   cv2ModalIkinciAksiyon = null;
-  if(typeof cv2CloseOpen === 'function') cv2CloseOpen(null);
+  if(typeof cv2CloseOpenInstant === 'function') cv2CloseOpenInstant();
   document.body.style.position = '';
   document.body.style.top = '';
   document.body.style.left = '';
