@@ -71,6 +71,12 @@
 
   .cv2-listpane{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
     padding:0 16px 24px 16px;touch-action:pan-y;}
+  .cv2-searchwrap{flex-shrink:0;padding:0 16px 10px 16px;}
+  .cv2-search{width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:14px;
+    padding:11px 14px;font-size:14px;font-weight:600;color:var(--ink);font-family:inherit;
+    background:#fff;outline:none;transition:border-color .2s ease;}
+  .cv2-search:focus{border-color:var(--accent);}
+  .cv2-search::placeholder{color:var(--muted);font-weight:600;}
   .cv2-list{display:flex;flex-direction:column;gap:10px;}
   .cv2-empty{padding:40px 18px;text-align:center;color:#a7b0b4;font-size:13px;font-weight:600;}
 
@@ -98,6 +104,7 @@
   .cv2-mid{flex:1;min-width:0;}
   .cv2-name{font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .cv2-date{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:3px;}
+  .cv2-date.cv2-relzaman{color:#1f7a4d;font-weight:700;}
   .cv2-bal{font-size:16px;font-weight:800;letter-spacing:-.4px;white-space:nowrap;flex-shrink:0;}
   .cv2-bal.debt{color:var(--red);} .cv2-bal.credit{color:var(--green);} .cv2-bal.zero{color:var(--ink);}
 
@@ -1983,6 +1990,9 @@
       <div class="cv2-sum-it debt"><div class="l">TOPLAM BORÇ</div><div class="v" id="cv2Borc">—</div></div>
       <div class="cv2-sum-it credit"><div class="l">TOPLAM ALACAK</div><div class="v" id="cv2Alacak">—</div></div>
     </div>
+  </div>
+  <div class="cv2-searchwrap">
+    <input type="text" id="cv2Search" class="cv2-search" placeholder="Cari ara...">
   </div>
   <div class="cv2-listpane" id="cv2ListPane">
     <div class="cv2-list" id="cv2List"></div>
@@ -4473,6 +4483,7 @@ function cv2Find(id, tur){
   const arr = tur === 'tedarikci' ? state.tedarikci : state.cari;
   return arr.find(x=>x.id===id);
 }
+let cv2SearchTerm = '';
 function cv2Liste(){
   // CH1'deki (renderCariHesaplar) sıralamayla birebir aynı: önce tedarikçiler
   // (bakiyeye göre azalan), sonra müşteriler (bakiyeye göre azalan). Filtre de
@@ -4481,10 +4492,15 @@ function cv2Liste(){
   const musteriler = state.cari.map(c=>({c, tur:'cari'}));
   tedarikciler.sort((a,b)=> cariBalance(b.c) - cariBalance(a.c));
   musteriler.sort((a,b)=> cariBalance(b.c) - cariBalance(a.c));
-  const combined = [...tedarikciler, ...musteriler];
-  return state.cariFilter === 'hareket'
-    ? combined.filter(({c}) => Math.abs(cariBalance(c)) > 0.005)
-    : combined;
+  let combined = [...tedarikciler, ...musteriler];
+  if(state.cariFilter === 'hareket'){
+    combined = combined.filter(({c}) => Math.abs(cariBalance(c)) > 0.005);
+  }
+  if(cv2SearchTerm.trim()){
+    const q = cv2SearchTerm.trim().toLocaleLowerCase('tr-TR');
+    combined = combined.filter(({c}) => c.name.toLocaleLowerCase('tr-TR').includes(q));
+  }
+  return combined;
 }
 
 /* ---------- CariCardV2 ---------- */
@@ -4492,8 +4508,20 @@ function CariCardV2(c, tur){
   const bal = cariBalance(c);
   const cls = cv2BalClass(bal);
   const sh = sonHareketTarihi(c);
-  const tarihTxt = sh ? cv2TR(sh) : 'Henüz hareket yok';
   const uid = tur + ':' + c.id;
+  // CH1'deki (Cari Hesaplar) tarih rozeti + "X gün/ay önce" mantığıyla birebir aynı
+  // (siparis-date-circle CSS'i ve relativeZaman() fonksiyonu doğrudan yeniden kullanılıyor).
+  let circleHtml, altYazi;
+  if(sh){
+    const gun = sh.getDate();
+    const ay = sh.toLocaleDateString('tr-TR', {month:'short'}).toUpperCase().replace('.', '');
+    circleHtml = `<span class="siparis-date-circle son-hareket"><b>${gun}</b>${ay}</span>`;
+    const adet = (c.transactions || []).length;
+    altYazi = `Son hareket: ${relativeZaman(sh)} · ${adet} hareket`;
+  } else {
+    circleHtml = '<span class="siparis-date-circle siparis-date-circle-empty"></span>';
+    altYazi = 'Henüz hareket yok';
+  }
   // CH1'deki (Cari Hesaplar) swipeActionsHtml ile birebir aynı mantık: tedarikçide
   // Alış/Ödeme, müşteride Tahsilat/Satış — sadece Düzenle CV2'ye özgü ek bir buton.
   const leftBtns = tur === 'tedarikci'
@@ -4514,10 +4542,10 @@ function CariCardV2(c, tur){
       <button class="cv2-abtn daha" data-act="daha" data-uid="${uid}">Daha Fazla</button>
     </div>
     <div class="cv2-card" data-uid="${uid}" data-id="${c.id}" data-tur="${tur}">
-      <span class="cv2-dot ${cls}"></span>
+      ${circleHtml}
       <div class="cv2-mid">
         <div class="cv2-name">${c.name}</div>
-        <div class="cv2-date">${tarihTxt}</div>
+        <div class="cv2-date cv2-relzaman">${altYazi}</div>
       </div>
       <div class="cv2-bal ${cls}">${fmtWhole(bal)}</div>
     </div>
@@ -4653,10 +4681,11 @@ function renderCariV2(){
     filterBtn.textContent = hareketMod ? 'Hareketli' : 'Tümü';
     filterBtn.classList.toggle('active', hareketMod);
   }
+  const tumHesaplar = [...state.tedarikci, ...state.cari];
+  const total  = tumHesaplar.reduce((s,c)=> s + cariBalance(c), 0);
+  const borc   = tumHesaplar.reduce((s,c)=> s + Math.min(cariBalance(c), 0), 0);
+  const alacak = tumHesaplar.reduce((s,c)=> s + Math.max(cariBalance(c), 0), 0);
   const list = cv2Liste();
-  const total  = list.reduce((s,x)=> s + cariBalance(x.c), 0);
-  const borc   = list.reduce((s,x)=> s + Math.min(cariBalance(x.c), 0), 0);
-  const alacak = list.reduce((s,x)=> s + Math.max(cariBalance(x.c), 0), 0);
 
   const netEl = document.getElementById('cv2Net');
   netEl.textContent = fmtWhole(total);
@@ -4998,6 +5027,12 @@ function cv2DahaFazla(id, tur){
   if(filterBtn) filterBtn.addEventListener('click', () => {
     state.cariFilter = state.cariFilter === 'hareket' ? 'tumu' : 'hareket';
     save();
+    renderCariV2();
+  });
+
+  const searchInput = document.getElementById('cv2Search');
+  if(searchInput) searchInput.addEventListener('input', e => {
+    cv2SearchTerm = e.target.value;
     renderCariV2();
   });
 
