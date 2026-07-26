@@ -64,7 +64,7 @@
   .cv2-sum-it.debt .v{color:var(--red);}
   .cv2-sum-it.credit .v{color:var(--green);}
 
-  .cv2-listpane{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  .cv2-listpane{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
     padding:0 16px 24px 16px;touch-action:pan-y;}
   .cv2-list{display:flex;flex-direction:column;gap:10px;}
   .cv2-empty{padding:40px 18px;text-align:center;color:#a7b0b4;font-size:13px;font-weight:600;}
@@ -120,7 +120,7 @@
   .cv2-sh-tot .l{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.2px;}
   .cv2-sh-tot .v{font-size:14px;font-weight:800;color:var(--ink);margin-top:2px;}
   .cv2-sh-last{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:9px;}
-  .cv2-sh-body{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 20px 10px 20px;}
+  .cv2-sh-body{flex:1;min-height:0;overflow-y:auto;padding:4px 20px 10px 20px;}
   .cv2-sh-mgroup{font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:.3px;text-transform:uppercase;
     padding:14px 2px 8px 2px;}
   .cv2-sh-mgroup:first-child{padding-top:8px;}
@@ -4713,7 +4713,17 @@ function cv2RefreshSheetIfOpen(id, tur){
 /* ---------- küçük onay/form penceresi (V2) ---------- */
 let cv2ModalAksiyon = null;
 let cv2ModalIkinciAksiyon = null;
+let cv2ModalScrollY = 0;
 function cv2ModalAc(baslik, mesaj, formHtml, onayMetni, onaySinif, aksiyon, ikinciBtn){
+  // iOS Safari'de, altındaki alan kaydırılırken açılan position:fixed pencereler
+  // bazen yerinden oynayıp listenin içine gömülü gibi görünebiliyor — bunu önlemek
+  // için modal açıkken arka plan sayfayı sabitliyoruz (kapanınca eski konuma dönülür).
+  cv2ModalScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+  document.body.style.position = 'fixed';
+  document.body.style.top = '-' + cv2ModalScrollY + 'px';
+  document.body.style.left = '0';
+  document.body.style.right = '0';
+  document.body.style.width = '100%';
   document.getElementById('cv2ModalTitle').textContent = baslik;
   document.getElementById('cv2ModalMsg').innerHTML = mesaj || '';
   document.getElementById('cv2ModalForm').innerHTML = formHtml || '';
@@ -4741,6 +4751,12 @@ function cv2ModalKapat(){
   m.classList.remove('in');
   cv2ModalAksiyon = null;
   cv2ModalIkinciAksiyon = null;
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.left = '';
+  document.body.style.right = '';
+  document.body.style.width = '';
+  window.scrollTo(0, cv2ModalScrollY);
   setTimeout(()=>{ if(!m.classList.contains('in')) m.classList.remove('show'); }, 260);
 }
 
