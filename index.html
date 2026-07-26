@@ -929,8 +929,39 @@
   .fis-kdv-row{display:flex;align-items:center;justify-content:space-between;padding:2px 0;}
   .fis-kdv-row label{font-size:14px;font-weight:600;color:var(--ink);}
 </style>
+<!-- Firebase (telefon numarasıyla giriş + bulut senkronizasyonu) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
 <body>
+
+<div id="authScreen" style="position:fixed;inset:0;z-index:99999;background:linear-gradient(160deg,#0b1a3d 0%,#1c3566 45%,#0f2350 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <div style="width:100%;max-width:340px;">
+    <div style="font-size:26px;font-weight:800;color:#fff;letter-spacing:-.5px;">Hesap Defteri</div>
+    <div style="font-size:13.5px;color:#a9b8d0;font-weight:600;margin-top:6px;margin-bottom:30px;">Verilerin bulutta güvenli — telefon numaranla giriş yap</div>
+
+    <div id="authStepPhone">
+      <label style="font-size:11.5px;color:#a9b8d0;font-weight:700;letter-spacing:.2px;">TELEFON NUMARASI</label>
+      <input id="authPhone" type="tel" placeholder="+90 5xx xxx xx xx" autocomplete="tel"
+        style="width:100%;box-sizing:border-box;padding:14px 15px;border-radius:14px;border:none;margin:8px 0 18px 0;font-size:16px;font-family:inherit;">
+      <button id="authSendCode" style="width:100%;padding:15px;border:none;border-radius:14px;background:#2f6690;color:#fff;font-weight:800;font-size:15px;font-family:inherit;cursor:pointer;">Kod Gönder</button>
+      <div id="authError" style="color:#ff9b9b;font-size:13px;font-weight:600;margin-top:14px;min-height:18px;"></div>
+    </div>
+
+    <div id="authStepCode" style="display:none;">
+      <label style="font-size:11.5px;color:#a9b8d0;font-weight:700;letter-spacing:.2px;">DOĞRULAMA KODU</label>
+      <input id="authCode" type="tel" inputmode="numeric" placeholder="6 haneli kod" autocomplete="one-time-code"
+        style="width:100%;box-sizing:border-box;padding:14px 15px;border-radius:14px;border:none;margin:8px 0 18px 0;font-size:18px;letter-spacing:5px;font-family:inherit;">
+      <button id="authVerifyCode" style="width:100%;padding:15px;border:none;border-radius:14px;background:#1f9d64;color:#fff;font-weight:800;font-size:15px;font-family:inherit;cursor:pointer;">Giriş Yap</button>
+      <div id="authError2" style="color:#ff9b9b;font-size:13px;font-weight:600;margin-top:14px;min-height:18px;"></div>
+      <button id="authBackToPhone" style="width:100%;padding:10px;border:none;background:none;color:#a9b8d0;font-weight:700;font-size:13px;font-family:inherit;margin-top:6px;cursor:pointer;">Numarayı değiştir</button>
+    </div>
+
+    <div id="authLoading" style="display:none;text-align:center;color:#a9b8d0;font-size:14px;font-weight:600;padding:20px 0;">Yükleniyor…</div>
+  </div>
+  <div id="recaptcha-container"></div>
+</div>
 
 <button id="anaMenuFloatBtn" class="glass-fab" style="display:none;position:fixed;right:20px;bottom:92px;width:58px;height:58px;border-radius:50%;z-index:500;align-items:center;justify-content:center;cursor:pointer;">
 </button>
@@ -2282,7 +2313,16 @@ if(!state.masrafHesaplari) state.masrafHesaplari = [];
 let activeLedger = 'cari';
 function getLedger(){ return state[activeLedger]; }
 
-function save(){ LS.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function save(){
+  LS.setItem(STORAGE_KEY, JSON.stringify(state));
+  // Giriş yapılmışsa aynı veriyi buluta da yazıyoruz (localStorage her zaman
+  // hızlı yerel bir kopya olarak kalıyor; Firebase gerçek/senkron kopya).
+  if(typeof fbAvailable !== 'undefined' && fbAvailable && fbAuth && fbAuth.currentUser){
+    fbDb.ref('users/' + fbAuth.currentUser.uid).set(state).catch(err => {
+      console.error('Bulut kayıt hatası:', err);
+    });
+  }
+}
 
 function fmt(n){
   const sign = n < 0 ? '-' : '';
@@ -8273,7 +8313,114 @@ function ensureCagatayTicaret(){
 }
 if(ensureCagatayTicaret()) save();
 
-render();
+// ================= Firebase: telefon numarasıyla giriş + bulut senkronizasyonu =================
+// Yerel veri (state/localStorage) yukarıdaki gibi AYNEN çalışmaya devam ediyor —
+// bu bölüm sadece üzerine ekleniyor. Firebase hiç yüklenemezse (ağ engeli, script
+// bloklanmışsa vb.) uygulama eskisi gibi SADECE yerel veriyle açılır, kilitlenip
+// kalmaz.
+const firebaseConfig = {
+  apiKey: "AIzaSyCgMCEapQnEC89b6c3_8lpqjRGRqRD5Quk",
+  authDomain: "defter-f2007.firebaseapp.com",
+  databaseURL: "https://defter-f2007-default-rtdb.firebaseio.com",
+  projectId: "defter-f2007",
+  storageBucket: "defter-f2007.firebasestorage.app",
+  messagingSenderId: "939612854579",
+  appId: "1:939612854579:web:6a5ebf9010f00547ff0646",
+  measurementId: "G-FB0Q71KSTJ"
+};
+
+var fbAuth = null, fbDb = null, fbAvailable = false, fbConfirmation = null;
+
+function authShowError(elId, msg){ const el = document.getElementById(elId); if(el) el.textContent = msg; }
+function authShowLoading(on){ document.getElementById('authLoading').style.display = on ? 'block' : 'none'; }
+
+function hideAuthScreen(){
+  document.getElementById('authScreen').style.display = 'none';
+}
+
+function cloudSyncAndBoot(user){
+  document.getElementById('authStepPhone').style.display = 'none';
+  document.getElementById('authStepCode').style.display = 'none';
+  authShowLoading(true);
+  fbDb.ref('users/' + user.uid).once('value').then(snap => {
+    if(snap.exists() && snap.val()){
+      state = snap.val();
+      LS.setItem(STORAGE_KEY, JSON.stringify(state));
+    } else {
+      // İlk kez giriş yapıyor — mevcut yerel veriyi (seed + bugüne kadarki her şey) buluta yollar.
+      fbDb.ref('users/' + user.uid).set(state);
+    }
+  }).catch(err => {
+    console.error('Bulut senkron hatası:', err);
+    // Bağlantı sorunu olsa bile yerel veriyle devam — kullanıcı dışarıda kalmasın.
+  }).finally(() => {
+    hideAuthScreen();
+    render();
+  });
+}
+
+try {
+  firebase.initializeApp(firebaseConfig);
+  fbAuth = firebase.auth();
+  fbDb = firebase.database();
+  fbAvailable = true;
+
+  fbAuth.onAuthStateChanged(user => {
+    if(user){
+      cloudSyncAndBoot(user);
+    } else {
+      authShowLoading(false);
+      document.getElementById('authStepPhone').style.display = 'block';
+      document.getElementById('authStepCode').style.display = 'none';
+    }
+  });
+
+  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { size: 'invisible' });
+
+  document.getElementById('authSendCode').addEventListener('click', () => {
+    authShowError('authError', '');
+    let phone = document.getElementById('authPhone').value.trim();
+    if(!phone){ authShowError('authError', 'Telefon numarası gir.'); return; }
+    if(!phone.startsWith('+')) phone = '+90' + phone.replace(/^0+/, '').replace(/\s+/g, '');
+    authShowLoading(true);
+    fbAuth.signInWithPhoneNumber(phone, window.recaptchaVerifier).then(result => {
+      fbConfirmation = result;
+      authShowLoading(false);
+      document.getElementById('authStepPhone').style.display = 'none';
+      document.getElementById('authStepCode').style.display = 'block';
+    }).catch(err => {
+      authShowLoading(false);
+      authShowError('authError', 'Kod gönderilemedi: ' + (err && err.message ? err.message : 'bilinmeyen hata'));
+      if(window.recaptchaVerifier && window.recaptchaVerifier.render){
+        window.recaptchaVerifier.render().then(widgetId => { if(window.grecaptcha) window.grecaptcha.reset(widgetId); });
+      }
+    });
+  });
+
+  document.getElementById('authVerifyCode').addEventListener('click', () => {
+    authShowError('authError2', '');
+    const code = document.getElementById('authCode').value.trim();
+    if(!code || !fbConfirmation){ authShowError('authError2', 'Kodu gir.'); return; }
+    authShowLoading(true);
+    fbConfirmation.confirm(code).catch(err => {
+      authShowLoading(false);
+      authShowError('authError2', 'Kod yanlış: ' + (err && err.message ? err.message : 'bilinmeyen hata'));
+    });
+    // Başarılıysa onAuthStateChanged tetiklenip cloudSyncAndBoot() zaten çağrılacak.
+  });
+
+  document.getElementById('authBackToPhone').addEventListener('click', () => {
+    document.getElementById('authStepCode').style.display = 'none';
+    document.getElementById('authStepPhone').style.display = 'block';
+    authShowError('authError2', '');
+  });
+} catch(e){
+  console.error('Firebase başlatılamadı, sadece yerel veriyle devam ediliyor:', e);
+  fbAvailable = false;
+  hideAuthScreen();
+  render();
+}
+
 </script>
 </body>
 </html>
