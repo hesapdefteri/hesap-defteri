@@ -198,6 +198,10 @@
     font-size:15px;font-weight:700;color:var(--ink);font-family:inherit;background:#fff;outline:none;
     transition:border-color .2s ease;}
   .cv2-field input:focus{border-color:var(--accent);}
+  .cv2-tur-btn{flex:1;border:1.5px solid var(--line);border-radius:12px;padding:10px 0;font-size:13px;
+    font-weight:800;color:var(--muted);background:#fff;font-family:inherit;cursor:pointer;
+    transition:background .15s ease,color .15s ease,border-color .15s ease;}
+  .cv2-tur-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
   .cv2-btn{border:none;border-radius:14px;padding:13px 10px;font-size:13.5px;font-weight:800;cursor:pointer;
     font-family:inherit;transition:transform .15s ease,opacity .15s ease;}
   .cv2-btn:active{transform:scale(.97);opacity:.85;}
@@ -5050,21 +5054,45 @@ function cv2Alis(id, tur){
 }
 function cv2Duzenle(id, tur){
   const c = cv2Find(id, tur); if(!c) return;
-  cv2ModalAc('Cariyi Düzenle', '',
-    '<div class="cv2-field"><label>FİRMA ADI</label><input id="cv2Ad" type="text" value="' + c.name.replace(/"/g,'&quot;') + '"></div>',
+  const formHtml =
+    '<div class="cv2-field"><label>FİRMA ADI</label><input id="cv2Ad" type="text" value="' + c.name.replace(/"/g,'&quot;') + '"></div>' +
+    '<div class="cv2-field"><label>TÜR</label>' +
+      '<div style="display:flex;gap:8px;margin-top:6px;">' +
+        '<button type="button" id="cv2TurMusteri" class="cv2-tur-btn' + (tur === 'cari' ? ' active' : '') + '">Müşteri</button>' +
+        '<button type="button" id="cv2TurTedarikci" class="cv2-tur-btn' + (tur === 'tedarikci' ? ' active' : '') + '">Tedarikçi</button>' +
+      '</div>' +
+    '</div>';
+  cv2ModalAc('Cariyi Düzenle', '', formHtml,
     'Kaydet', 'primary',
     function(){
       const yeni = (document.getElementById('cv2Ad').value || '').trim();
+      const yeniTur = document.getElementById('cv2TurTedarikci').classList.contains('active') ? 'tedarikci' : 'cari';
       cv2ModalKapat();
       if(yeni){
         showIslemYapiliyor(()=>{
           c.name = yeni;
+          // Müşteri/Tedarikçi türü değiştiyse, cari kaydı ilgili diziler arasında taşınır.
+          if(yeniTur !== tur){
+            const eskiDizi = tur === 'tedarikci' ? state.tedarikci : state.cari;
+            const yeniDizi = yeniTur === 'tedarikci' ? state.tedarikci : state.cari;
+            const idx = eskiDizi.findIndex(x => x.id === c.id);
+            if(idx > -1) eskiDizi.splice(idx, 1);
+            yeniDizi.push(c);
+          }
           save();
           renderCariV2();
         }, 2000);
       }
     }
   );
+  document.getElementById('cv2TurMusteri').addEventListener('click', () => {
+    document.getElementById('cv2TurMusteri').classList.add('active');
+    document.getElementById('cv2TurTedarikci').classList.remove('active');
+  });
+  document.getElementById('cv2TurTedarikci').addEventListener('click', () => {
+    document.getElementById('cv2TurTedarikci').classList.add('active');
+    document.getElementById('cv2TurMusteri').classList.remove('active');
+  });
 }
 function cv2EkTarih(d){
   const gg = String(d.getDate()).padStart(2,'0');
