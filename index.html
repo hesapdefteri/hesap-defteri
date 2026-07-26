@@ -4570,7 +4570,9 @@ function CariCardV2(c, tur){
   }
   // CH1'deki (Cari Hesaplar) swipeActionsHtml ile birebir aynı mantık: tedarikçide
   // Alış/Ödeme, müşteride Tahsilat/Satış — sadece Düzenle CV2'ye özgü ek bir buton.
-  const leftBtns = tur === 'tedarikci'
+  // NOT: kullanıcı sağdan sola kaydırmayı daha sık kullandığı için bu butonlar
+  // artık SAĞ panelde (sola kaydırınca açılıyor); Hareketler/Ekstre/Daha Fazla SOL panelde.
+  const paraBtns = tur === 'tedarikci'
     ? `<button class="cv2-abtn alis" data-act="alis" data-uid="${uid}">Alış</button>
       <button class="cv2-abtn odeme" data-act="odeme" data-uid="${uid}">Ödeme</button>
       <button class="cv2-abtn duzenle" data-act="duzenle" data-uid="${uid}">Düzenle</button>`
@@ -4580,12 +4582,12 @@ function CariCardV2(c, tur){
   return `
   <div class="cv2-wrap" data-uid="${uid}">
     <div class="cv2-actions left" style="display:none;">
-      ${leftBtns}
-    </div>
-    <div class="cv2-actions right" style="display:none;">
       <button class="cv2-abtn hareketler" data-act="hareketler" data-uid="${uid}">Hareketler</button>
       <button class="cv2-abtn ekstre" data-act="ekstre" data-uid="${uid}">Ekstre</button>
       <button class="cv2-abtn daha" data-act="daha" data-uid="${uid}">Daha Fazla</button>
+    </div>
+    <div class="cv2-actions right" style="display:none;">
+      ${paraBtns}
     </div>
     <div class="cv2-card" data-uid="${uid}" data-id="${c.id}" data-tur="${tur}">
       ${circleHtml}
