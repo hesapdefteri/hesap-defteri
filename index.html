@@ -4481,12 +4481,12 @@ function CariCardV2(c, tur){
   const uid = tur + ':' + c.id;
   return `
   <div class="cv2-wrap" data-uid="${uid}">
-    <div class="cv2-actions left">
+    <div class="cv2-actions left" style="display:none;">
       <button class="cv2-abtn tahsilat" data-act="tahsilat" data-uid="${uid}">Tahsilat</button>
       <button class="cv2-abtn odeme" data-act="odeme" data-uid="${uid}">Ödeme</button>
       <button class="cv2-abtn duzenle" data-act="duzenle" data-uid="${uid}">Düzenle</button>
     </div>
-    <div class="cv2-actions right">
+    <div class="cv2-actions right" style="display:none;">
       <button class="cv2-abtn hareketler" data-act="hareketler" data-uid="${uid}">Hareketler</button>
       <button class="cv2-abtn ekstre" data-act="ekstre" data-uid="${uid}">Ekstre</button>
       <button class="cv2-abtn daha" data-act="daha" data-uid="${uid}">Daha Fazla</button>
@@ -4503,6 +4503,18 @@ function CariCardV2(c, tur){
 }
 
 /* ---------- TransactionList (V2) ---------- */
+// İki aksiyon paneli (sol: Tahsilat/Ödeme/Düzenle, sağ: Hareketler/Ekstre/Daha Fazla)
+// her biri 222px olduğu için toplamları çoğu telefon ekranında kartın genişliğinden
+// GENİŞTİR — ikisi de aynı anda DOM'da "display:flex" olsaydı ortada çakışıp
+// birbirine karışıyorlardı (kullanıcının bildirdiği "her iki tarafta da görünüyorlar" hatası).
+// Bu yüzden her zaman sadece kaydırma yönüne uyan panel gösteriliyor, diğeri display:none.
+function cv2SyncPanels(wrap, x){
+  const left = wrap.querySelector('.cv2-actions.left');
+  const right = wrap.querySelector('.cv2-actions.right');
+  if(left) left.style.display = x > 0.5 ? 'flex' : 'none';
+  if(right) right.style.display = x < -0.5 ? 'flex' : 'none';
+}
+
 function cv2CloseOpen(exceptUid){
   document.querySelectorAll('.cv2-wrap').forEach(w=>{
     if(exceptUid && w.dataset.uid === exceptUid) return;
@@ -4511,6 +4523,7 @@ function cv2CloseOpen(exceptUid){
     card.style.transform = 'translateX(0px)';
     card.dataset.tx = '0';
     card.classList.remove('cv2-pressed');
+    cv2SyncPanels(w, 0);
   });
   if(!exceptUid) cv2OpenId = null;
 }
@@ -4526,6 +4539,7 @@ function cv2CloseOpenInstant(){
     card.style.transform = 'translateX(0px)';
     card.dataset.tx = '0';
     card.classList.remove('cv2-pressed');
+    cv2SyncPanels(w, 0);
   });
   cv2OpenId = null;
 }
@@ -4565,6 +4579,7 @@ function cv2BindCards(){
       x = Math.max(-CV2_PANEL, Math.min(CV2_PANEL, x));
       card.style.transform = 'translateX(' + x + 'px)';
       card.dataset.tx = String(x);
+      cv2SyncPanels(card.parentElement, x);
     });
 
     const finish = () => {
@@ -4574,9 +4589,9 @@ function cv2BindCards(){
       if(!horizontal) return;
       const x = parseFloat(card.dataset.tx || '0');
       card.style.transition = 'transform .22s cubic-bezier(.22,.9,.3,1)';
-      if(x > CV2_PANEL/2){ card.style.transform = 'translateX(' + CV2_PANEL + 'px)'; card.dataset.tx = String(CV2_PANEL); cv2OpenId = uid; }
-      else if(x < -CV2_PANEL/2){ card.style.transform = 'translateX(-' + CV2_PANEL + 'px)'; card.dataset.tx = String(-CV2_PANEL); cv2OpenId = uid; }
-      else { card.style.transform = 'translateX(0px)'; card.dataset.tx = '0'; if(cv2OpenId === uid) cv2OpenId = null; }
+      if(x > CV2_PANEL/2){ card.style.transform = 'translateX(' + CV2_PANEL + 'px)'; card.dataset.tx = String(CV2_PANEL); cv2OpenId = uid; cv2SyncPanels(card.parentElement, CV2_PANEL); }
+      else if(x < -CV2_PANEL/2){ card.style.transform = 'translateX(-' + CV2_PANEL + 'px)'; card.dataset.tx = String(-CV2_PANEL); cv2OpenId = uid; cv2SyncPanels(card.parentElement, -CV2_PANEL); }
+      else { card.style.transform = 'translateX(0px)'; card.dataset.tx = '0'; if(cv2OpenId === uid) cv2OpenId = null; cv2SyncPanels(card.parentElement, 0); }
     };
     card.addEventListener('pointerup', finish);
     card.addEventListener('pointercancel', finish);
