@@ -1942,7 +1942,7 @@
     </div>
   </div>
 
-  <div class="kk-monthbar"><span class="m" id="kkAyBaslik">—</span><span class="s" id="kkAyOzet"></span></div>
+  <div class="kk-monthbar"><span class="m" id="kkAyBaslik">—</span><span class="s" id="kkAyOzet"></span><button id="kkYeniBtn" style="margin-left:auto;border:0;border-radius:999px;background:#2e56c9;color:#fff;font-size:12.5px;font-weight:800;padding:7px 14px;letter-spacing:.2px;">+ Yeni İşlem</button></div>
 
   <div class="kk-split">
     <div class="kk-rail" id="kkRail"></div>
@@ -5070,63 +5070,18 @@ function kkAyEkle(iso, n){
 
 // durum: 'odendi' | 'odenmedi' | 'kismi'
 const KK_SEED = [
-  { ad:'OCAK',    yil:2026, adet:7,  tutar:4350.00, hareketler:[] },
-  { ad:'ŞUBAT',   yil:2026, adet:6,  tutar:3980.00, hareketler:[] },
-  { ad:'MART',    yil:2026, adet:8,  tutar:5250.00, hareketler:[] },
-  { ad:'NİSAN',   yil:2026, adet:9,  tutar:6420.00, hareketler:[] },
-  { ad:'MAYIS',   yil:2026, adet:7,  tutar:4850.00, hareketler:[] },
-  { ad:'HAZİRAN', yil:2026, adet:6,  tutar:4100.00, hareketler:[] },
-  { ad:'TEMMUZ',  yil:2026, adet:8,  tutar:5680.00, hareketler:[] },
-  { ad:'AĞUSTOS', yil:2026, adet:11, tutar:7732.77, hareketler:[
-      { yer:'DESA DERİ', aciklama:'Deri çanta ve aksesuar', sahiplik:'Asıl Kart', tip:'Bonus Flexi Card',
-        tur:'Taksitli Alışveriş', taksitNo:2, taksitAdet:2, ilk:'2026-07-01',
-        tarih:'2026-08-01', sonOdeme:'2026-08-12', tutar:620.00, odenen:0, durum:'odenmedi',
-        ref:'GRT-2608-014732', notlar:'—' },
-      { yer:'U.S POLO BULVAR SAMSUN', aciklama:'Giyim / aksesuar', sahiplik:'Asıl Kart', tip:'Bonus Platinum Troy',
-        tur:'Taksitli Alışveriş', taksitNo:2, taksitAdet:3, ilk:'2026-07-01',
-        tarih:'2026-08-01', sonOdeme:'2026-08-12', tutar:1000.00, odenen:1000.00, durum:'odendi',
-        ref:'GRT-2608-014733', notlar:'—' },
-      { yer:'ANKARA ANONİM TÜRK SİGORTA', aciklama:'Kasko / trafik sigortası primi', sahiplik:'Ek Kart', tip:'Bonus Flexi Card',
-        tur:'Taksitli Alışveriş', taksitNo:2, taksitAdet:6, ilk:'2026-07-02',
-        tarih:'2026-08-02', sonOdeme:'2026-08-12', tutar:615.00, odenen:0, durum:'odenmedi',
-        ref:'GRT-2608-014801', notlar:'Poliçe yenileme' },
-      { yer:'TRENDYOL.COM', aciklama:'Online alışveriş', sahiplik:'Ek Kart', tip:'Bonus Flexi Card',
-        tur:'Taksitli Alışveriş', taksitNo:2, taksitAdet:3, ilk:'2026-07-02',
-        tarih:'2026-08-02', sonOdeme:'2026-08-12', tutar:366.00, odenen:0, durum:'odenmedi',
-        ref:'GRT-2608-014802', notlar:'—' },
-      { yer:'IYZICO *AMAZON.COM.TR', aciklama:'Online alışveriş (Iyzico)', sahiplik:'Asıl Kart', tip:'Bonus Flexi Card',
-        tur:'Taksitli Alışveriş', taksitNo:2, taksitAdet:6, ilk:'2026-07-03',
-        tarih:'2026-08-03', sonOdeme:'2026-08-12', tutar:1080.00, odenen:0, durum:'odenmedi',
-        ref:'GRT-2608-014910', notlar:'—' },
-      { yer:'MİGROS TİCARET A.Ş.', aciklama:'Market alışverişi', sahiplik:'Asıl Kart', tip:'Bonus Flexi Card',
-        tur:'Tek Çekim', taksitNo:1, taksitAdet:1, ilk:'2026-08-03',
-        tarih:'2026-08-03', sonOdeme:'2026-08-12', tutar:850.00, odenen:850.00, durum:'odendi',
-        ref:'GRT-2608-014911', notlar:'—' },
-      { yer:'VESTEL ELEKTRONİK', aciklama:'Beyaz eşya alımı', sahiplik:'Ek Kart', tip:'Bonus Flexi Card',
-        tur:'Taksitli Alışveriş', taksitNo:1, taksitAdet:4, ilk:'2026-08-04',
-        tarih:'2026-08-04', sonOdeme:'2026-08-12', tutar:2499.00, odenen:1200.00, durum:'kismi',
-        ref:'GRT-2608-015004', notlar:'Kısmi ödeme yapıldı' },
-      { yer:'SHELL AKARYAKIT', aciklama:'Akaryakıt', sahiplik:'Asıl Kart', tip:'Bonus Flexi Card',
-        tur:'Tek Çekim', taksitNo:1, taksitAdet:1, ilk:'2026-08-05',
-        tarih:'2026-08-05', sonOdeme:'2026-08-12', tutar:750.00, odenen:750.00, durum:'odendi',
-        ref:'GRT-2608-015115', notlar:'—' },
-      { yer:'LC WAIKIKI', aciklama:'Giyim', sahiplik:'Ek Kart', tip:'Bonus Flexi Card',
-        tur:'Taksitli Alışveriş', taksitNo:1, taksitAdet:3, ilk:'2026-08-06',
-        tarih:'2026-08-06', sonOdeme:'2026-08-12', tutar:925.00, odenen:0, durum:'odenmedi',
-        ref:'GRT-2608-015220', notlar:'—' },
-      { yer:'TEKNO SA', aciklama:'Elektronik', sahiplik:'Asıl Kart', tip:'Bonus Flexi Card',
-        tur:'Taksitli Alışveriş', taksitNo:1, taksitAdet:2, ilk:'2026-08-07',
-        tarih:'2026-08-07', sonOdeme:'2026-08-12', tutar:1749.00, odenen:800.00, durum:'kismi',
-        ref:'GRT-2608-015331', notlar:'Kısmi ödeme yapıldı' },
-      { yer:'BİM BİRLEŞİK MAĞAZALAR', aciklama:'Market alışverişi', sahiplik:'Asıl Kart', tip:'Bonus Flexi Card',
-        tur:'Tek Çekim', taksitNo:1, taksitAdet:1, ilk:'2026-08-07',
-        tarih:'2026-08-07', sonOdeme:'2026-08-12', tutar:217.77, odenen:217.77, durum:'odendi',
-        ref:'GRT-2608-015332', notlar:'—' }
-    ] },
-  { ad:'EYLÜL',  yil:2026, adet:10, tutar:7112.77, hareketler:[] },
-  { ad:'EKİM',   yil:2026, adet:7,  tutar:4656.80, hareketler:[] },
-  { ad:'KASIM',  yil:2026, adet:6,  tutar:3128.97, hareketler:[] },
-  { ad:'ARALIK', yil:2026, adet:6,  tutar:3128.97, hareketler:[] }
+  { ad:'OCAK',    yil:2026, adet:0, tutar:0, hareketler:[] },
+  { ad:'ŞUBAT',   yil:2026, adet:0, tutar:0, hareketler:[] },
+  { ad:'MART',    yil:2026, adet:0, tutar:0, hareketler:[] },
+  { ad:'NİSAN',   yil:2026, adet:0, tutar:0, hareketler:[] },
+  { ad:'MAYIS',   yil:2026, adet:0, tutar:0, hareketler:[] },
+  { ad:'HAZİRAN', yil:2026, adet:0, tutar:0, hareketler:[] },
+  { ad:'TEMMUZ',  yil:2026, adet:0, tutar:0, hareketler:[] },
+  { ad:'AĞUSTOS', yil:2026, adet:0, tutar:0, hareketler:[] },
+  { ad:'EYLÜL',   yil:2026, adet:0, tutar:0, hareketler:[] },
+  { ad:'EKİM',    yil:2026, adet:0, tutar:0, hareketler:[] },
+  { ad:'KASIM',   yil:2026, adet:0, tutar:0, hareketler:[] },
+  { ad:'ARALIK',  yil:2026, adet:0, tutar:0, hareketler:[] }
 ];
 
 // Kredi Kartı verisi artık state.kk içinde tutuluyor: localStorage'a yazılır ve
@@ -5356,6 +5311,68 @@ function editTransaction(id){
   );
 }
 
+/* ---------- yeni işlem ---------- */
+function kkYeniIslem(){
+  const a = kkAylar()[kkSeciliAy];
+  const bugun = new Date();
+  const varsayilanTarih = a.yil + '-' + String(kkSeciliAy + 1).padStart(2,'0') + '-' +
+    String(Math.min(bugun.getDate(), 28)).padStart(2,'0');
+  kkModalAc(
+    'Yeni İşlem',
+    a.ad + ' ' + a.yil,
+    '<div class="kk-field"><label>İŞYERİ / AÇIKLAMA</label>' +
+      '<input id="kkYnYer" type="text" placeholder="Ekstredeki işyeri adı"></div>' +
+    '<div class="kk-field"><label>İŞLEM TARİHİ</label>' +
+      '<input id="kkYnTarih" type="date" value="' + varsayilanTarih + '"></div>' +
+    '<div class="kk-field"><label>TUTAR (TL)</label>' +
+      '<input id="kkYnTutar" type="text" inputmode="decimal" placeholder="0,00"></div>' +
+    '<div class="kk-field"><label>TAKSİT SAYISI (tek çekim için 1)</label>' +
+      '<input id="kkYnAdet" type="number" min="1" value="1"></div>' +
+    '<div class="kk-field"><label>KAÇINCI TAKSİT</label>' +
+      '<input id="kkYnNo" type="number" min="1" value="1"></div>' +
+    '<div class="kk-field"><label>ÖDENEN TUTAR (TL)</label>' +
+      '<input id="kkYnOdenen" type="text" inputmode="decimal" value="0"></div>',
+    'Ekle', 'primary',
+    function(){
+      const say = id => {
+        const ham = (document.getElementById(id).value || '').trim();
+        const v = parseFloat(ham.replace(/\./g,'').replace(',','.'));
+        return isNaN(v) ? 0 : v;
+      };
+      const yer = (document.getElementById('kkYnYer').value || '').trim();
+      const tutar = say('kkYnTutar');
+      if(!yer || tutar <= 0) return;
+
+      const adet = Math.max(1, parseInt(document.getElementById('kkYnAdet').value, 10) || 1);
+      const no   = Math.min(adet, Math.max(1, parseInt(document.getElementById('kkYnNo').value, 10) || 1));
+      const odenen = Math.min(say('kkYnOdenen'), tutar);
+      const tarih = document.getElementById('kkYnTarih').value || varsayilanTarih;
+
+      a.hareketler.push({
+        yer: yer,
+        aciklama: adet > 1 ? 'Taksitli alışveriş' : 'Tek çekim',
+        sahiplik: 'Asıl Kart',
+        tip: KK_KART.ad,
+        tur: adet > 1 ? 'Taksitli Alışveriş' : 'Tek Çekim',
+        taksitNo: no,
+        taksitAdet: adet,
+        ilk: kkAyEkle(tarih, -(no - 1)),
+        tarih: tarih,
+        sonOdeme: tarih,
+        tutar: tutar,
+        odenen: odenen,
+        durum: odenen >= tutar ? 'odendi' : (odenen > 0 ? 'kismi' : 'odenmedi'),
+        ref: '—',
+        notlar: '—'
+      });
+      a.hareketler.sort((x,y) => (x.tarih || '').localeCompare(y.tarih || ''));
+      save();
+      MonthSidebar();
+      TransactionList();
+    }
+  );
+}
+
 function deleteTransaction(id){
   const a = kkAylar()[kkSeciliAy];
   const h = a.hareketler[id];
@@ -5398,6 +5415,9 @@ function renderKrediKarti(){
 
 /* ---------- olaylar ---------- */
 (function kkBind(){
+  const yeni = document.getElementById('kkYeniBtn');
+  if(yeni) yeni.onclick = () => kkYeniIslem();
+
   const bar = document.getElementById('kkSumBar');
   if(bar) bar.onclick = () => document.getElementById('kkSummary').classList.toggle('open');
   if(window.matchMedia && window.matchMedia('(min-width:700px)').matches){
