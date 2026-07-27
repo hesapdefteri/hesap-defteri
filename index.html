@@ -4196,6 +4196,7 @@ document.getElementById('anaMenu').querySelectorAll('.am-tile').forEach(tile=>{
       renderKrediKarti();
       hideAllScreens();
       document.getElementById('kkScreen').classList.add('show');
+      requestAnimationFrame(() => requestAnimationFrame(MonthSidebar));
       nudge();
     } else if(mod === 'urunler'){
       renderUrunler();
@@ -5126,7 +5127,18 @@ if(!state._kkGercekVeri2026){
   save();
 }
 
-let kkSeciliAy = 7;      // AĞUSTOS
+// Bugünün gerçek tarihine göre başlangıç ayı — artık sabit "7" değil, ad+yıl eşleşmesiyle
+// hesaplanıyor. Eşleşme yoksa (örn. state.kk farklı bir yıl içeriyorsa) en son aya düşer.
+function kkBugunAyIndex(){
+  const TR_AYLAR = ['OCAK','ŞUBAT','MART','NİSAN','MAYIS','HAZİRAN','TEMMUZ','AĞUSTOS','EYLÜL','EKİM','KASIM','ARALIK'];
+  const now = new Date();
+  const ad = TR_AYLAR[now.getMonth()];
+  const yil = now.getFullYear();
+  const aylar = kkAylar();
+  const idx = aylar.findIndex(a => a.ad === ad && a.yil === yil);
+  return idx > -1 ? idx : aylar.length - 1;
+}
+let kkSeciliAy = kkBugunAyIndex();
 let kkSeciliIslem = -1;  // bottom sheet'te açık işlem
 
 const KK_TIK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
@@ -5167,6 +5179,12 @@ function MonthSidebar(){
     el.addEventListener('click', ()=>kkAySec(i));
     el.addEventListener('keydown', e=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); kkAySec(i); } });
   });
+  // Seçili ay her zaman rayın ortasında dursun — kullanıcı aramakla uğraşmasın diye.
+  const secili = rail.querySelector('.kk-m.on');
+  if(secili){
+    const hedefTop = secili.offsetTop - (rail.clientHeight / 2) + (secili.clientHeight / 2);
+    rail.scrollTop = Math.max(0, hedefTop);
+  }
 }
 
 /* ---------- TransactionCard ---------- */
