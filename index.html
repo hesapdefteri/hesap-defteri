@@ -5039,18 +5039,20 @@ function cv2DahaFazla(id, tur){
 // NOT: kart limiti, kesim/son ödeme tarihleri ve işlem dökümü şimdilik sabit (örnek) veridir;
 // gerçek kaynağa bağlanana kadar KK_KART / state.kk (kkAylar()) üzerinden düzenlenir.
 
+// Kart bilgileri Garanti BBVA ekstresinden (27 Tem 2026). Limit bilgileri ekstrede
+// yer almadığı için null bırakıldı — uydurma rakam gösterilmiyor, '—' basılıyor.
 const KK_KART = {
   ad:'Bonus Flexi',
   no:'5342 **** **** 9019',
   visNo:'•••• 5342',
   sahip:'ERDİN KAYA',
   banka:'Garanti BBVA',
-  toplamLimit:882600.00,
-  kullanilabilirLimit:868988.55,
-  buAyOdenecek:5205.00,
-  toplamTaksit:33305.00,
-  kesim:'02/08/2026',
-  sonOdeme:'12/08/2026'
+  toplamLimit:null,
+  kullanilabilirLimit:null,
+  buAyOdenecek:1195.03,
+  toplamTaksit:1393.09,
+  kesim:'01/09/2026',
+  sonOdeme:'11/09/2026'
 };
 
 const KK_AY_ADLARI = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
@@ -5077,7 +5079,28 @@ const KK_SEED = [
   { ad:'MAYIS',   yil:2026, adet:0, tutar:0, hareketler:[] },
   { ad:'HAZİRAN', yil:2026, adet:0, tutar:0, hareketler:[] },
   { ad:'TEMMUZ',  yil:2026, adet:0, tutar:0, hareketler:[] },
-  { ad:'AĞUSTOS', yil:2026, adet:0, tutar:0, hareketler:[] },
+  { ad:'AĞUSTOS', yil:2026, adet:0, tutar:0, hareketler:[
+      { yer:'IYZICO *AMAZON.COM.TR', aciklama:'Market', sahiplik:'Asıl Kart', tip:'Bonus Flexi',
+        tur:'Taksitli Alışveriş', taksitNo:6, taksitAdet:6, ilk:'2026-03-04',
+        tarih:'2026-08-04', sonOdeme:'2026-09-11', tutar:1079.61, odenen:0, durum:'odenmedi',
+        ref:'—', notlar:'—' },
+      { yer:'IYZICO *AMAZON.COM.TR', aciklama:'Market', sahiplik:'Asıl Kart', tip:'Bonus Flexi',
+        tur:'Taksitli Alışveriş', taksitNo:6, taksitAdet:9, ilk:'2026-03-06',
+        tarih:'2026-08-06', sonOdeme:'2026-09-11', tutar:380.55, odenen:0, durum:'odenmedi',
+        ref:'—', notlar:'—' },
+      { yer:'IYZICO *AMAZON.COM.TR (İADE)', aciklama:'Market — iade', sahiplik:'Asıl Kart', tip:'Bonus Flexi',
+        tur:'Taksitli Alışveriş', taksitNo:6, taksitAdet:9, ilk:'2026-03-06',
+        tarih:'2026-08-06', sonOdeme:'2026-09-11', tutar:-380.55, odenen:0, durum:'odenmedi',
+        ref:'—', notlar:'Aynı gün iade edildi' },
+      { yer:'IYZICO *AMAZON.COM.TR', aciklama:'Market', sahiplik:'Asıl Kart', tip:'Bonus Flexi',
+        tur:'Taksitli Alışveriş', taksitNo:6, taksitAdet:6, ilk:'2026-03-09',
+        tarih:'2026-08-09', sonOdeme:'2026-09-11', tutar:49.40, odenen:0, durum:'odenmedi',
+        ref:'—', notlar:'—' },
+      { yer:'IYZICO *AMAZON.COM.TR', aciklama:'Market', sahiplik:'Asıl Kart', tip:'Bonus Flexi',
+        tur:'Taksitli Alışveriş', taksitNo:6, taksitAdet:9, ilk:'2026-03-09',
+        tarih:'2026-08-09', sonOdeme:'2026-09-11', tutar:66.02, odenen:0, durum:'odenmedi',
+        ref:'—', notlar:'—' }
+    ] },
   { ad:'EYLÜL',   yil:2026, adet:0, tutar:0, hareketler:[] },
   { ad:'EKİM',    yil:2026, adet:0, tutar:0, hareketler:[] },
   { ad:'KASIM',   yil:2026, adet:0, tutar:0, hareketler:[] },
@@ -5092,6 +5115,15 @@ const KK_SEED = [
 function kkAylar(){
   if(!Array.isArray(state.kk)) state.kk = JSON.parse(JSON.stringify(KK_SEED));
   return state.kk;
+}
+
+// TEK SEFERLİK GEÇİŞ (27 Tem 2026): daha önce cihaza tohumlanmış DEMO işlemleri
+// (VESTEL/MİGROS/SHELL vb.) gerçek Bonus Flexi ekstresiyle değiştirir. Bayrak
+// state'te tutulduğu için bir kez çalışır — kullanıcı sonradan satır silerse geri gelmez.
+if(!state._kkGercekVeri2026){
+  state.kk = JSON.parse(JSON.stringify(KK_SEED));
+  state._kkGercekVeri2026 = true;
+  save();
 }
 
 let kkSeciliAy = 7;      // AĞUSTOS
@@ -5400,8 +5432,9 @@ function renderKrediKarti(){
   document.getElementById('kkKartNo').textContent = KK_KART.no;
   document.getElementById('kkKartNo2').textContent = KK_KART.no;
   document.getElementById('kkKartSahibi').textContent = KK_KART.sahip;
-  document.getElementById('kkToplamLimit').textContent = fmtPlain(KK_KART.toplamLimit) + ' TL';
-  document.getElementById('kkKullanilabilir').textContent = fmtPlain(KK_KART.kullanilabilirLimit) + ' TL';
+  const limitYaz = v => (v === null || v === undefined) ? '—' : fmtPlain(v) + ' TL';
+  document.getElementById('kkToplamLimit').textContent = limitYaz(KK_KART.toplamLimit);
+  document.getElementById('kkKullanilabilir').textContent = limitYaz(KK_KART.kullanilabilirLimit);
   document.getElementById('kkBuAy').textContent = fmtPlain(KK_KART.buAyOdenecek) + ' TL';
   document.getElementById('kkBuAy2').textContent = fmtPlain(KK_KART.buAyOdenecek) + ' TL';
   document.getElementById('kkToplamTaksit').textContent = fmtPlain(KK_KART.toplamTaksit) + ' TL';
