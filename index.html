@@ -5037,7 +5037,7 @@ function cv2DahaFazla(id, tur){
 // ================= KREDİ KARTI HESABIM =================
 // Bileşenler: MonthSidebar · TransactionList · TransactionCard · TransactionDetailBottomSheet
 // NOT: kart limiti, kesim/son ödeme tarihleri ve işlem dökümü şimdilik sabit (örnek) veridir;
-// gerçek kaynağa bağlanana kadar KK_KART / KK_AYLAR üzerinden düzenlenir.
+// gerçek kaynağa bağlanana kadar KK_KART / state.kk (kkAylar()) üzerinden düzenlenir.
 
 const KK_KART = {
   ad:'Bonus Flexi',
@@ -5069,7 +5069,7 @@ function kkAyEkle(iso, n){
 }
 
 // durum: 'odendi' | 'odenmedi' | 'kismi'
-const KK_AYLAR = [
+const KK_SEED = [
   { ad:'OCAK',    yil:2026, adet:7,  tutar:4350.00, hareketler:[] },
   { ad:'ŞUBAT',   yil:2026, adet:6,  tutar:3980.00, hareketler:[] },
   { ad:'MART',    yil:2026, adet:8,  tutar:5250.00, hareketler:[] },
@@ -5129,6 +5129,16 @@ const KK_AYLAR = [
   { ad:'ARALIK', yil:2026, adet:6,  tutar:3128.97, hareketler:[] }
 ];
 
+// Kredi Kartı verisi artık state.kk içinde tutuluyor: localStorage'a yazılır ve
+// girişliyken Firebase'e senkronlanır. state ithalat/bulut senkronunda komple
+// değiştirilebildiği için doğrudan referans yerine her seferinde bu erişimci
+// kullanılır. state.kk bir dizi ise (boş olsa bile) yeniden tohumlanmaz —
+// kullanıcı tüm işlemleri silerse geri gelmez.
+function kkAylar(){
+  if(!Array.isArray(state.kk)) state.kk = JSON.parse(JSON.stringify(KK_SEED));
+  return state.kk;
+}
+
 let kkSeciliAy = 7;      // AĞUSTOS
 let kkSeciliIslem = -1;  // bottom sheet'te açık işlem
 
@@ -5164,7 +5174,7 @@ function kkAySec(i){
 function MonthSidebar(){
   const rail = document.getElementById('kkRail');
   if(!rail) return;
-  rail.innerHTML = KK_AYLAR.map((a,i)=>MonthItem(a,i)).join('');
+  rail.innerHTML = kkAylar().map((a,i)=>MonthItem(a,i)).join('');
   rail.querySelectorAll('.kk-m').forEach(el=>{
     const i = +el.dataset.i;
     el.addEventListener('click', ()=>kkAySec(i));
@@ -5198,7 +5208,7 @@ function TransactionCard(h, i){
 
 /* ---------- TransactionList ---------- */
 function TransactionList(){
-  const a = KK_AYLAR[kkSeciliAy];
+  const a = kkAylar()[kkSeciliAy];
   const list = document.getElementById('kkTxList');
   if(!list) return;
 
@@ -5230,7 +5240,7 @@ function TransactionList(){
 function kkSatir(l, v, cls){ return `<div class="kk-row"><span class="l">${l}</span><span class="v ${cls||''}">${v}</span></div>`; }
 
 function TransactionDetailBottomSheet(i){
-  const a = KK_AYLAR[kkSeciliAy];
+  const a = kkAylar()[kkSeciliAy];
   const h = a.hareketler[i];
   if(!h) return;
   kkSeciliIslem = i;
@@ -5319,7 +5329,7 @@ function kkModalKapat(){
 
 /* ---------- işlem düzenle / sil ---------- */
 function editTransaction(id){
-  const h = KK_AYLAR[kkSeciliAy].hareketler[id];
+  const h = kkAylar()[kkSeciliAy].hareketler[id];
   if(!h) return;
   kkModalAc(
     'İşlemi Düzenle',
@@ -5338,6 +5348,7 @@ function editTransaction(id){
       }
       const nt = (document.getElementById('kkEdNot').value || '').trim();
       h.notlar = nt || '—';
+      save();
       MonthSidebar();
       TransactionList();
       TransactionDetailBottomSheet(id);
@@ -5346,7 +5357,7 @@ function editTransaction(id){
 }
 
 function deleteTransaction(id){
-  const a = KK_AYLAR[kkSeciliAy];
+  const a = kkAylar()[kkSeciliAy];
   const h = a.hareketler[id];
   if(!h) return;
   kkModalAc(
@@ -5355,6 +5366,7 @@ function deleteTransaction(id){
     '', 'Sil', 'danger',
     function(){
       a.hareketler.splice(id, 1);
+      save();
       closeKkSheet();
       MonthSidebar();
       TransactionList();
