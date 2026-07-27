@@ -37,7 +37,6 @@
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{overflow-x:hidden;max-width:100vw;}
-  #musteriScreen{position:fixed;inset:0;z-index:15;background:#f4f7f8;display:none;flex-direction:column;}
   
   #anaMenu{min-height:100vh;background:linear-gradient(160deg,#0b1a3d 0%, #1c3566 45%, #0f2350 100%);padding:64px 18px 40px 18px;display:flex;flex-direction:column;justify-content:flex-start;}
   .am-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px 6px;}
@@ -972,7 +971,6 @@
 
 <div id="anaMenu">
   <div class="am-grid" id="amGrid">
-    <div class="am-tile" data-mod="tedarikci"><div class="am-badge b-cari"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><circle cx="8.5" cy="11" r="2"/><path d="M5.3 16c.5-1.8 1.8-2.7 3.2-2.7s2.7.9 3.2 2.7"/><path d="M15 9.5h4M15 13h4"/></svg></div><div class="am-label">CARİ HESAPLAR</div></div>
     <div class="am-tile" data-mod="siparisler"><div class="am-badge b-siparis"><svg viewBox="0 0 24 24" fill="#fff" stroke="none"><path d="M12 3.2C6.8 3.2 2.6 6.8 2.6 11.2c0 2.3 1.15 4.35 3.05 5.8-.1.95-.4 2.1-1.15 3.2 1.4-.15 2.75-.75 3.7-1.4 1.15.4 2.45.6 3.8.6 5.2 0 9.4-3.6 9.4-8.2S17.2 3.2 12 3.2z"/></svg><div class="am-badge-count" id="amSiparisBadge" style="display:none;"></div></div><div class="am-label">SİPARİŞLER</div></div>
     <div class="am-tile" data-mod="urunler"><div class="am-badge b-urun"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12.6 2.6A2 2 0 0 0 11.2 2H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.7 8.7a2.4 2.4 0 0 0 3.4 0l6.6-6.6a2.4 2.4 0 0 0 0-3.4z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg></div><div class="am-label">STOKLAR</div></div>
     <div class="am-tile" data-mod="satislar"><div class="am-badge b-satis"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.5 2h2l2.6 12.6a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L23 6H6"/></svg></div><div class="am-label">SATIŞLAR</div></div>
@@ -985,46 +983,6 @@
     <div class="am-tile" data-mod="ayarlar"><div class="am-badge b-ayarlar"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13a7.9 7.9 0 0 0 0-2l1.9-1.5-2-3.4-2.3.8a8 8 0 0 0-1.7-1L15 3.5h-6l-.3 2.4a8 8 0 0 0-1.7 1l-2.3-.8-2 3.4L4.6 11a7.9 7.9 0 0 0 0 2l-1.9 1.5 2 3.4 2.3-.8a8 8 0 0 0 1.7 1L9 20.5h6l.3-2.4a8 8 0 0 0 1.7-1l2.3.8 2-3.4z"/></svg></div><div class="am-label">AYARLAR</div></div>
     <div class="am-tile" data-mod="iletisim"><div class="am-badge b-iletisim"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><path d="M4 13a2 2 0 0 1 2-2h1v5H6a2 2 0 0 1-2-2z"/><path d="M20 13a2 2 0 0 0-2-2h-1v5h1a2 2 0 0 0 2-2z"/><path d="M16 17.5v.5a2 2 0 0 1-2 2h-1.5"/></svg></div><div class="am-label">İLETİŞİM</div></div>
   </div>
-</div>
-
-<div id="musteriScreen" style="display:none;">
-<div style="height:env(safe-area-inset-top, 12px);flex-shrink:0;"></div>
-
-<div class="sheet" style="margin-top:0;">
-  <div class="grabber" style="margin:4px auto 2px auto;"></div>
-  <div class="content">
-    <div class="sheet-title" id="sheetTitle" style="display:none;">HESAPLAR</div>
-    <div class="cari-card" id="cariSummaryCard">
-      <div class="cari-card-top">
-        <span class="cari-card-label" id="cariTotalLbl">CARİ HESAPLAR</span>
-        <button id="cariFilterFab" class="cari-card-logo mode-tumu" title="Tümü" style="background:none;border:none;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;"><i class="c1"></i><i class="c2"></i></button>
-      </div>
-      <button id="openAdd" title="Ekle" style="position:absolute;top:46px;right:14px;width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent);border:none;font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;-webkit-tap-highlight-color:transparent;">＋</button>
-      <div class="cari-card-balance" id="cariTotal">0,00₺</div>
-      <div class="cari-card-name">Net Bakiye</div>
-      <div class="cari-card-bottom" style="align-items:center;">
-        <div class="cari-card-info" style="display:flex;flex-wrap:wrap;gap:8px 14px;">
-          <div style="flex:1 1 26%;min-width:92px;">
-            <div style="font-size:12pt;letter-spacing:.3px;color:var(--muted);">TOPLAM BORÇ</div>
-            <div id="cariToplamBorc" style="font-size:12pt;font-weight:800;color:var(--red);margin-top:2px;">0,00₺</div>
-          </div>
-          <div style="flex:1 1 26%;min-width:92px;">
-            <div style="font-size:12pt;letter-spacing:.3px;color:var(--muted);">TOPLAM ALACAK</div>
-            <div id="cariToplamAlacak" style="font-size:12pt;font-weight:800;color:var(--green);margin-top:2px;">0,00₺</div>
-          </div>
-          <div style="flex:1 1 26%;min-width:92px;">
-            <div style="font-size:12pt;letter-spacing:.3px;color:var(--muted);">NAKİT (KASA)</div>
-            <div id="cashAmount" style="font-size:12pt;font-weight:800;color:var(--accent);margin-top:2px;">0,00₺</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="spacer"></div>
-    <div class="cari-list-scroll">
-      <div class="acct-card cari-sub" id="cariList"></div>
-    </div>
-  </div>
-</div>
 </div>
 
 <div class="overlay" id="overlay">
@@ -2538,77 +2496,6 @@ function bindOrderButtons(container){
 }
 
 function render(){
-  document.getElementById('cashAmount').textContent = fmt(state.cash);
-
-  const ledgerList = getLedger();
-  const cariTotal = ledgerList.reduce((s,c)=> s + cariBalance(c), 0);
-  document.getElementById('cariTotal').textContent = fmt(cariTotal);
-  const toplamBorc = ledgerList.reduce((s,c)=> s + Math.min(cariBalance(c), 0), 0);
-  const toplamAlacak = ledgerList.reduce((s,c)=> s + Math.max(cariBalance(c), 0), 0);
-  document.getElementById('cariToplamBorc').textContent = fmt(Math.abs(toplamBorc));
-  document.getElementById('cariToplamAlacak').textContent = fmt(toplamAlacak);
-
-  const cariList = document.getElementById('cariList');
-  cariList.innerHTML = getLedger().map(c => {
-    const bal = cariBalance(c);
-    const siparisForCari = state.siparisFisleri.filter(f=>f.cariId===c.id && !f.tamamlandi).sort((a,b)=> new Date(b.tarih)-new Date(a.tarih))[0];
-    const hasSiparis = !!siparisForCari;
-    let circleHtml = '<span class="siparis-date-circle siparis-date-circle-empty"></span>';
-    let ozetHtml = '';
-    if(hasSiparis){
-      const od = new Date(siparisForCari.tarih);
-      const gun = isNaN(od) ? '' : od.getDate();
-      const ay = isNaN(od) ? '' : od.toLocaleDateString('tr-TR', {month:'short'}).toUpperCase().replace('.', '');
-      const ilkKalem = siparisForCari.kalemler[0] ? siparisForCari.kalemler[0].ad : '';
-      const ozet = siparisForCari.kalemler.length + ' kalem' + (ilkKalem ? ' — ' + ilkKalem : '');
-      circleHtml = `<span class="siparis-date-circle"><b>${gun}</b>${ay}</span>`;
-      ozetHtml = `<div class="siparis-teslimat-row">${ozet}</div>`;
-    } else {
-      const sh = sonHareketTarihi(c);
-      if(sh){
-        const gun = sh.getDate();
-        const ay = sh.toLocaleDateString('tr-TR', {month:'short'}).toUpperCase().replace('.', '');
-        const gorecelZaman = relativeZaman(sh);
-        circleHtml = `<span class="siparis-date-circle son-hareket"><b>${gun}</b>${ay}</span>`;
-        ozetHtml = `<div class="siparis-teslimat-row son-hareket-text">Son hareket: ${gorecelZaman}</div>`;
-      }
-    }
-    return `
-    <div class="swipe-wrap">
-      ${swipeActionsHtml(c.id, activeLedger)}
-      ${orderActionHtml(c.id, activeLedger)}
-      <div class="acct-row swipe-content" data-id="${c.id}" data-ledger="${activeLedger}">
-        ${circleHtml}
-        <div class="name-wrap" style="flex:1;min-width:0;margin-left:12px;">
-          <span class="name ${bal < 0 ? 'neg-name' : ''}">${bal < 0 ? '(' + c.name + ')' : c.name}</span>
-          ${ozetHtml}
-        </div>
-        <span class="amount ${bal < 0 ? 'neg' : ''}">${fmtWhole(bal)}</span>
-      </div>
-    </div>`;
-  }).join('');
-
-  cariList.querySelectorAll('.acct-row[data-id]').forEach(row=>{
-    row.onclick = () => {
-      if(row.__isSwipeMoved && row.__isSwipeMoved()) return;
-      if(row.classList.contains('swiped')){ row.style.transform=''; row.classList.remove('swiped'); return; }
-      if(row.classList.contains('swiped-order')){ row.style.transform=''; row.classList.remove('swiped-order'); return; }
-      const key = row.dataset.ledger + ':' + row.dataset.id;
-      if(selectedCariKey === key){
-        openCariEkstrePopup(row.dataset.id, row.dataset.ledger);
-        selectedCariKey = null;
-        row.classList.remove('selected');
-      } else {
-        cariList.querySelectorAll('.acct-row.selected').forEach(r=>r.classList.remove('selected'));
-        selectedCariKey = key;
-        row.classList.add('selected');
-      }
-    };
-  });
-  enableSwipeRows(cariList);
-  bindOrderButtons(cariList);
-  bindSwipeActionButtons(cariList);
-
   const now = new Date();
   const thisMonth = state.transactions.filter(t=>{
     const d = new Date(t.date);
@@ -2640,97 +2527,6 @@ function render(){
 
 // Cari Hesaplar (Tedarikçi + Müşteri birleşik görünüm) — tedarikçiler
 // (kime borcumuz var) üstte, sonra müşteriler (kim bize borçlu) listelenir.
-function renderCariHesaplar(){
-  document.getElementById('cashAmount').textContent = fmt(state.cash);
-
-  const tedarikciler = state.tedarikci.map(c=>({c, tur:'tedarikci'}));
-  const musteriler = state.cari.map(c=>({c, tur:'musteri'}));
-  tedarikciler.sort((a,b)=> cariBalance(b.c) - cariBalance(a.c));
-  musteriler.sort((a,b)=> cariBalance(b.c) - cariBalance(a.c));
-  const combined = [...tedarikciler, ...musteriler];
-
-  const total = combined.reduce((s,x)=> s + cariBalance(x.c), 0);
-  document.getElementById('cariTotal').textContent = fmt(total);
-  const toplamBorc = combined.reduce((s,x)=> s + Math.min(cariBalance(x.c), 0), 0);
-  const toplamAlacak = combined.reduce((s,x)=> s + Math.max(cariBalance(x.c), 0), 0);
-  document.getElementById('cariToplamBorc').textContent = fmt(Math.abs(toplamBorc));
-  document.getElementById('cariToplamAlacak').textContent = fmt(toplamAlacak);
-
-  const filterFab = document.getElementById('cariFilterFab');
-  if(filterFab){
-    filterFab.title = state.cariFilter === 'hareket' ? 'Borç/Alacak' : 'Tümü';
-    filterFab.classList.toggle('mode-tumu', state.cariFilter !== 'hareket');
-    filterFab.classList.toggle('mode-ba', state.cariFilter === 'hareket');
-  }
-  const visibleList = state.cariFilter === 'hareket'
-    ? combined.filter(({c}) => Math.abs(cariBalance(c)) > 0.005)
-    : combined;
-
-  const cariList = document.getElementById('cariList');
-  cariList.innerHTML = visibleList.map(({c, tur})=>{
-    const bal = cariBalance(c);
-    const ledgerKey = tur === 'tedarikci' ? 'tedarikci' : 'cari';
-    const siparisForCari = state.siparisFisleri.filter(f=>f.cariId===c.id && !f.tamamlandi).sort((a,b)=> new Date(b.tarih)-new Date(a.tarih))[0];
-    const hasSiparis = !!siparisForCari;
-    let circleHtml = '<span class="siparis-date-circle siparis-date-circle-empty"></span>';
-    let ozetHtml = '';
-    if(hasSiparis){
-      const od = new Date(siparisForCari.tarih);
-      const gun = isNaN(od) ? '' : od.getDate();
-      const ay = isNaN(od) ? '' : od.toLocaleDateString('tr-TR', {month:'short'}).toUpperCase().replace('.', '');
-      const ilkKalem = siparisForCari.kalemler[0] ? siparisForCari.kalemler[0].ad : '';
-      const ozet = siparisForCari.kalemler.length + ' kalem' + (ilkKalem ? ' — ' + ilkKalem : '');
-      circleHtml = `<span class="siparis-date-circle"><b>${gun}</b>${ay}</span>`;
-      ozetHtml = `<div class="siparis-teslimat-row">${ozet}</div>`;
-    } else {
-      const sh = sonHareketTarihi(c);
-      if(sh){
-        const gun = sh.getDate();
-        const ay = sh.toLocaleDateString('tr-TR', {month:'short'}).toUpperCase().replace('.', '');
-        const gorecelZaman = relativeZaman(sh);
-        circleHtml = `<span class="siparis-date-circle son-hareket"><b>${gun}</b>${ay}</span>`;
-        ozetHtml = `<div class="siparis-teslimat-row son-hareket-text">Son hareket: ${gorecelZaman}</div>`;
-      }
-    }
-    return `
-    <div class="swipe-wrap">
-      ${swipeActionsHtml(c.id, ledgerKey)}
-      ${orderActionHtml(c.id, ledgerKey)}
-      <div class="acct-row swipe-content" data-id="${c.id}" data-ledger="${ledgerKey}">
-        ${circleHtml}
-        <div class="name-wrap" style="flex:1;min-width:0;margin-left:12px;">
-          <span class="name ${bal < 0 ? 'neg-name' : ''}">${bal < 0 ? '(' + c.name + ')' : c.name}</span>
-          ${ozetHtml}
-        </div>
-        <span class="amount ${bal < 0 ? 'neg' : ''}">${fmtWhole(bal)}</span>
-      </div>
-    </div>`;
-  }).join('') || (state.cariFilter === 'hareket'
-    ? '<div class="sk-empty">Borç/alacaklı hesap yok</div>'
-    : '<div class="sk-empty">Henüz cari hesap yok</div>');
-
-  cariList.querySelectorAll('.acct-row[data-id]').forEach(row=>{
-    row.onclick = () => {
-      if(row.__isSwipeMoved && row.__isSwipeMoved()) return;
-      if(row.classList.contains('swiped')){ row.style.transform=''; row.classList.remove('swiped'); return; }
-      if(row.classList.contains('swiped-order')){ row.style.transform=''; row.classList.remove('swiped-order'); return; }
-      const key = row.dataset.ledger + ':' + row.dataset.id;
-      if(selectedCariKey === key){
-        openCariEkstrePopup(row.dataset.id, row.dataset.ledger);
-        selectedCariKey = null;
-        row.classList.remove('selected');
-      } else {
-        cariList.querySelectorAll('.acct-row.selected').forEach(r=>r.classList.remove('selected'));
-        selectedCariKey = key;
-        row.classList.add('selected');
-      }
-    };
-  });
-  enableSwipeRows(cariList);
-  bindSwipeActionButtons(cariList);
-  bindOrderButtons(cariList);
-}
-
 const overlay = document.getElementById('overlay');
 let currentType = 'income';
 
@@ -2740,12 +2536,6 @@ function closeModal(){
   document.getElementById('fDesc').value = '';
   document.getElementById('fAmount').value = '';
 }
-document.getElementById('openAdd').onclick = openYeniCari;
-document.getElementById('cariFilterFab').onclick = () => {
-  state.cariFilter = state.cariFilter === 'hareket' ? 'tumu' : 'hareket';
-  save();
-  renderCariHesaplar();
-};
 
 let ncTur = 'cari';
 function openYeniCari(){
@@ -2813,7 +2603,6 @@ document.getElementById('ncSave').onclick = () => {
   save();
   document.getElementById('yeniCariOverlay').classList.remove('show');
   render();
-  renderCariHesaplar();
   if(ncFromCekCikis){
     ncFromCekCikis = false;
     openCekCikis(cekCikisIdx);
@@ -2934,7 +2723,6 @@ document.getElementById('tamamlaOnayla').onclick = () => {
   save();
   document.getElementById('tamamlaOverlay').classList.remove('show');
   render();
-  renderCariHesaplar();
 };
 
 function openSiparisDetay(fisId){
@@ -3112,7 +2900,6 @@ document.getElementById('siparisFisKaydet').onclick = () => {
   document.getElementById('siparisListScreen').classList.add('show');
   renderSiparisList();
   render();
-  renderCariHesaplar();
   nudge();
 };
 document.getElementById('siparisDetaySil').onclick = () => {
@@ -3125,7 +2912,6 @@ document.getElementById('siparisDetaySil').onclick = () => {
     document.getElementById('siparisListScreen').classList.add('show');
     renderSiparisList();
     render();
-    renderCariHesaplar();
     nudge();
   });
 };
@@ -3167,7 +2953,6 @@ function renderSiparisList(){
         save();
         renderSiparisList();
         render();
-        renderCariHesaplar();
       });
     };
   });
@@ -3433,7 +3218,6 @@ document.getElementById('ciSave').onclick = () => {
   document.getElementById('dEkstreToplam').textContent = document.getElementById('dToplam').textContent;
   renderEkstreInfo();
   render();
-  renderCariHesaplar();
 };
 
 let quickTxLedger = null, quickTxId = null, quickTxType = null, quickTxEditDate = null;
@@ -3693,7 +3477,6 @@ document.getElementById('quickTxSave').onclick = () => {
   document.getElementById('quickTxOverlay').classList.remove('show');
   activeLedger = quickTxLedger;
   render();
-  renderCariHesaplar();
   if(kasaScreen.classList.contains('show')) renderKasa();
   renderCekSenet();
 };
@@ -4262,7 +4045,6 @@ document.getElementById('rcDelete').onclick = () => {
     if(removeCurrentReceiptTx()){
       save();
       renderDetail();
-      renderCariHesaplar();
       if(kasaScreen.classList.contains('show')) renderKasa();
       renderCekSenet();
     }
@@ -4313,7 +4095,6 @@ receiptOverlay.onclick = (e) => { if(e.target === receiptOverlay) receiptOverlay
 
 // ---------- Ana Menü / Navigasyon ----------
 const anaMenu = document.getElementById('anaMenu');
-const musteriScreen = document.getElementById('musteriScreen');
 const raporScreen = document.getElementById('raporScreen');
 const kasaScreen = document.getElementById('kasaScreen');
 
@@ -4334,7 +4115,6 @@ function nudge(){
 function hideAllScreens(){
   anaMenu.style.display = 'none';
   anaMenu.style.visibility = 'hidden';
-  musteriScreen.style.display = 'none';
   raporScreen.classList.remove('show');
   document.getElementById('urunlerScreen').classList.remove('show');
   document.getElementById('skDetailScreen').classList.remove('show');
@@ -4385,15 +4165,7 @@ document.getElementById('anaMenuFloatBtn').onclick = () => showAnaMenu();
 document.getElementById('anaMenu').querySelectorAll('.am-tile').forEach(tile=>{
   tile.onclick = () => {
     const mod = tile.dataset.mod;
-    if(mod === 'tedarikci'){
-      activeLedger = 'cari';
-      document.getElementById('sheetTitle').textContent = 'CARİ HESAPLAR';
-      document.getElementById('cariTotalLbl').textContent = 'CARİ HESAPLAR';
-      hideAllScreens();
-      musteriScreen.style.display = 'flex';
-      renderCariHesaplar();
-      nudge();
-    } else if(mod === 'raporlar'){
+    if(mod === 'raporlar'){
       renderRapor();
       render();
       hideAllScreens();
@@ -4558,10 +4330,10 @@ function renderKasa(){
   });
 }
 
-// ================= CARİ HESAP V2 (yeni, paralel modül) =================
-// Eski "Cari Hesaplar" ekranına (renderCariHesaplar, musteriScreen, swipe-wrap...)
-// HİÇ dokunulmuyor; bu modül sadece aynı state.cari/state.tedarikci verisini
-// okuyup kendi bağımsız ekranında gösteriyor. "+ Cari" butonu, veriyi bozmamak
+// ================= CARİ HESAP V2 (artık TEK cari hesap ekranı) =================
+// Eski "Cari Hesaplar" (CH1) ekranı tamamen kaldırıldı (menü kutucuğu, musteriScreen,
+// renderCariHesaplar, swipe-wrap...) — bu modül artık uygulamanın TEK cari hesap ekranı.
+// Aynı state.cari/state.tedarikci verisini okuyor. "+ Cari" butonu, veriyi bozmamak
 // için mevcut openYeniCari() akışını (aynı formu) çağırır — sadece bu ekrandan
 // açıldığında kayıt sonrası V2 listesi de tazelenir (aşağıdaki ek dinleyici).
 
@@ -5846,7 +5618,6 @@ function iadeAlCek(idx){
     save();
     renderCekSenet();
     render();
-    renderCariHesaplar();
     if(kasaScreen.classList.contains('show')) renderKasa();
   }, 'Evet, İade Al');
 }
@@ -5881,7 +5652,6 @@ function silCek(idx){
     save();
     renderCekSenet();
     render();
-    renderCariHesaplar();
     if(kasaScreen.classList.contains('show')) renderKasa();
   }, 'Evet, Sil');
 }
@@ -5950,7 +5720,6 @@ function cekCikisiUygula(tedarikciId){
   document.getElementById('cekCikisOverlay').classList.remove('show');
   renderCekSenet();
   render();
-  renderCariHesaplar();
   if(kasaScreen.classList.contains('show')) renderKasa();
 }
 // Bir "Çek Çıkış" ödemesi silinirse, o çekin kaynağı olan tahsilat kaydındaki
@@ -7364,7 +7133,6 @@ function fisSilOnayla(fisId, onDone){
     if(idx !== -1) liste.splice(idx,1);
     save();
     render();
-    renderCariHesaplar();
     if(onDone) onDone(); else renderFisList();
   });
 }
