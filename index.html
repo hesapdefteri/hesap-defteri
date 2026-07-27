@@ -2318,6 +2318,10 @@ let activeLedger = 'cari';
 function getLedger(){ return state[activeLedger]; }
 
 function save(){
+  // Yerel değişiklik her zaman "en yeni" damgayı taşısın diye — bu, uygulamayı
+  // silme/düzenleme sonrası hemen yenileyince Firebase'in henüz tamamlanmamış
+  // yazmayı geçip ESKİ bulut kopyasını geri getirmesini (yarış durumu) önlüyor.
+  state._lastSaved = Date.now();
   LS.setItem(STORAGE_KEY, JSON.stringify(state));
   // Giriş yapılmışsa aynı veriyi buluta da yazıyoruz (localStorage her zaman
   // hızlı yerel bir kopya olarak kalıyor; Firebase gerçek/senkron kopya).
@@ -8370,12 +8374,18 @@ function cloudSyncAndBoot(user){
   document.getElementById('authStepPhone').style.display = 'none';
   document.getElementById('authStepCode').style.display = 'none';
   authShowLoading(true);
+  const yerelDamga = state._lastSaved || 0;
   fbDb.ref('users/' + user.uid).once('value').then(snap => {
-    if(snap.exists() && snap.val()){
-      state = snap.val();
+    const bulut = snap.exists() ? snap.val() : null;
+    const bulutDamga = (bulut && bulut._lastSaved) || 0;
+    if(bulut && bulutDamga > yerelDamga){
+      // Bulut gerçekten daha yeni (ör. başka bir cihazdan yapılan değişiklik) — onu kullan.
+      state = bulut;
       LS.setItem(STORAGE_KEY, JSON.stringify(state));
     } else {
-      // İlk kez giriş yapıyor — mevcut yerel veriyi (seed + bugüne kadarki her şey) buluta yollar.
+      // Yerel veri aynı veya daha yeni (silme/düzenleme sonrası hemen yenilemede
+      // Firebase'in henüz bitmemiş yazmasını GERİ ALMAMAK için önemli) — yerelde kal
+      // ve bulutu buna göre güncelle.
       fbDb.ref('users/' + user.uid).set(state);
     }
   }).catch(err => {
