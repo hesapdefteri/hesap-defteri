@@ -2283,6 +2283,8 @@ if(!state.siparisFisleri) state.siparisFisleri = [];
 if(!state.cariFilter) state.cariFilter = 'tumu';
 if(!state.masrafKategorileri) state.masrafKategorileri = [];
 if(!state.masrafHesaplari) state.masrafHesaplari = [];
+if(!state.stokKartlari) state.stokKartlari = [];
+if(!state.transactions) state.transactions = [];
 let activeLedger = 'cari';
 function getLedger(){ return state[activeLedger]; }
 
@@ -8484,6 +8486,13 @@ function cloudSyncAndBoot(user){
     if(bulut && bulutDamga > yerelDamga){
       // Bulut gerçekten daha yeni (ör. başka bir cihazdan yapılan değişiklik) — onu kullan.
       state = bulut;
+      // Bulut kopyası, alanın koda eklenmesinden ÖNCE kaydedilmiş olabilir (ör.
+      // stokKartlari) — bu durumda state = bulut ilk yüklemedeki backfill'i
+      // geçersiz kılar, o yüzden burada da tekrar tamamlıyoruz (30 Tem 2026,
+      // kullanıcının gerçek verisinde stokKartlari hiç yoktu, bu yüzden Stoklar
+      // ve fatura ürün ekleme ekranları hiç açılmıyordu).
+      if(!state.stokKartlari) state.stokKartlari = [];
+      if(!state.transactions) state.transactions = [];
       LS.setItem(STORAGE_KEY, JSON.stringify(state));
     } else {
       // Yerel veri aynı veya daha yeni (silme/düzenleme sonrası hemen yenilemede
