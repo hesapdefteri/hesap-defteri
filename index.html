@@ -3312,6 +3312,7 @@ document.getElementById('cekWizOverlay').onclick = (e) => {
     document.getElementById('cekWizOverlay').classList.remove('show');
     document.getElementById('quickTxOverlay').classList.remove('show');
     editingTx = null;
+    if(cv2ReturnCtx){ const ctx = cv2ReturnCtx; cv2ReturnCtx = null; cv2Hareketler(ctx.id, ctx.tur); }
   }
 };
 document.getElementById('tahYontemSecBtn').onclick = () => { document.getElementById('tahYontemOverlay').classList.add('show'); };
@@ -3407,14 +3408,22 @@ document.getElementById('quickTxCekToggle').onclick = function(){
 document.getElementById('quickTxCiroToggle').onclick = function(){
   quickTxCiroOn = skToggleSwitch(this);
 };
-document.getElementById('quickTxCancel').onclick = () => { editingTx = null; document.getElementById('quickTxOverlay').classList.remove('show'); };
+document.getElementById('quickTxCancel').onclick = () => {
+  editingTx = null;
+  document.getElementById('quickTxOverlay').classList.remove('show');
+  if(cv2ReturnCtx){ const ctx = cv2ReturnCtx; cv2ReturnCtx = null; cv2Hareketler(ctx.id, ctx.tur); }
+};
 document.getElementById('quickTxOverlay').onclick = (e) => {
-  if(e.target === document.getElementById('quickTxOverlay')){ editingTx = null; document.getElementById('quickTxOverlay').classList.remove('show'); }
+  if(e.target === document.getElementById('quickTxOverlay')){
+    editingTx = null;
+    document.getElementById('quickTxOverlay').classList.remove('show');
+    if(cv2ReturnCtx){ const ctx = cv2ReturnCtx; cv2ReturnCtx = null; cv2Hareketler(ctx.id, ctx.tur); }
+  }
 };
 document.getElementById('quickTxSave').onclick = () => {
   const c = state[quickTxLedger].find(x=>x.id===quickTxId);
   if(!c) return;
-  const amount = parseFloat(document.getElementById('quickTxAmount').value.replace(',', '.'));
+  const amount = parseFloat(document.getElementById('quickTxAmount').value.replace(/\./g,'').replace(',', '.'));
   document.getElementById('quickTxAmountUyari').classList.toggle('hidden', !!(amount && amount > 0));
   if(!amount || amount <= 0) return;
 
@@ -3480,6 +3489,11 @@ document.getElementById('quickTxSave').onclick = () => {
   render();
   if(kasaScreen.classList.contains('show')) renderKasa();
   renderCekSenet();
+  if(cv2ReturnCtx){
+    const ctx = cv2ReturnCtx; cv2ReturnCtx = null;
+    renderCariV2();
+    cv2Hareketler(ctx.id, ctx.tur);
+  }
 };
 
 // Borç/Alacak Ekle artık ayrı buton değil, Tahsilat/Ödeme pop-up'ının içindeki
@@ -4592,7 +4606,7 @@ function cv2Totals(c, tur){
 
 /* ---------- TransactionDetailBottomSheet (V2: Hareketler) ---------- */
 let cv2SheetCtx = { id:null, tur:null };
-let cv2ReturnCtx = null; // Hareketler'den fatura formuna geçildiğinde geri dönüş hedefi
+let cv2ReturnCtx = null; // Hareketler'den fatura VEYA tahsilat/ödeme formuna geçildiğinde geri dönüş hedefi
 
 function cv2Hareketler(id, tur){
   const c = cv2Find(id, tur); if(!c) return;
@@ -4745,6 +4759,10 @@ function cv2TxAc(tur, id, idx){
     cv2TxAcFatura(tur, id, idx);
     return;
   }
+  if(t.type === 'TAHSİLAT' || t.type === 'ÖDEME'){
+    cv2TxAcOdeme(tur, id, idx);
+    return;
+  }
   const amt = signedAmount(t);
   const cls = cv2BalClass(amt);
   const d = new Date(t.date);
@@ -4795,6 +4813,34 @@ function cv2TxAcFatura(tur, id, idx){
     tutar
   });
   renderFisDetayBody();
+}
+
+// CH1'deki (openTxEditForm) TAHSİLAT/ÖDEME düzenleme akışıyla birebir aynı:
+// mevcut openQuickTx formunu editingTx ile Edit Mode'a sokuyor — yeni ekran/form
+// yok, ödeme yöntemi (Nakit/Çek) dahil tüm alanlar değiştirilebiliyor. Kaydet
+// quickTxSave içindeki mevcut "orijinali sil + yeniyi ekle, TEK save()" mantığını
+// kullanır (bkz. editingTx), CREATE akışıyla aynı kod yolu — kod tekrarı yok.
+function cv2TxAcOdeme(tur, id, idx){
+  const c = cv2Find(id, tur); if(!c) return;
+  const t = c.transactions[idx]; if(!t) return;
+  cv2CloseSheet(true);
+  cv2ReturnCtx = { id, tur };
+  openQuickTx(id, tur, t.type);
+  editingTx = { ledgerKey: tur, cariId: id, tx: t };
+  quickTxEditDate = t.date;
+  quickTxPrevCiro = !!t.ciro;
+  document.getElementById('quickTxAmount').value = fmtPlain(Math.abs(t.amount));
+  document.getElementById('quickTxTarih').value = new Date(t.date).toISOString().slice(0,10);
+  if(t.type === 'TAHSİLAT' && t.cek){
+    tahYontemSec('cek');
+    cekFormuDoldur({ cekDetay: t.cekDetay });
+  } else if(t.type !== 'TAHSİLAT' && t.cek){
+    quickTxCekOn = true;
+    document.getElementById('quickTxCekToggle').classList.add('on');
+    document.getElementById('quickTxCiroRow').classList.toggle('hidden', !t.ciro);
+    quickTxCiroOn = !!t.ciro;
+    if(t.ciro) document.getElementById('quickTxCiroToggle').classList.add('on');
+  }
 }
 
 function cv2TxSilOnayla(tur, id, idx){
