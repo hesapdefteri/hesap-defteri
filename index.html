@@ -3317,17 +3317,31 @@ document.getElementById('cekWizOverlay').onclick = (e) => {
 };
 document.getElementById('tahYontemSecBtn').onclick = () => { document.getElementById('tahYontemOverlay').classList.add('show'); };
 document.getElementById('tahYontemNakitSecBtn').onclick = () => {
-  quickTxType = 'TAHSİLAT';
   const c = state[quickTxLedger].find(x=>x.id===quickTxId);
-  document.getElementById('quickTxTitle').textContent = 'Tahsilat' + (c ? ' — ' + c.name : '');
-  tahYontemSec('nakit');
+  if(quickTxType === 'ÖDEME'){
+    quickTxCekOn = false;
+    document.getElementById('quickTxCekToggle').classList.remove('on');
+    document.getElementById('quickTxCiroRow').classList.add('hidden');
+    document.getElementById('tahYontemSecLabel').textContent = 'Nakit Ödemesi';
+  } else {
+    quickTxType = 'TAHSİLAT';
+    document.getElementById('quickTxTitle').textContent = 'Tahsilat' + (c ? ' — ' + c.name : '');
+    tahYontemSec('nakit');
+  }
   document.getElementById('tahYontemOverlay').classList.remove('show');
 };
 document.getElementById('tahYontemCekSecBtn').onclick = () => {
-  quickTxType = 'TAHSİLAT';
   const c = state[quickTxLedger].find(x=>x.id===quickTxId);
-  document.getElementById('quickTxTitle').textContent = 'Tahsilat' + (c ? ' — ' + c.name : '');
-  tahYontemSec('cek');
+  if(quickTxType === 'ÖDEME'){
+    quickTxCekOn = true;
+    document.getElementById('quickTxCekToggle').classList.add('on');
+    document.getElementById('quickTxCiroRow').classList.remove('hidden');
+    document.getElementById('tahYontemSecLabel').textContent = 'Çek Ödemesi (Ciro)';
+  } else {
+    quickTxType = 'TAHSİLAT';
+    document.getElementById('quickTxTitle').textContent = 'Tahsilat' + (c ? ' — ' + c.name : '');
+    tahYontemSec('cek');
+  }
   document.getElementById('tahYontemOverlay').classList.remove('show');
 };
 document.getElementById('tahYontemOverlay').onclick = (e) => {
@@ -3358,10 +3372,20 @@ function cekFormuDoldur(tx){
 }
 function applyQuickTxTypeVisibility(type){
   const isTahsilat = type === 'TAHSİLAT';
-  document.getElementById('tahsilatYontemRow').classList.toggle('hidden', !isTahsilat);
-  document.getElementById('quickTxCekToggleRow').classList.toggle('hidden', isTahsilat);
+  const isOdeme = type === 'ÖDEME';
+  // Eski sade "Çek mi?" anahtarı yerine artık hem Tahsilat hem Ödeme'de aynı
+  // "Ödeme Yöntemi" butonu (tahYontemSecBtn → Nakit/Çek seçenekli overlay)
+  // kullanılıyor — kullanıcı isteğiyle (29 Tem 2026), tutarlı arayüz için.
+  document.getElementById('tahsilatYontemRow').classList.toggle('hidden', !(isTahsilat || isOdeme));
+  document.getElementById('quickTxCekToggleRow').classList.add('hidden');
   if(isTahsilat){
     tahYontemSec('nakit');
+  } else if(isOdeme){
+    quickTxCekOn = false;
+    document.getElementById('quickTxCekToggle').classList.remove('on');
+    document.getElementById('quickTxCiroRow').classList.add('hidden');
+    document.getElementById('tahYontemSecLabel').textContent = 'Nakit Ödemesi';
+    document.getElementById('cekDetayForm').classList.add('hidden');
   } else {
     document.getElementById('cekDetayForm').classList.add('hidden');
   }
@@ -4838,6 +4862,7 @@ function cv2TxAcOdeme(tur, id, idx){
     quickTxCekOn = true;
     document.getElementById('quickTxCekToggle').classList.add('on');
     document.getElementById('quickTxCiroRow').classList.toggle('hidden', !t.ciro);
+    document.getElementById('tahYontemSecLabel').textContent = 'Çek Ödemesi (Ciro)';
     quickTxCiroOn = !!t.ciro;
     if(t.ciro) document.getElementById('quickTxCiroToggle').classList.add('on');
   }
