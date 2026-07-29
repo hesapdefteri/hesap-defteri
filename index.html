@@ -4763,28 +4763,29 @@ function cv2ModalKapat(){
 function cv2TxAc(tur, id, idx){
   const c = cv2Find(id, tur); if(!c) return;
   const t = c.transactions[idx]; if(!t) return;
-  if(t.type === 'SATIŞ' || t.type === 'ALIŞ'){
-    cv2TxAcFatura(tur, id, idx);
-    return;
-  }
-  if(t.type === 'TAHSİLAT' || t.type === 'ÖDEME'){
-    cv2TxAcOdeme(tur, id, idx);
-    return;
-  }
   const amt = signedAmount(t);
   const cls = cv2BalClass(amt);
   const d = new Date(t.date);
+  const odemeBilgisi = (t.type === 'TAHSİLAT' || t.type === 'ÖDEME')
+    ? (t.cek ? ('Çek' + (t.type === 'ÖDEME' ? ' (Ciro)' : '')) : 'Nakit')
+    : null;
   const detay =
     '<div class="cv2-txdetail">' +
       '<div class="cv2-txdetail-amt ' + cls + '">' + fmtWhole(amt) + '</div>' +
       '<div class="cv2-txdetail-row"><span>Tür</span><b>' + cv2TxLabel(t.type) + '</b></div>' +
       '<div class="cv2-txdetail-row"><span>Tarih</span><b>' + (isNaN(d) ? '—' : cv2TR(d)) + '</b></div>' +
+      (odemeBilgisi ? '<div class="cv2-txdetail-row"><span>Ödeme Yöntemi</span><b>' + odemeBilgisi + '</b></div>' : '') +
       (t.desc ? '<div class="cv2-txdetail-row"><span>Açıklama</span><b>' + t.desc + '</b></div>' : '') +
     '</div>';
   cv2ModalAc(
     'Hareket Detayı', detay, '',
     'Düzenle', 'primary',
-    function(){ cv2ModalKapat(); cv2TxDuzenle(tur, id, idx); },
+    function(){
+      cv2ModalKapat();
+      if(t.type === 'SATIŞ' || t.type === 'ALIŞ') cv2TxAcFatura(tur, id, idx);
+      else if(t.type === 'TAHSİLAT' || t.type === 'ÖDEME') cv2TxAcOdeme(tur, id, idx);
+      else cv2TxDuzenle(tur, id, idx);
+    },
     { label:'Sil', cls:'danger', aksiyon: function(){ cv2TxSilOnayla(tur, id, idx); } }
   );
 }
