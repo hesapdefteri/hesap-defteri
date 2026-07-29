@@ -1755,6 +1755,9 @@
 <div class="overlay" id="kalemEkleOverlay">
   <div class="modal">
     <h3 id="kalemEkleTitle">Ürün Ekle</h3>
+    <div class="ios-card hidden" id="kalemAdRow" style="margin-bottom:14px;">
+      <div class="field-ios"><label>Ürün / Açıklama</label><input type="text" id="kalemAdInput" placeholder="Örn: Süngerli askı"></div>
+    </div>
     <div class="ios-card">
       <div class="field-ios"><label>Miktar</label><input type="number" id="kalemMiktar" placeholder="0" inputmode="decimal"></div>
       <div class="field-ios"><label>Birim Fiyat</label><input type="number" id="kalemFiyat" placeholder="0,00" inputmode="decimal"></div>
@@ -7486,6 +7489,8 @@ function openKalemEkleModal(stokKartId){
   kalemFiyatManuel = false;
   const c = state.stokKartlari.find(x=>x.id===stokKartId);
   document.getElementById('kalemEkleTitle').textContent = c.ad;
+  document.getElementById('kalemEkleTitle').classList.remove('hidden');
+  document.getElementById('kalemAdRow').classList.add('hidden');
   document.getElementById('kalemMiktar').value = '';
   const gecmisListe = fisTuru==='alis' ? (c.alislar||[]) : (c.satislar||[]);
   const son = skSonFiyatCariden(gecmisListe, draftFis.cariAdi);
@@ -7512,7 +7517,20 @@ function openKalemDuzenle(idx){
   kalemStokKartId = k.stokKartId;
   editingKalemIdx = idx;
   kalemFiyatManuel = true;
-  document.getElementById('kalemEkleTitle').textContent = k.ad;
+  // Stok kartına bağlı gerçek ürünlerde isim karttan gelir (değiştirilemez, sabit
+  // başlık). Ama eski/bağlantısız hareketlerden dönüştürülen kalemlerde (stokKartId
+  // null) isim yoktu, sadece miktar/fiyat düzenlenebiliyordu — kullanıcı "içeriği
+  // yanlış/eksik" dedi (29 Tem 2026): artık bu satırlarda ürün/açıklama metni de
+  // düzenlenebiliyor.
+  if(k.stokKartId){
+    document.getElementById('kalemEkleTitle').textContent = k.ad;
+    document.getElementById('kalemEkleTitle').classList.remove('hidden');
+    document.getElementById('kalemAdRow').classList.add('hidden');
+  } else {
+    document.getElementById('kalemEkleTitle').classList.add('hidden');
+    document.getElementById('kalemAdRow').classList.remove('hidden');
+    document.getElementById('kalemAdInput').value = k.ad || '';
+  }
   document.getElementById('kalemMiktar').value = k.miktar;
   document.getElementById('kalemFiyat').value = k.birimFiyat;
   document.getElementById('kalemFiyatHint').style.display = 'none';
@@ -7545,9 +7563,10 @@ document.getElementById('kalemEkleBtn').onclick = () => {
   if(!miktar || !fiyat){ return; }
   const c = state.stokKartlari.find(x=>x.id===kalemStokKartId);
   const eski = editingKalemIdx !== null ? draftFis.kalemler[editingKalemIdx] : null;
+  const manuelAd = document.getElementById('kalemAdInput').value.trim();
   const kalem = {
     stokKartId: kalemStokKartId,
-    ad: c ? c.ad : (eski ? eski.ad : ''),
+    ad: c ? c.ad : (manuelAd || (eski ? eski.ad : '')),
     birim: c ? c.birim : (eski ? eski.birim : 'Adet'),
     miktar, birimFiyat: fiyat,
     tutar: miktar * fiyat
