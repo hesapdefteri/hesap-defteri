@@ -3317,31 +3317,11 @@ document.getElementById('cekWizOverlay').onclick = (e) => {
 };
 document.getElementById('tahYontemSecBtn').onclick = () => { document.getElementById('tahYontemOverlay').classList.add('show'); };
 document.getElementById('tahYontemNakitSecBtn').onclick = () => {
-  const c = state[quickTxLedger].find(x=>x.id===quickTxId);
-  if(quickTxType === 'ÖDEME'){
-    quickTxCekOn = false;
-    document.getElementById('quickTxCekToggle').classList.remove('on');
-    document.getElementById('quickTxCiroRow').classList.add('hidden');
-    document.getElementById('tahYontemSecLabel').textContent = 'Nakit Ödemesi';
-  } else {
-    quickTxType = 'TAHSİLAT';
-    document.getElementById('quickTxTitle').textContent = 'Tahsilat' + (c ? ' — ' + c.name : '');
-    tahYontemSec('nakit');
-  }
+  tahYontemSec('nakit');
   document.getElementById('tahYontemOverlay').classList.remove('show');
 };
 document.getElementById('tahYontemCekSecBtn').onclick = () => {
-  const c = state[quickTxLedger].find(x=>x.id===quickTxId);
-  if(quickTxType === 'ÖDEME'){
-    quickTxCekOn = true;
-    document.getElementById('quickTxCekToggle').classList.add('on');
-    document.getElementById('quickTxCiroRow').classList.remove('hidden');
-    document.getElementById('tahYontemSecLabel').textContent = 'Çek Ödemesi (Ciro)';
-  } else {
-    quickTxType = 'TAHSİLAT';
-    document.getElementById('quickTxTitle').textContent = 'Tahsilat' + (c ? ' — ' + c.name : '');
-    tahYontemSec('cek');
-  }
+  tahYontemSec('cek');
   document.getElementById('tahYontemOverlay').classList.remove('show');
 };
 document.getElementById('tahYontemOverlay').onclick = (e) => {
@@ -3371,21 +3351,17 @@ function cekFormuDoldur(tx){
   document.getElementById('cekVadeUyari').classList.add('hidden');
 }
 function applyQuickTxTypeVisibility(type){
-  const isTahsilat = type === 'TAHSİLAT';
-  const isOdeme = type === 'ÖDEME';
-  // Eski sade "Çek mi?" anahtarı yerine artık hem Tahsilat hem Ödeme'de aynı
-  // "Ödeme Yöntemi" butonu (tahYontemSecBtn → Nakit/Çek seçenekli overlay)
-  // kullanılıyor — kullanıcı isteğiyle (29 Tem 2026), tutarlı arayüz için.
-  document.getElementById('tahsilatYontemRow').classList.toggle('hidden', !(isTahsilat || isOdeme));
+  // Kullanıcı isteğiyle (29 Tem 2026): Ödeme artık Tahsilat'la BİREBİR aynı
+  // "Ödeme Yöntemi" butonunu ve Çek seçilince aynı tam çek formunu (banka/
+  // vade/keşideci/kime ciro edildi vb.) kullanıyor — eskiden Ödeme'de sadece
+  // basit bir "Çek mi?" anahtarı vardı, bilerek daha az detaylıydı; kullanıcı
+  // aynı formu istedi, artık ikisi de tahYontemSec() ile yönetiliyor.
+  const usesYontem = (type === 'TAHSİLAT' || type === 'ÖDEME');
+  document.getElementById('tahsilatYontemRow').classList.toggle('hidden', !usesYontem);
   document.getElementById('quickTxCekToggleRow').classList.add('hidden');
-  if(isTahsilat){
+  document.getElementById('quickTxCiroRow').classList.add('hidden');
+  if(usesYontem){
     tahYontemSec('nakit');
-  } else if(isOdeme){
-    quickTxCekOn = false;
-    document.getElementById('quickTxCekToggle').classList.remove('on');
-    document.getElementById('quickTxCiroRow').classList.add('hidden');
-    document.getElementById('tahYontemSecLabel').textContent = 'Nakit Ödemesi';
-    document.getElementById('cekDetayForm').classList.add('hidden');
   } else {
     document.getElementById('cekDetayForm').classList.add('hidden');
   }
@@ -3452,8 +3428,9 @@ document.getElementById('quickTxSave').onclick = () => {
   if(!amount || amount <= 0) return;
 
   const isTahsilat = quickTxType === 'TAHSİLAT';
-  const cekSecili = isTahsilat ? (tahsilatYontem === 'cek') : quickTxCekOn;
-  if(cekSecili && isTahsilat && !document.getElementById('cekVadeTarihi').value){
+  const usesYontem = isTahsilat || quickTxType === 'ÖDEME';
+  const cekSecili = usesYontem ? (tahsilatYontem === 'cek') : quickTxCekOn;
+  if(cekSecili && usesYontem && !document.getElementById('cekVadeTarihi').value){
     document.getElementById('cekVadeUyari').classList.remove('hidden');
     return;
   }
@@ -3468,8 +3445,8 @@ document.getElementById('quickTxSave').onclick = () => {
     tarihIso = quickTxEditDate || new Date().toISOString();
   }
 
-  const tx = { type: quickTxType, desc: '', amount, date: tarihIso, cek: cekSecili, ciro: isTahsilat ? (cekSecili && quickTxPrevCiro) : (quickTxCekOn && quickTxCiroOn) };
-  if(cekSecili && isTahsilat){
+  const tx = { type: quickTxType, desc: '', amount, date: tarihIso, cek: cekSecili, ciro: isTahsilat ? (cekSecili && quickTxPrevCiro) : (usesYontem ? cekSecili : (quickTxCekOn && quickTxCiroOn)) };
+  if(cekSecili && usesYontem){
     tx.cekId = 'cek_' + Date.now() + '_' + Math.floor(Math.random()*100000);
     tx.cekDetay = {
       no: document.getElementById('cekNo').value.trim(),
@@ -4669,11 +4646,15 @@ function cv2Hareketler(id, tur){
       }
       const amt = signedAmount(t);
       const acls = cv2BalClass(amt);
+      const odemeBilgisi = (t.type === 'TAHSİLAT' || t.type === 'ÖDEME')
+        ? (t.cek ? ('Çek' + (t.type === 'ÖDEME' ? ' (Ciro)' : '')) : 'Nakit')
+        : null;
       html += '<div class="cv2-txcard" data-idx="' + i + '">' +
         '<div class="cv2-txico ' + acls + '"></div>' +
         '<div class="cv2-txmid">' +
           '<div class="cv2-txtype">' + cv2TxLabel(t.type) + '</div>' +
           (t.desc ? '<div class="cv2-txdesc">' + t.desc + '</div>' : '') +
+          (odemeBilgisi ? '<div class="cv2-txdesc">' + odemeBilgisi + '</div>' : '') +
           '<div class="cv2-txdate">' + (isNaN(d) ? '' : cv2TR(d)) + '</div>' +
         '</div>' +
         '<div class="cv2-txright">' +
@@ -4841,9 +4822,11 @@ function cv2TxAcFatura(tur, id, idx){
 
 // CH1'deki (openTxEditForm) TAHSİLAT/ÖDEME düzenleme akışıyla birebir aynı:
 // mevcut openQuickTx formunu editingTx ile Edit Mode'a sokuyor — yeni ekran/form
-// yok, ödeme yöntemi (Nakit/Çek) dahil tüm alanlar değiştirilebiliyor. Kaydet
-// quickTxSave içindeki mevcut "orijinali sil + yeniyi ekle, TEK save()" mantığını
-// kullanır (bkz. editingTx), CREATE akışıyla aynı kod yolu — kod tekrarı yok.
+// yok, ödeme yöntemi (Nakit/Çek, tam çek formuyla) dahil tüm alanlar
+// değiştirilebiliyor. Kaydet quickTxSave içindeki mevcut "orijinali sil +
+// yeniyi ekle, TEK save()" mantığını kullanır (bkz. editingTx), CREATE
+// akışıyla aynı kod yolu — kod tekrarı yok. Tahsilat/Ödeme artık çek
+// formu açısından simetrik (29 Tem 2026, kullanıcı isteği).
 function cv2TxAcOdeme(tur, id, idx){
   const c = cv2Find(id, tur); if(!c) return;
   const t = c.transactions[idx]; if(!t) return;
@@ -4855,16 +4838,9 @@ function cv2TxAcOdeme(tur, id, idx){
   quickTxPrevCiro = !!t.ciro;
   document.getElementById('quickTxAmount').value = fmtPlain(Math.abs(t.amount));
   document.getElementById('quickTxTarih').value = new Date(t.date).toISOString().slice(0,10);
-  if(t.type === 'TAHSİLAT' && t.cek){
+  if(t.cek){
     tahYontemSec('cek');
     cekFormuDoldur({ cekDetay: t.cekDetay });
-  } else if(t.type !== 'TAHSİLAT' && t.cek){
-    quickTxCekOn = true;
-    document.getElementById('quickTxCekToggle').classList.add('on');
-    document.getElementById('quickTxCiroRow').classList.toggle('hidden', !t.ciro);
-    document.getElementById('tahYontemSecLabel').textContent = 'Çek Ödemesi (Ciro)';
-    quickTxCiroOn = !!t.ciro;
-    if(t.ciro) document.getElementById('quickTxCiroToggle').classList.add('on');
   }
 }
 
