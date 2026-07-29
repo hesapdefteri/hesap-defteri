@@ -171,6 +171,7 @@
   .cv2-txdetail-row:last-child{border-bottom:none;}
   .cv2-txdetail-row span{color:var(--muted);font-weight:600;}
   .cv2-txdetail-row b{color:var(--ink);font-weight:800;text-align:right;}
+  .cv2-txdetail-row b.debt{color:var(--red);} .cv2-txdetail-row b.credit{color:var(--green);}
 
   /* ---- küçük onay/form penceresi ---- */
   #cv2Modal{position:fixed;inset:0;z-index:920;display:none;align-items:center;justify-content:center;padding:22px;}
@@ -4760,6 +4761,18 @@ function cv2ModalKapat(){
 }
 
 /* ---------- tek hareketi görüntüle / düzenle / sil ---------- */
+// Ekstre ekranındaki (cv2Ekstre) koşan bakiye mantığıyla BİREBİR aynı: tarihe göre
+// artan sırada toplanır, hedef hareket ile aynı obje referansına ulaşınca durur —
+// kullanıcı isteğiyle (29 Tem 2026) Hareket Detayı önizlemesinde de gösteriliyor.
+function cv2RunningBalance(c, targetT){
+  const rows = (c.transactions || []).slice().sort((a,b)=> new Date(a.date) - new Date(b.date));
+  let running = 0;
+  for(const row of rows){
+    running += signedAmount(row);
+    if(row === targetT) break;
+  }
+  return running;
+}
 function cv2TxAc(tur, id, idx){
   const c = cv2Find(id, tur); if(!c) return;
   const t = c.transactions[idx]; if(!t) return;
@@ -4769,6 +4782,9 @@ function cv2TxAc(tur, id, idx){
   const odemeBilgisi = (t.type === 'TAHSİLAT' || t.type === 'ÖDEME')
     ? (t.cek ? ('Çek' + (t.type === 'ÖDEME' ? ' (Ciro)' : '')) : 'Nakit')
     : null;
+  const bakiye = cv2RunningBalance(c, t);
+  const bakiyeCls = cv2BalClass(bakiye);
+  const bakiyeMetin = fmtWhole(Math.abs(bakiye)) + (bakiye < 0 ? ' Borç' : (bakiye > 0 ? ' Alacak' : ''));
   const detay =
     '<div class="cv2-txdetail">' +
       '<div class="cv2-txdetail-amt ' + cls + '">' + fmtWhole(amt) + '</div>' +
@@ -4776,6 +4792,7 @@ function cv2TxAc(tur, id, idx){
       '<div class="cv2-txdetail-row"><span>Tarih</span><b>' + (isNaN(d) ? '—' : cv2TR(d)) + '</b></div>' +
       (odemeBilgisi ? '<div class="cv2-txdetail-row"><span>Ödeme Yöntemi</span><b>' + odemeBilgisi + '</b></div>' : '') +
       (t.desc ? '<div class="cv2-txdetail-row"><span>Açıklama</span><b>' + t.desc + '</b></div>' : '') +
+      '<div class="cv2-txdetail-row"><span>Ekstre Bakiyesi</span><b class="' + bakiyeCls + '">' + bakiyeMetin + '</b></div>' +
     '</div>';
   cv2ModalAc(
     'Hareket Detayı', detay, '',
