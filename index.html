@@ -137,9 +137,15 @@
   .cv2-sh-mgroup{font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:.3px;text-transform:uppercase;
     padding:14px 2px 8px 2px;}
   .cv2-sh-mgroup:first-child{padding-top:8px;}
-  .cv2-txcard{display:flex;align-items:center;gap:12px;background:#f8fafa;border-radius:15px;padding:11px 13px;
-    margin-bottom:8px;cursor:pointer;transition:transform .14s ease,background .14s ease;}
-  .cv2-txcard:active{transform:scale(.98);background:#f0f3f4;}
+  .cv2-tx-wrap{position:relative;overflow:hidden;border-radius:15px;margin-bottom:8px;}
+  .cv2-tx-actions{position:absolute;top:0;right:0;height:100%;display:flex;z-index:0;}
+  .cv2-tx-abtn{width:74px;height:100%;border:none;color:#fff;font-size:12.5px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .cv2-tx-abtn.duzenle{background:#2e56c9;}
+  .cv2-tx-abtn.sil{background:var(--red);}
+  .cv2-txcard{position:relative;z-index:1;display:flex;align-items:center;gap:12px;background:#f8fafa;border-radius:15px;padding:11px 13px;
+    margin-bottom:0;cursor:pointer;touch-action:pan-y;will-change:transform;background-clip:padding-box;}
+  .cv2-txcard.cv2-tx-pressed{transform:scale(.98);background:#f0f3f4;}
   .cv2-txico{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
   .cv2-txico.debt{background:var(--red);}
   .cv2-txico.credit{background:var(--green);}
@@ -4613,6 +4619,100 @@ function cv2Totals(c, tur){
 let cv2SheetCtx = { id:null, tur:null };
 let cv2ReturnCtx = null; // Hareketler'den fatura VEYA tahsilat/ödeme formuna geçildiğinde geri dönüş hedefi
 
+// Hareket satırlarını hesap kartlarındaki gibi sola kaydırınca Düzenle/Sil
+// çıkıyor (kullanıcı isteğiyle, 29 Tem 2026) — cv2BindCards'ın TEK yönlü
+// (sadece sola, tek panel) sadeleştirilmiş hâli. Kaydırmadan normal dokunma
+// hâlâ cv2TxAc'ın önizleme modalını açıyor; kaydırıp Düzenle'ye basmak
+// önizlemeyi ATLAYIP doğrudan cv2TxDuzenleRoute'a gidiyor.
+const CV2_TX_PANEL = 148;
+let cv2TxOpenIdx = null;
+function cv2TxCloseOpen(container, exceptIdx){
+  if(cv2TxOpenIdx === null || cv2TxOpenIdx === exceptIdx) return;
+  const card = container.querySelector('.cv2-txcard[data-idx="' + cv2TxOpenIdx + '"]');
+  if(card){
+    card.style.transition = 'transform .2s cubic-bezier(.22,.9,.3,1)';
+    card.style.transform = 'translateX(0px)';
+    card.dataset.tx = '0';
+  }
+  cv2TxOpenIdx = null;
+}
+function cv2BindTxCards(container, tur, id){
+  cv2TxOpenIdx = null;
+  container.querySelectorAll('.cv2-txcard').forEach(card=>{
+    let startX=0, startY=0, curX=0, dragging=false, decided=false, horizontal=false;
+    const idx = +card.dataset.idx;
+
+    card.addEventListener('pointerdown', e=>{
+      if(e.pointerType === 'mouse' && e.button !== 0) return;
+      startX = e.clientX; startY = e.clientY;
+      curX = parseFloat(card.dataset.tx || '0');
+      dragging = true; decided = false; horizontal = false;
+      card.style.transition = 'none';
+      card.classList.add('cv2-tx-pressed');
+    });
+
+    card.addEventListener('pointermove', e=>{
+      if(!dragging) return;
+      const dx = e.clientX - startX, dy = e.clientY - startY;
+      if(!decided){
+        if(Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+        decided = true;
+        horizontal = Math.abs(dx) > Math.abs(dy);
+        if(horizontal){
+          try{ card.setPointerCapture(e.pointerId); }catch(err){}
+          cv2TxCloseOpen(container, idx);
+        } else {
+          dragging = false;
+          card.classList.remove('cv2-tx-pressed');
+          return;
+        }
+      }
+      if(!horizontal) return;
+      let x = curX + dx;
+      x = Math.max(-CV2_TX_PANEL, Math.min(0, x));
+      card.style.transform = 'translateX(' + x + 'px)';
+      card.dataset.tx = String(x);
+    });
+
+    const finish = () => {
+      card.classList.remove('cv2-tx-pressed');
+      if(!dragging) return;
+      dragging = false;
+      if(!horizontal) return;
+      const x = parseFloat(card.dataset.tx || '0');
+      card.style.transition = 'transform .2s cubic-bezier(.22,.9,.3,1)';
+      if(x < -CV2_TX_PANEL/2){
+        card.style.transform = 'translateX(-' + CV2_TX_PANEL + 'px)';
+        card.dataset.tx = String(-CV2_TX_PANEL);
+        cv2TxOpenIdx = idx;
+      } else {
+        card.style.transform = 'translateX(0px)';
+        card.dataset.tx = '0';
+        if(cv2TxOpenIdx === idx) cv2TxOpenIdx = null;
+      }
+    };
+    card.addEventListener('pointerup', finish);
+    card.addEventListener('pointercancel', finish);
+
+    card.addEventListener('click', () => {
+      const tx = parseFloat(card.dataset.tx || '0');
+      if(Math.abs(tx) > 4){ cv2TxCloseOpen(container, null); return; }
+      cv2TxAc(tur, id, idx);
+    });
+  });
+
+  container.querySelectorAll('.cv2-tx-abtn').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      e.stopPropagation();
+      const bIdx = +btn.dataset.idx;
+      const act = btn.dataset.act;
+      cv2TxCloseOpen(container, null);
+      if(act === 'duzenle') cv2TxDuzenleRoute(tur, id, bIdx);
+      else if(act === 'sil') cv2TxSilOnayla(tur, id, bIdx);
+    });
+  });
+}
+
 function cv2Hareketler(id, tur){
   const c = cv2Find(id, tur); if(!c) return;
   cv2SheetCtx = { id, tur };
@@ -4653,24 +4753,28 @@ function cv2Hareketler(id, tur){
       const odemeBilgisi = (t.type === 'TAHSİLAT' || t.type === 'ÖDEME')
         ? (t.cek ? ('Çek' + (t.type === 'ÖDEME' ? ' (Ciro)' : '')) : 'Nakit')
         : null;
-      html += '<div class="cv2-txcard" data-idx="' + i + '">' +
-        '<div class="cv2-txico ' + acls + '"></div>' +
-        '<div class="cv2-txmid">' +
-          '<div class="cv2-txtype">' + cv2TxLabel(t.type) + '</div>' +
-          (t.desc ? '<div class="cv2-txdesc">' + t.desc + '</div>' : '') +
-          (odemeBilgisi ? '<div class="cv2-txdesc">' + odemeBilgisi + '</div>' : '') +
-          '<div class="cv2-txdate">' + (isNaN(d) ? '' : cv2TR(d)) + '</div>' +
+      html += '<div class="cv2-tx-wrap" data-idx="' + i + '">' +
+        '<div class="cv2-tx-actions">' +
+          '<button class="cv2-tx-abtn duzenle" data-act="duzenle" data-idx="' + i + '">Düzenle</button>' +
+          '<button class="cv2-tx-abtn sil" data-act="sil" data-idx="' + i + '">Sil</button>' +
         '</div>' +
-        '<div class="cv2-txright">' +
-          '<div class="cv2-txamt ' + acls + '">' + fmtWhole(amt) + '</div>' +
-          '<div class="cv2-txlbl">' + cv2TxLabel(t.type) + '</div>' +
+        '<div class="cv2-txcard" data-idx="' + i + '">' +
+          '<div class="cv2-txico ' + acls + '"></div>' +
+          '<div class="cv2-txmid">' +
+            '<div class="cv2-txtype">' + cv2TxLabel(t.type) + '</div>' +
+            (t.desc ? '<div class="cv2-txdesc">' + t.desc + '</div>' : '') +
+            (odemeBilgisi ? '<div class="cv2-txdesc">' + odemeBilgisi + '</div>' : '') +
+            '<div class="cv2-txdate">' + (isNaN(d) ? '' : cv2TR(d)) + '</div>' +
+          '</div>' +
+          '<div class="cv2-txright">' +
+            '<div class="cv2-txamt ' + acls + '">' + fmtWhole(amt) + '</div>' +
+            '<div class="cv2-txlbl">' + cv2TxLabel(t.type) + '</div>' +
+          '</div>' +
         '</div>' +
       '</div>';
     });
     body.innerHTML = html;
-    body.querySelectorAll('.cv2-txcard').forEach(card=>{
-      card.addEventListener('click', () => cv2TxAc(tur, id, +card.dataset.idx));
-    });
+    cv2BindTxCards(body, tur, id);
   }
 
   const quickRow = document.getElementById('cv2ShQuickRow');
@@ -4773,6 +4877,16 @@ function cv2RunningBalance(c, targetT){
   }
   return running;
 }
+// Hareket tipine göre doğru düzenleme formuna yönlendirir — hem önizleme
+// modalındaki Düzenle butonu hem de sola kaydırınca çıkan Düzenle butonu
+// (kayıtları atlayıp doğrudan buraya gelir) AYNI fonksiyonu kullanır.
+function cv2TxDuzenleRoute(tur, id, idx){
+  const c = cv2Find(id, tur); if(!c) return;
+  const t = c.transactions[idx]; if(!t) return;
+  if(t.type === 'SATIŞ' || t.type === 'ALIŞ') cv2TxAcFatura(tur, id, idx);
+  else if(t.type === 'TAHSİLAT' || t.type === 'ÖDEME') cv2TxAcOdeme(tur, id, idx);
+  else cv2TxDuzenle(tur, id, idx);
+}
 function cv2TxAc(tur, id, idx){
   const c = cv2Find(id, tur); if(!c) return;
   const t = c.transactions[idx]; if(!t) return;
@@ -4797,12 +4911,7 @@ function cv2TxAc(tur, id, idx){
   cv2ModalAc(
     'Hareket Detayı', detay, '',
     'Düzenle', 'primary',
-    function(){
-      cv2ModalKapat();
-      if(t.type === 'SATIŞ' || t.type === 'ALIŞ') cv2TxAcFatura(tur, id, idx);
-      else if(t.type === 'TAHSİLAT' || t.type === 'ÖDEME') cv2TxAcOdeme(tur, id, idx);
-      else cv2TxDuzenle(tur, id, idx);
-    },
+    function(){ cv2ModalKapat(); cv2TxDuzenleRoute(tur, id, idx); },
     { label:'Sil', cls:'danger', aksiyon: function(){ cv2TxSilOnayla(tur, id, idx); } }
   );
 }
