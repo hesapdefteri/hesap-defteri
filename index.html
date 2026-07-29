@@ -7555,15 +7555,20 @@ let urunSecTerm = '';
 function openUrunSec(){
   urunSecTerm = '';
   document.getElementById('urunSecSearch').value = '';
-  renderUrunSecList();
+  // ÖNEMLİ: ekranı göstermeyi renderUrunSecList()'ten SONRAYA bırakmıyoruz —
+  // (bozuk/eksik bir stok kartı kaydı render'ı sessizce patlatırsa ekran hiç
+  // açılmıyordu, kullanıcı "+ Ürün/Hizmet Ekle'ye basınca hiçbir şey açılmıyor"
+  // diye bildirdi, 30 Tem 2026). Ekran önce açılıyor, render try/catch içinde.
   document.getElementById('urunSecScreen').classList.add('show');
+  try{ renderUrunSecList(); }catch(err){ console.error('renderUrunSecList hata:', err); }
   nudge();
 }
 function renderUrunSecList(){
   const term = urunSecTerm.toLocaleLowerCase('tr-TR');
-  const list = state.stokKartlari.filter(c=>{
+  const list = (state.stokKartlari || []).filter(c=>{
+    if(!c) return false;
     if(!c.aktif) return false;
-    if(term && !(`${c.ad} ${c.stokKodu}`).toLocaleLowerCase('tr-TR').includes(term)) return false;
+    if(term && !(`${c.ad||''} ${c.stokKodu||''}`).toLocaleLowerCase('tr-TR').includes(term)) return false;
     return true;
   });
   const el = document.getElementById('urunSecList');
@@ -7571,10 +7576,10 @@ function renderUrunSecList(){
     <div class="sk-card" data-id="${c.id}">
       <div class="sk-card-top">
         <div>
-          <div class="sk-card-name">${c.ad}</div>
+          <div class="sk-card-name">${c.ad || '(İsimsiz ürün)'}</div>
           <div class="sk-card-code">${c.stokKodu || '—'}</div>
         </div>
-        <div class="sk-card-qty">${fmtPlain(skMiktar(c))} ${c.birim}</div>
+        <div class="sk-card-qty">${fmtPlain(skMiktar(c))} ${c.birim || ''}</div>
       </div>
     </div>
   `).join('') : '<div class="sk-empty">Stok kartı bulunamadı — önce Stoklar\'dan ekleyin</div>';
