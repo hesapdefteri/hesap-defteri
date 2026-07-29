@@ -4225,9 +4225,9 @@ document.getElementById('anaMenu').querySelectorAll('.am-tile').forEach(tile=>{
       requestAnimationFrame(() => requestAnimationFrame(MonthSidebar));
       nudge();
     } else if(mod === 'urunler'){
-      renderUrunler();
       hideAllScreens();
       document.getElementById('urunlerScreen').classList.add('show');
+      try{ renderUrunler(); }catch(err){ console.error('renderUrunler hata:', err); }
       nudge();
     } else if(mod === 'alislar' || mod === 'satislar'){
       fisTuru = (mod === 'alislar') ? 'alis' : 'satis';
@@ -6388,25 +6388,27 @@ let urunSearchTerm = '';
 function renderUrunler(){
   skDoldurFiltreListeleri();
   const term = urunSearchTerm.toLocaleLowerCase('tr-TR');
-  let list = state.stokKartlari.filter(c=>{
-    if(term && !(`${c.ad} ${c.stokKodu}`).toLocaleLowerCase('tr-TR').includes(term)) return false;
+  let list = (state.stokKartlari || []).filter(c=>{
+    if(!c) return false;
+    if(term && !(`${c.ad||''} ${c.stokKodu||''}`).toLocaleLowerCase('tr-TR').includes(term)) return false;
     return true;
   });
   const urunList = document.getElementById('urunList');
   urunList.innerHTML = list.length ? list.map(c=>{
     const miktar = skMiktar(c);
+    const fiyatlar = c.fiyatlar || {};
     return `
       <div class="sk-card ${c.aktif ? '' : 'pasif'}" data-id="${c.id}">
         <div class="sk-card-top">
           <div>
-            <div class="sk-card-name">${c.ad}</div>
+            <div class="sk-card-name">${c.ad || '(İsimsiz ürün)'}</div>
             <div class="sk-card-code">${c.stokKodu || '—'}</div>
           </div>
-          <div class="sk-card-qty ${miktar < 0 ? 'neg' : ''}">${fmtPlain(miktar)} ${c.birim}</div>
+          <div class="sk-card-qty ${miktar < 0 ? 'neg' : ''}">${fmtPlain(miktar)} ${c.birim || ''}</div>
         </div>
         <div class="sk-card-bottom">
-          <span>Alış: ${fmt(toNum(c.fiyatlar.sonAlis))}</span>
-          <span>Satış: ${fmt(toNum(c.fiyatlar.satis1))}</span>
+          <span>Alış: ${fmt(toNum(fiyatlar.sonAlis))}</span>
+          <span>Satış: ${fmt(toNum(fiyatlar.satis1))}</span>
         </div>
       </div>`;
   }).join('') : '<div class="sk-empty">Henüz stok kartı yok — sağ alttaki ＋ ile ekleyin</div>';
@@ -6494,7 +6496,7 @@ document.getElementById('urunSaveBtn').onclick = () => {
   }
   save();
   urunOverlay.classList.remove('show');
-  renderUrunler();
+  try{ renderUrunler(); }catch(err){ console.error('renderUrunler hata:', err); }
   if(editingSkId) { renderSkDetayUst(); renderSkTab(currentSkTab); }
   if(siparisYeniUrunAktif && yeniKart){
     renderSiparisStokList();
