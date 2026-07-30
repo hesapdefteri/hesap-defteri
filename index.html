@@ -4221,9 +4221,9 @@ document.getElementById('anaMenu').querySelectorAll('.am-tile').forEach(tile=>{
       document.getElementById('cv2Screen').classList.add('show');
       nudge();
     } else if(mod === 'krediKarti'){
-      renderKrediKarti();
       hideAllScreens();
       document.getElementById('kkScreen').classList.add('show');
+      try{ renderKrediKarti(); }catch(err){ console.error('renderKrediKarti hata:', err); }
       requestAnimationFrame(() => requestAnimationFrame(MonthSidebar));
       nudge();
     } else if(mod === 'urunler'){
@@ -5363,8 +5363,8 @@ let kkSeciliIslem = -1;  // bottom sheet'te açık işlem
 const KK_TIK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
 const KK_DURUM = { odendi:{c:'ok', t:'Ödendi'}, odenmedi:{c:'no', t:'Henüz ödenmedi'}, kismi:{c:'part', t:'Kısmi ödendi'} };
 
-function kkAyAdet(a){ return a.hareketler.length ? a.hareketler.length : a.adet; }
-function kkAyTutar(a){ return a.hareketler.length ? a.hareketler.reduce((s,h)=>s+h.tutar,0) : a.tutar; }
+function kkAyAdet(a){ const h = a && a.hareketler; return (h && h.length) ? h.length : ((a && a.adet) || 0); }
+function kkAyTutar(a){ const h = a && a.hareketler; return (h && h.length) ? h.reduce((s,x)=>s+(x.tutar||0),0) : ((a && a.tutar) || 0); }
 function kkTaksitEtiket(h){ return h.taksitAdet > 1 ? (h.taksitNo + '/' + h.taksitAdet) : ''; }
 function kkSonTaksit(h){ return h.taksitAdet > 1 ? kkAyEkle(h.ilk, h.taksitAdet - 1) : null; }
 
@@ -5432,9 +5432,12 @@ function TransactionCard(h, i){
 
 /* ---------- TransactionList ---------- */
 function TransactionList(){
-  const a = kkAylar()[kkSeciliAy];
+  const aylar = kkAylar();
+  if(kkSeciliAy < 0 || kkSeciliAy >= aylar.length) kkSeciliAy = Math.max(0, aylar.length - 1);
+  const a = aylar[kkSeciliAy];
   const list = document.getElementById('kkTxList');
-  if(!list) return;
+  if(!list || !a) return;
+  const hareketler = Array.isArray(a.hareketler) ? a.hareketler : [];
 
   document.getElementById('kkAyBaslik').textContent = a.ad + ' ' + a.yil;
   document.getElementById('kkAyOzet').textContent = `(${kkAyAdet(a)} işlem · ${fmtPlain(kkAyTutar(a))} TL)`;
@@ -5443,21 +5446,21 @@ function TransactionList(){
   void list.offsetWidth;          // animasyonu yeniden tetikle
   list.classList.add('kk-swap');
 
-  if(!a.hareketler.length){
+  if(!hareketler.length){
     list.innerHTML = '<div class="kk-card kk-empty">Bu ay için işlem dökümü yok</div>';
   } else {
-    list.innerHTML = a.hareketler.map((h,i)=>TransactionCard(h,i)).join('');
+    list.innerHTML = hareketler.map((h,i)=>TransactionCard(h,i)).join('');
     list.querySelectorAll('.kk-tx').forEach(el=>{
       el.onclick = () => TransactionDetailBottomSheet(+el.dataset.i);
     });
   }
 
   const toplam = kkAyTutar(a);
-  const odenen = a.hareketler.reduce((s,h)=>s+(h.odenen||0),0);
+  const odenen = hareketler.reduce((s,h)=>s+((h && h.odenen)||0),0);
   document.getElementById('kkFootAdet').textContent = kkAyAdet(a);
   document.getElementById('kkFootHarcama').textContent = fmtPlain(toplam);
-  document.getElementById('kkFootOdenen').textContent = a.hareketler.length ? fmtPlain(odenen) : '—';
-  document.getElementById('kkFootKalan').textContent  = a.hareketler.length ? fmtPlain(toplam - odenen) : '—';
+  document.getElementById('kkFootOdenen').textContent = hareketler.length ? fmtPlain(odenen) : '—';
+  document.getElementById('kkFootKalan').textContent  = hareketler.length ? fmtPlain(toplam - odenen) : '—';
 }
 
 /* ---------- TransactionDetailBottomSheet ---------- */
@@ -5465,7 +5468,7 @@ function kkSatir(l, v, cls){ return `<div class="kk-row"><span class="l">${l}</s
 
 function TransactionDetailBottomSheet(i){
   const a = kkAylar()[kkSeciliAy];
-  const h = a.hareketler[i];
+  const h = a && Array.isArray(a.hareketler) ? a.hareketler[i] : null;
   if(!h) return;
   kkSeciliIslem = i;
 
