@@ -223,23 +223,27 @@
   .cv2-ek-head{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;
     padding:14px 16px;border-bottom:1px solid var(--line);}
   .cv2-ek-vazgec,.cv2-ek-gonder{border:none;background:none;color:var(--accent);font-family:inherit;
-    font-size:16px;font-weight:600;cursor:pointer;padding:4px;}
-  .cv2-ek-baslik{font-size:18px;font-weight:800;color:var(--ink);}
+    font-size:18px;font-weight:600;cursor:pointer;padding:4px;}
+  .cv2-ek-baslik{font-size:21px;font-weight:800;color:var(--ink);}
   .cv2-ek-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-  .cv2-ek-carikutu{background:#fdf9e0;padding:14px 16px;text-align:center;}
-  .cv2-ek-carikutu .ad{font-size:17px;font-weight:800;color:var(--ink);}
-  .cv2-ek-carikutu .tur{font-size:12.5px;color:var(--muted);font-weight:600;margin-top:2px;}
-  .cv2-ek-table{width:100%;border-collapse:collapse;font-size:11.5px;}
-  .cv2-ek-table thead th{position:sticky;top:0;background:#fff;text-align:left;font-size:10px;
-    font-weight:800;color:var(--muted);letter-spacing:.2px;padding:8px 6px;border-bottom:1px solid var(--line);
+  .cv2-ek-carikutu{background:#fdf9e0;padding:16px 16px;text-align:center;}
+  .cv2-ek-carikutu .ad{font-size:24px;font-weight:800;color:var(--ink);}
+  .cv2-ek-carikutu .tur{font-size:16px;color:var(--muted);font-weight:600;margin-top:3px;}
+  .cv2-ek-table{width:100%;border-collapse:collapse;font-size:18px;}
+  .cv2-ek-table thead th{position:sticky;top:0;background:#fff;text-align:left;font-size:15px;
+    font-weight:800;color:var(--muted);letter-spacing:.2px;padding:11px 8px;border-bottom:1px solid var(--line);
     z-index:1;}
   .cv2-ek-table th.num, .cv2-ek-table td.num{text-align:right;}
-  .cv2-ek-table td{padding:7px 6px;border-bottom:1px solid #f0f2f3;color:var(--ink);vertical-align:top;}
+  .cv2-ek-table td{padding:13px 8px;border-bottom:1px solid #f0f2f3;color:var(--ink);vertical-align:top;font-size:18px;}
   .cv2-ek-table tr.cv2-ek-alis td, .cv2-ek-table tr.cv2-ek-alis td.num{color:var(--red);}
-  .cv2-ek-table td.cv2-ek-tur{font-weight:800;}
-  .cv2-ek-table tr.cv2-ek-ay td{background:#f6f8f9;font-weight:800;font-size:12px;color:var(--ink);
-    padding:9px 6px;}
-  .cv2-ek-table tr.cv2-ek-ay td.num{color:var(--muted);font-weight:700;font-size:10.5px;}
+  .cv2-ek-table td.cv2-ek-tur{font-weight:800;font-size:18px;}
+  .cv2-ek-dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:8px;
+    vertical-align:middle;flex-shrink:0;}
+  .cv2-ek-dot.pos{background:var(--green);}
+  .cv2-ek-dot.neg{background:var(--red);}
+  .cv2-ek-table tr.cv2-ek-ay td{background:#f6f8f9;font-weight:800;font-size:17px;color:var(--ink);
+    padding:12px 8px;}
+  .cv2-ek-table tr.cv2-ek-ay td.num{color:var(--muted);font-weight:700;font-size:15.5px;}
 
   @media(min-width:700px){
     #cv2Screen .cv2-head{padding:20px 24px 10px 24px;}
@@ -2075,7 +2079,7 @@
     </div>
     <table class="cv2-ek-table">
       <thead>
-        <tr><th>TARİH</th><th>AÇIKLAMA</th><th>HESAP</th><th class="num">MİKTAR</th><th class="num">TOPLAM</th></tr>
+        <tr><th>TARİH</th><th>AÇIKLAMA</th><th class="num">MİKTAR</th><th class="num">TOPLAM</th></tr>
       </thead>
       <tbody id="cv2EkBody"></tbody>
     </table>
@@ -5111,39 +5115,40 @@ function cv2Ekstre(id, tur){
   const rows = (c.transactions || []).slice().sort((a,b)=> new Date(a.date) - new Date(b.date));
   const body = document.getElementById('cv2EkBody');
   if(!rows.length){
-    body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px 8px;">Hareket yok</td></tr>';
+    body.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:24px 8px;">Hareket yok</td></tr>';
   } else {
-    let html = '';
+    // Koşan bakiye ESKİDEN YENİYE doğru hesaplanır (doğruluğu bunu gerektirir),
+    // ama ekranda EN YENİ hareket EN ÜSTTE görünsün diye ay blokları ve blok
+    // içindeki satırlar sona kadar toplanıp en son ters çevrilir.
     let running = 0;
-    let ayEtiket = null;
-    let ayPos = 0, ayNeg = 0;
-
-    const ayFlush = () => {
-      if(ayEtiket === null) return;
-      html += `<tr class="cv2-ek-ay"><td colspan="3">${ayEtiket}</td><td class="num" colspan="2">${fmtPlain(ayPos)} ${fmtPlain(ayNeg)} = ${fmtPlain(running)}</td></tr>`;
-    };
+    const bloklar = []; // { etiket, satirlarHtml:[], pos, neg, runningSonu }
+    let mevcut = null;
 
     rows.forEach(t=>{
       const d = new Date(t.date);
       const etiket = isNaN(d) ? 'Tarihsiz' : (KK_AY_ADLARI[d.getMonth()].toUpperCase() + ' ' + d.getFullYear());
-      if(etiket !== ayEtiket){
-        ayFlush();
-        ayEtiket = etiket; ayPos = 0; ayNeg = 0;
+      if(!mevcut || etiket !== mevcut.etiket){
+        mevcut = { etiket, satirlarHtml: [], pos: 0, neg: 0, runningSonu: 0 };
+        bloklar.push(mevcut);
       }
       const amt = signedAmount(t);
       running += amt;
-      if(amt >= 0) ayPos += amt; else ayNeg += amt;
-      const hesap = (t.type === 'TAHSİLAT' || t.type === 'ÖDEME') ? 'Nakit (Kasa)' : '';
+      if(amt >= 0) mevcut.pos += amt; else mevcut.neg += amt;
+      mevcut.runningSonu = running;
       const negCls = amt < 0 ? ' cv2-ek-alis' : '';
-      html += `<tr class="${negCls.trim()}">
+      mevcut.satirlarHtml.push(`<tr class="${negCls.trim()}">
         <td>${isNaN(d) ? '—' : cv2EkTarih(d)}</td>
-        <td><span class="cv2-ek-tur">${cv2TxLabel(t.type)}</span>${t.desc ? '<br><span style="color:var(--muted);font-weight:600;">' + t.desc + '</span>' : ''}</td>
-        <td>${hesap}</td>
+        <td><span class="cv2-ek-dot ${amt >= 0 ? 'pos' : 'neg'}"></span><span class="cv2-ek-tur">${cv2TxLabel(t.type)}</span>${t.desc ? '<br><span style="color:var(--muted);font-weight:600;font-size:16.5px;">' + t.desc + '</span>' : ''}</td>
         <td class="num">${fmtPlain(amt)}</td>
         <td class="num">${fmtPlain(running)}</td>
-      </tr>`;
+      </tr>`);
     });
-    ayFlush();
+
+    let html = '';
+    bloklar.slice().reverse().forEach(b=>{
+      html += b.satirlarHtml.slice().reverse().join('');
+      html += `<tr class="cv2-ek-ay"><td colspan="2">${b.etiket}</td><td class="num" colspan="2">${fmtPlain(b.pos)} ${fmtPlain(b.neg)} = ${fmtPlain(b.runningSonu)}</td></tr>`;
+    });
     body.innerHTML = html;
   }
 
@@ -7509,7 +7514,7 @@ document.getElementById('fisKaydet').onclick = () => {
   }
   cari.transactions.push({
     type: fisTuru === 'alis' ? 'ALIŞ' : 'SATIŞ',
-    desc: `${d.kalemler.length} kalem` + (d.belgeNo ? ' · ' + d.belgeNo : ''),
+    desc: `${d.kalemler.length} kalem` + (d.belgeNo ? ' · ' + d.belgeNo : '') + (d.aciklama && d.aciklama.trim() ? ' — ' + d.aciklama.trim() : ''),
     amount: d.toplam,
     date: new Date(d.tarih).toISOString(),
     skRef: d.id
