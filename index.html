@@ -627,6 +627,10 @@
   .siparis-date-circle.son-hareket{background:#1c3566;color:#fff;box-shadow:none;}
   .siparis-teslimat-row.son-hareket-text{color:#1f7a4d;font-weight:700;}
   .siparis-date-circle-empty{background:#e4e8ea;box-shadow:none;}
+  .cv2-ring{position:relative;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .cv2-ring-badge{position:absolute;top:-3px;left:-3px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;
+    color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 1px 4px rgba(0,0,0,.3);font-family:inherit;letter-spacing:0;}
   .siparis-date-circle b{font-size:19px;line-height:1.05;font-weight:800;}
 
   .swipe-wrap{position:relative;overflow:hidden;border-bottom:1px solid var(--line);}
@@ -4502,6 +4506,27 @@ function CariCardV2(c, tur){
     circleHtml = '<span class="siparis-date-circle siparis-date-circle-empty"></span>';
     altYazi = 'Henüz hareket yok';
   }
+  // Ödeme tarihi girilmişse dairenin etrafına, tarihe yaklaştıkça saat yönünde
+  // (12 hizasından başlayarak) dolan bir ilerleme halkası + sol üst köşede kalan
+  // gün sayısını gösteren minik rozet ekleniyor (05 Ağu 2026, kullanıcı isteği).
+  if(c.odemeTarihi){
+    const odeme = new Date(c.odemeTarihi + 'T12:00:00');
+    const now = new Date();
+    const baslangic = sh || new Date(odeme.getTime() - 30*86400000);
+    let toplamSure = odeme - baslangic;
+    if(toplamSure <= 0) toplamSure = 1;
+    const gecenSure = now - baslangic;
+    const oran = Math.max(0, Math.min(1, gecenSure / toplamSure));
+    const deg = Math.round(oran * 360);
+    const kalanGun = Math.ceil((odeme - now) / 86400000);
+    const gecikti = kalanGun < 0;
+    const renk = gecikti ? '#e5484d' : '#dd7a2c';
+    const rozetYazi = gecikti ? String(kalanGun) : ('+' + kalanGun);
+    circleHtml = `<div class="cv2-ring" style="background:conic-gradient(${renk} ${deg}deg, #e4e8ea ${deg}deg 360deg);">
+      ${circleHtml}
+      <span class="cv2-ring-badge" style="background:${renk};">${rozetYazi}</span>
+    </div>`;
+  }
   // CH1'deki (Cari Hesaplar) swipeActionsHtml ile birebir aynı mantık: tedarikçide
   // Alış/Ödeme, müşteride Tahsilat/Satış — sadece Düzenle CV2'ye özgü ek bir buton.
   // NOT: kullanıcı sağdan sola kaydırmayı daha sık kullandığı için bu butonlar
@@ -5246,12 +5271,24 @@ function cv2Ekstre(id, tur){
 
   document.getElementById('cv2EkstreScreen').classList.add('show');
 }
+function cv2OdemeTarihiKaydet(id, tur){
+  const c = cv2Find(id, tur); if(!c) return;
+  const inp = document.getElementById('cv2OdemeTarihiInput');
+  if(!inp) return;
+  c.odemeTarihi = inp.value || null;
+  save();
+  renderCariV2();
+  const btn = document.getElementById('cv2OdemeTarihiKaydetBtn');
+  if(btn){ const eski = btn.textContent; btn.textContent = 'Kaydedildi ✓'; setTimeout(()=>{ btn.textContent = eski; }, 1200); }
+}
 function cv2DahaFazla(id, tur){
   const c = cv2Find(id, tur); if(!c) return;
   // CH1'deki (bindOrderButtons) Sipariş/Sipariş Gör/Tamamlandı de aynı fonksiyonlarla
   // buraya eklendi — sadece CV2'nin ayrı bir swipe alanı yerine "Daha Fazla" içinde.
   const hasPending = state.siparisFisleri.some(f=>f.cariId===id && !f.tamamlandi);
   const formHtml =
+    '<div class="cv2-field"><label>ÖDEME TARİHİ</label><input id="cv2OdemeTarihiInput" type="date" value="' + (c.odemeTarihi || '') + '"></div>' +
+    '<button class="cv2-more-row" id="cv2OdemeTarihiKaydetBtn" data-act="odemetarihikaydet" data-id="' + id + '" data-tur="' + tur + '">Ödeme Tarihini Kaydet</button>' +
     '<button class="cv2-more-row" data-act="siparis">Sipariş</button>' +
     '<button class="cv2-more-row" data-act="siparisgor">Sipariş Gör</button>' +
     '<button class="cv2-more-row"' + (hasPending ? '' : ' disabled') + ' data-act="tamamla">Tamamlandı</button>';
@@ -5273,6 +5310,7 @@ function cv2DahaFazla(id, tur){
     btn.addEventListener('click', () => {
       if(btn.disabled) return;
       const act = btn.dataset.act;
+      if(act === 'odemetarihikaydet'){ cv2OdemeTarihiKaydet(id, tur); return; }
       cv2ModalKapat();
       if(act === 'siparis') openSiparis(id, tur);
       else if(act === 'siparisgor') openSiparisGorPopup(id, tur);
