@@ -1012,6 +1012,15 @@
     </div>
 
     <div id="authLoading" style="display:none;text-align:center;color:#a9b8d0;font-size:14px;font-weight:600;padding:20px 0;">Yükleniyor…</div>
+
+    <div id="authBootError" style="display:none;text-align:center;">
+      <div style="font-size:15px;color:#ff9b9b;font-weight:700;margin-bottom:10px;">⚠️ Verilerinize ulaşılamadı</div>
+      <div style="font-size:13px;color:#a9b8d0;font-weight:600;line-height:1.5;margin-bottom:22px;">
+        İnternet bağlantısı sorunlu görünüyor. Gerçek verilerinizin üzerine yanlışlıkla boş/eski veri
+        yazılmasını önlemek için uygulama şu an açılmadı. Bağlantınızı kontrol edip tekrar deneyin.
+      </div>
+      <button id="authBootRetry" style="width:100%;padding:15px;border:none;border-radius:14px;background:#2f6690;color:#fff;font-weight:800;font-size:15px;font-family:inherit;cursor:pointer;">Tekrar Dene</button>
+    </div>
   </div>
   <div id="recaptcha-container"></div>
 </div>
@@ -8675,6 +8684,7 @@ function hideAuthScreen(){
 function cloudSyncAndBoot(user){
   document.getElementById('authStepPhone').style.display = 'none';
   document.getElementById('authStepCode').style.display = 'none';
+  document.getElementById('authBootError').style.display = 'none';
   authShowLoading(true);
   const yerelDamga = state._lastSaved || 0;
   fbDb.ref('users/' + user.uid).once('value').then(snap => {
@@ -8707,14 +8717,36 @@ function cloudSyncAndBoot(user){
     // boş varsayılan veri buluta basılır ve SONRASINDA giriş yapan TÜM gerçek
     // cihazları bu boş/varsayılan veriyle ezer (yaşanan olay tam olarak buydu).
     // İlk gerçek save() zaten normal akışta buluta doğru şekilde yazacak.
-  }).catch(err => {
-    console.error('Bulut senkron hatası:', err);
-    // Bağlantı sorunu olsa bile yerel veriyle devam — kullanıcı dışarıda kalmasın.
-  }).finally(() => {
     hideAuthScreen();
     render();
+  }).catch(err => {
+    console.error('Bulut senkron hatası:', err);
+    if(yerelDamga > 0){
+      // Cihazda gerçek/kaydedilmiş bir geçmiş var — bağlantı sorunu olsa bile
+      // yerel veriyle devam et, kullanıcı dışarıda kalmasın.
+      hideAuthScreen();
+      render();
+    } else {
+      // İKİNCİ GÜVENLİK AĞI (07 Ağu 2026 tekrarlayan veri kaybı sonrası eklendi):
+      // Bulut okunamadı VE bu cihazda hiç gerçek kayıt geçmişi yok — yani şu an
+      // elimizdeki tek "state" koddaki sabit örnek/varsayılan veri. Bu durumda
+      // sessizce uygulamayı açıp kullanıcının işlem yapmasına izin VERME: bir
+      // sonraki save() bu varsayılan veriyi taze bir zaman damgasıyla buluta
+      // yazar ve gerçek bulut verisinin üzerine geçer (yaşanan tekrarlayan olay
+      // tam olarak buydu). Bunun yerine kilitli bir "bağlantı sorunu" ekranı
+      // gösterip Tekrar Dene ile aynı fonksiyonu yeniden çağırıyoruz.
+      authShowLoading(false);
+      document.getElementById('authBootError').style.display = 'block';
+      window._cv2BootRetryUser = user;
+    }
   });
 }
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('authBootRetry');
+  if(btn) btn.addEventListener('click', () => {
+    if(window._cv2BootRetryUser) cloudSyncAndBoot(window._cv2BootRetryUser);
+  });
+});
 
 try {
   firebase.initializeApp(firebaseConfig);
