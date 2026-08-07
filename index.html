@@ -8502,12 +8502,20 @@ function cloudSyncAndBoot(user){
       if(!state.stokKartlari) state.stokKartlari = [];
       if(!state.transactions) state.transactions = [];
       LS.setItem(STORAGE_KEY, JSON.stringify(state));
-    } else {
-      // Yerel veri aynı veya daha yeni (silme/düzenleme sonrası hemen yenilemede
-      // Firebase'in henüz bitmemiş yazmasını GERİ ALMAMAK için önemli) — yerelde kal
-      // ve bulutu buna göre güncelle.
+    } else if(yerelDamga > 0){
+      // Yerel veri aynı veya daha yeni VE en az bir kez gerçekten kaydedilmiş
+      // (yerelDamga>0 = kullanıcı en az bir işlem yapıp save() tetiklemiş) —
+      // yerelde kal ve bulutu buna göre güncelle.
       fbDb.ref('users/' + user.uid).set(state);
     }
+    // else: yerelDamga===0 VE bulut yok/daha eski değil — yani state HİÇ
+    // dokunulmamış kod-içi varsayılan (ilk kurulum) veri. KRİTİK GÜVENLİK AĞI
+    // (06 Ağu 2026 veri kaybı sonrası eklendi): bu "dokunulmamış" hâli ASLA
+    // buluta yazma — aksi halde başka bir cihazda (henüz hiç kullanılmamış/
+    // localStorage'ı boş bir tarayıcı bağlamında) ilk kez giriş yapılırsa, o
+    // boş varsayılan veri buluta basılır ve SONRASINDA giriş yapan TÜM gerçek
+    // cihazları bu boş/varsayılan veriyle ezer (yaşanan olay tam olarak buydu).
+    // İlk gerçek save() zaten normal akışta buluta doğru şekilde yazacak.
   }).catch(err => {
     console.error('Bulut senkron hatası:', err);
     // Bağlantı sorunu olsa bile yerel veriyle devam — kullanıcı dışarıda kalmasın.
