@@ -1759,6 +1759,11 @@
     <span class="urun-search-icon">🔍</span>
     <input type="text" id="cariSecSearch" placeholder="cari ara">
   </div>
+  <div style="display:flex;justify-content:flex-end;padding:10px 16px 0;">
+    <button id="cariSecArtiBtn" style="background:linear-gradient(135deg,#1e3a5f,#2c5282);color:#fff;border:none;
+      border-radius:999px;padding:10px 20px;font-size:15px;font-weight:700;font-family:inherit;
+      box-shadow:0 3px 10px rgba(30,58,95,.3);cursor:pointer;">+ Cari</button>
+  </div>
   <div class="urun-list sk-list" id="cariSecList"></div>
 </div>
 
@@ -6424,6 +6429,18 @@ function renderCariSecList(){
   });
 }
 document.getElementById('cariSecSearch').oninput = e => { cariSecTerm = e.target.value; renderCariSecList(); };
+document.getElementById('cariSecSearch').addEventListener('keydown', e => {
+  if(e.key === 'Enter'){
+    e.preventDefault();
+    const btn = document.getElementById('cariSecYeniEkle');
+    if(btn) btn.click();
+  }
+});
+document.getElementById('cariSecArtiBtn').onclick = () => {
+  const btn = document.getElementById('cariSecYeniEkle');
+  if(btn) btn.click();
+  else document.getElementById('cariSecSearch').focus();
+};
 document.getElementById('cariSecBack').onclick = () => { document.getElementById('cariSecScreen').classList.remove('show'); nudge(); };
 
 // ---- Liste ekranı ----
