@@ -2198,7 +2198,9 @@ let state = JSON.parse(LS.getItem(STORAGE_KEY) || 'null') || {
       ] },
     { id:'pertek', name: 'Pertek Kuru Tem', transactions: [
         {type:'AÇILIŞ', desc:'Açılış Fişi', amount:2960.00, date:'2026-01-01T00:00:00'}
-      ] },
+      ] }
+  ],
+  tedarikci: [
     { id:'safplast', name: 'Saf Plast', transactions: [
         {type:'AÇILIŞ', desc:'Açılış (önceki bakiye)', amount:-16500, date:'2025-09-01T00:00:00'},
         {type:'ALIŞ', desc:'Best Tatvan', amount:9075, date:'2025-09-09T21:38:00'},
@@ -2252,9 +2254,7 @@ let state = JSON.parse(LS.getItem(STORAGE_KEY) || 'null') || {
         {type:'ALIŞ', desc:'Cihan kuru temizleme', amount:34000, date:'2026-07-07T15:54:00'},
         {type:'ALIŞ', desc:'300 mandalı x 6.5 PERTEK', amount:1950, date:'2026-07-08T23:40:00'},
         {type:'ALIŞ', desc:'İrsaliye No 2864 - 2000 adet süngerli askı (Şalal-8 kat) x6', amount:12000, date:'2026-07-27T00:00:00'}
-      ] }
-  ],
-  tedarikci: [
+      ] },
     { id:'irmak', name: 'Irmak Plastik', transactions: [
         {type:'ALIŞ', desc:'2500 ctp 43 nisali x 3', amount:-7500.00, date:'2025-08-13T02:05:00'},
         {type:'ÖDEME', desc:'', amount:7500.00, date:'2025-08-22T20:24:00'},
@@ -2335,6 +2335,13 @@ function bulYadaEkleCari(ledgerKey, adı){
   const ledger = state[ledgerKey];
   let c = ledger.find(x => normAd(x.name) === normAd(adı));
   if(!c){
+    // GÜVENLİK AĞI (07 Ağu 2026, "Saf Plast" tür karışıklığı sonrası eklendi):
+    // aynı isim KARŞI defterde (cari↔tedarikci) zaten varsa, orada YENİ bir
+    // kopya oluşturmak yerine mevcut kaydı kullan — aksi halde aynı hesap iki
+    // ayrı yerde, ayrı bakiyelerle var olabilir.
+    const digerKey = ledgerKey === 'cari' ? 'tedarikci' : 'cari';
+    const digerde = state[digerKey].find(x => normAd(x.name) === normAd(adı));
+    if(digerde) return digerde;
     c = { id: 'c_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6), name: adı, transactions: [] };
     ledger.push(c);
   }
