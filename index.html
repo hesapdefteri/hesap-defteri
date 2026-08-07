@@ -6371,10 +6371,14 @@ function renderCariSecList(){
   const list = state[cariSecLedger].filter(c => !term || c.name.toLocaleLowerCase('tr-TR').includes(term));
   const el = document.getElementById('cariSecList');
   const tamEslesme = term && list.some(c => c.name.toLocaleLowerCase('tr-TR') === term);
-  const yeniEkleHtml = (cariSecMode === 'fill' && cariSecTerm.trim() && !tamEslesme) ? `
+  const yeniAd = cariSecTerm.trim();
+  const etiket = yeniAd ? `+ "${yeniAd}" olarak yeni ekle` : (cariSecLedger === 'tedarikci' ? '+ Yeni Tedarikçi Ekle' : '+ Yeni Müşteri Ekle');
+  // Her zaman görünür — yazı olmasa bile en üstte durur (boşken tıklanınca sadece arama
+  // kutusuna odaklanır, kullanıcıya isim yazması gerektiğini gösterir).
+  const yeniEkleHtml = (cariSecMode === 'fill' && !tamEslesme) ? `
     <div class="sk-card" id="cariSecYeniEkle" style="border:1.5px dashed var(--accent, #2563eb);">
       <div class="sk-card-top">
-        <div class="sk-card-name" style="color:var(--accent, #2563eb);font-weight:700;">+ "${cariSecTerm.trim()}" olarak yeni ekle</div>
+        <div class="sk-card-name" style="color:var(--accent, #2563eb);font-weight:700;">${etiket}</div>
       </div>
     </div>
   ` : '';
@@ -6388,8 +6392,12 @@ function renderCariSecList(){
   const yeniBtn = document.getElementById('cariSecYeniEkle');
   if(yeniBtn){
     yeniBtn.onclick = () => {
+      if(!yeniAd){
+        document.getElementById('cariSecSearch').focus();
+        return;
+      }
       const input = document.getElementById(cariSecTargetId);
-      input.value = cariSecTerm.trim();
+      input.value = yeniAd;
       input.dispatchEvent(new Event('input'));
       document.getElementById('cariSecScreen').classList.remove('show');
       nudge();
