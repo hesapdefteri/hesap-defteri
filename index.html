@@ -5452,6 +5452,15 @@ function cv2DahaFazla(id, tur){
     '<button class="cv2-more-row"' + (hasPending ? '' : ' disabled') + ' data-act="tamamla">Tamamlandı</button>';
   cv2ModalAc('Daha Fazla', c.name + '<br>Bu cariyi listeden silmek istiyor musun?', formHtml, 'Sil', 'danger',
     function(){
+      // 08 Ağu 2026, kullanıcı isteği: cari hesap kartı, üzerinde hâlâ hareket
+      // (fiş/tahsilat/ödeme vb.) varken YANLIŞLIKLA silinip tüm geçmişin
+      // kaybolmasını önlemek için — önce TÜM hareketler teker teker (Hareketler
+      // sheet'inden) silinmeden kartın kendisi silinemiyor.
+      if(c.transactions && c.transactions.length > 0){
+        cv2ModalKapat();
+        alertBox('"' + c.name + '" hesabında hâlâ ' + c.transactions.length + ' hareket var. Cari hesabı silmeden önce Hareketler ekranından tüm hareketleri teker teker silmen gerekiyor — bu, veri kaybını önlemek için.');
+        return;
+      }
       cv2ModalKapat();
       const arr = tur === 'tedarikci' ? state.tedarikci : state.cari;
       const idx = arr.findIndex(x=>x.id===id);
