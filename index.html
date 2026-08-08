@@ -1521,9 +1521,9 @@
 
 <div class="overlay islem-overlay" id="islemYapiliyorOverlay" style="z-index:200;">
   <div class="modal islem-modal">
-    <div class="islem-spinner"></div>
-    <div style="font-weight:800;font-size:18px;color:var(--ink);">İşleminiz Yapılıyor</div>
-    <div style="color:var(--muted);font-size:14px;margin-top:5px;">Lütfen bekleyin...</div>
+    <div class="islem-spinner" id="islemSpinner"></div>
+    <div style="font-weight:800;font-size:18px;color:var(--ink);" id="islemTitle">İşleminiz Yapılıyor</div>
+    <div style="color:var(--muted);font-size:14px;margin-top:5px;" id="islemSubtitle">Lütfen bekleyin...</div>
     <div class="islem-progress-track"><div class="islem-progress-fill" id="islemProgressFill"></div></div>
   </div>
 </div>
@@ -4146,6 +4146,49 @@ function showIslemYapiliyor(callback, duration){
     if(callback) callback();
   }, duration);
 }
+// Uygulamadaki tüm "Kaydet" düğmeleri: tıklanınca mevcut İşlem Yapılıyor
+// overlay'i "Kayıt ediliyor, lütfen bekleyiniz..." metniyle gösterip, kısa
+// bir süre sonra "✓ Kayıt edildi" başarı mesajına geçiyor.
+const KAYIT_BUTON_ID_LISTESI = ['saveBtn','txSave','ciSave','ncSave','siparisFisKaydet','quickTxSave','urunSaveBtn','skAlisSave','skSatisSave','fisKaydet','mkSave','masrafEkleSave','skgKaydet','skfKaydet'];
+let kayitBildirimZamanlayici = null;
+function kayitBildirimGoster(){
+  const overlay = document.getElementById('islemYapiliyorOverlay');
+  const spinner = document.getElementById('islemSpinner');
+  const title = document.getElementById('islemTitle');
+  const subtitle = document.getElementById('islemSubtitle');
+  const fill = document.getElementById('islemProgressFill');
+  if(kayitBildirimZamanlayici){ clearTimeout(kayitBildirimZamanlayici); kayitBildirimZamanlayici = null; }
+  spinner.style.display = '';
+  title.textContent = 'Kayıt ediliyor';
+  title.style.color = 'var(--ink)';
+  subtitle.textContent = 'Lütfen bekleyiniz...';
+  fill.style.transition = 'none';
+  fill.style.width = '0%';
+  overlay.classList.add('show');
+  void fill.offsetWidth;
+  fill.style.transition = 'width 650ms linear';
+  fill.style.width = '100%';
+  kayitBildirimZamanlayici = setTimeout(() => {
+    spinner.style.display = 'none';
+    title.textContent = '✓ Kayıt edildi';
+    title.style.color = '#1f9d64';
+    subtitle.textContent = '';
+    kayitBildirimZamanlayici = setTimeout(() => {
+      overlay.classList.remove('show');
+      spinner.style.display = '';
+      title.textContent = 'İşleminiz Yapılıyor';
+      title.style.color = 'var(--ink)';
+      subtitle.textContent = 'Lütfen bekleyin...';
+      fill.style.width = '0%';
+      kayitBildirimZamanlayici = null;
+    }, 900);
+  }, 650);
+}
+document.addEventListener('click', function(e){
+  const t = e.target;
+  if(t && t.id && KAYIT_BUTON_ID_LISTESI.includes(t.id)) kayitBildirimGoster();
+});
+
 function openConfirm(title, text, action, yesLabel){
   document.getElementById('confirmDeleteTitle').textContent = title;
   document.getElementById('confirmDeleteText').textContent = text;
