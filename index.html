@@ -8613,6 +8613,25 @@ function ensureSanalSunerliAskiSatisi(){
 }
 if(ensureSanalSunerliAskiSatisi()) save();
 
+// 08 Ağu 2026: Kullanıcı toplam 8.000₺ tahsilat aldığını söyledi ama sistemde
+// sadece 5.500₺ (2.000+3.500) kayıtlıydı — 2.500₺'lik fark, kullanıcının verdiği
+// "15 gün önce" bilgisine göre 24 Tem 2026 (bugünden -15 gün) olarak eklendi.
+function ensureSanalEksikTahsilat2500(){
+  let changed = false;
+  const sanal = state.cari.find(c => normAd(c.name) === normAd('Şanal Kuru Temizleme'));
+  if(sanal && !sanal.transactions.some(t => t.type === 'TAHSİLAT' && t.amount === 2500)){
+    sanal.transactions.push({
+      type: 'TAHSİLAT',
+      desc: 'Tahsilat',
+      amount: 2500.00,
+      date: '2026-07-24T12:00:00.000Z'
+    });
+    changed = true;
+  }
+  return changed;
+}
+if(ensureSanalEksikTahsilat2500()) save();
+
 // Temmuz 2026: Kullanıcı "market alışverişi masrafları var, onları masrafa yaz" dedi —
 // Garanti BBVA'dan zaten Banka moduline (Para Çek) işlenmiş MAVI MARKET harcamaları
 // (22.07.2026, 185₺ ve 465₺) AYRICA Masraflar moduline de "Mavi Market" kalemi olarak
