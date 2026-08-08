@@ -2457,6 +2457,9 @@ function cv2CountTx(s){
   (s.tedarikci || []).forEach(a => { c += (a.transactions || []).length; });
   return c;
 }
+function cv2CountStok(s){
+  return (s.stokKartlari || []).length;
+}
 
 function cv2BuyukDususUyariGoster(oncekiSayi, yeniSayi, onOnayla, onVazgec){
   const el = document.getElementById('cv2BigDropWarn');
@@ -2493,9 +2496,11 @@ function cv2YedekEkle(stateKopyasi){
 
 function cv2GercekBulutaYaz(){
   const yeniSayi = cv2CountTx(state);
+  const yeniStokSayi = cv2CountStok(state);
   const stateKopyasi = JSON.parse(JSON.stringify(state));
   fbDb.ref('users/' + fbAuth.currentUser.uid).set(state).then(() => {
     window._cv2LastCloudTxCount = yeniSayi;
+    window._cv2LastCloudStokCount = yeniStokSayi;
     cv2YedekEkle(stateKopyasi);
   }).catch(err => {
     console.error('Bulut kayıt hatası:', err);
@@ -2518,6 +2523,20 @@ function save(){
   // kullanıcıya sor.
   const yeniSayi = cv2CountTx(state);
   const oncekiSayi = window._cv2LastCloudTxCount;
+  const yeniStokSayi = cv2CountStok(state);
+  const oncekiStokSayi = window._cv2LastCloudStokCount;
+  // Stok kartları için ayrı kontrol (08 Ağu 2026, "Stoklar boş çıkıyor" olayından
+  // sonra eklendi): cari/tedarikçi hareket sayısı aynı kalsa bile (ör. sadece
+  // stok kartları silinmiş olabilir), bilinen kart sayısı ≥1 iken TÜMÜ birden
+  // kayboluyorsa da uyar.
+  if(typeof oncekiStokSayi === 'number' && oncekiStokSayi >= 1 && yeniStokSayi === 0 && !window._cv2BuyukDususOnaylandi){
+    cv2SaveToastGizle();
+    cv2BuyukDususUyariGoster(oncekiStokSayi + ' stok kartı', '0 stok kartı',
+      () => { window._cv2BuyukDususOnaylandi = true; cv2SaveToastGoster(); cv2GercekBulutaYaz(); },
+      () => {}
+    );
+    return;
+  }
   if(typeof oncekiSayi === 'number' && oncekiSayi >= 5 && yeniSayi < oncekiSayi * 0.5 && !window._cv2BuyukDususOnaylandi){
     cv2SaveToastGizle();
     cv2BuyukDususUyariGoster(oncekiSayi, yeniSayi,
@@ -9119,6 +9138,95 @@ function ensureSafPlastGeriYukle(){
 }
 if(ensureSafPlastGeriYukle()) save();
 
+// 08 Ağu 2026: Kullanıcı "stok kartlarımı silmişsin, Stoklar ekranı boş" dedi —
+// yine aynı kalıp: cihaz gerçek buluta ulaşamadan koddaki dokunulmamış varsayılan
+// state ile açılmış olmalı (o state.stokKartlari için hiç veri içermiyordu),
+// sonra bir save() bu boş hâli buluta yazmış. Kullanıcının 05 Ağustos 21:17
+// paylaştığı JSON yedeğindeki GERÇEK 2 stok kartı (STK-000001, STK-000002 —
+// biri Şanal Kuru Temizleme'ye yapılan gerçek 15.800₺'lik satışın (STF-000001)
+// bağlı olduğu kart) buraya gömülüp geri koyuldu. SADECE state.stokKartlari BOŞSA
+// çalışır — ileride gerçekten yeni kart eklenirse üzerine yazmaz.
+function ensureStokKartlariGeriYukle(){
+  if(state.stokKartlari && state.stokKartlari.length > 0) return false;
+  state.stokKartlari = [
+  {
+    "id": "s_ms6oznoixqu81",
+    "stokKodu": "STK-000001",
+    "ad": "Kuru temizleme askısı",
+    "aciklama": "",
+    "birim": "Adet",
+    "kdvAlis": 20,
+    "kdvSatis": 0,
+    "aktif": true,
+    "acilisMiktar": 0,
+    "fiyatlar": {
+      "sonAlis": 5.5,
+      "ortalamaAlis": 5.5,
+      "maliyet": 5.5,
+      "satis1": 6.7,
+      "satis2": 0,
+      "satis3": 0
+    },
+    "fiyatGecmisi": [],
+    "alislar": [],
+    "satislar": []
+  },
+  {
+    "id": "s_ms6p0cetv8ne1",
+    "stokKodu": "STK-000002",
+    "ad": "Kuru temizleme askısı Süngerli",
+    "aciklama": "",
+    "birim": "Adet",
+    "kdvAlis": 20,
+    "kdvSatis": 0,
+    "aktif": true,
+    "acilisMiktar": 0,
+    "fiyatlar": {
+      "sonAlis": 6,
+      "ortalamaAlis": 6,
+      "maliyet": 6,
+      "satis1": 7.9,
+      "satis2": 0,
+      "satis3": 0
+    },
+    "fiyatGecmisi": [],
+    "alislar": [
+      {
+        "id": "s_ms6p1ft5uhd3u",
+        "tarih": "2026-07-29",
+        "belgeNo": "ALF-000001",
+        "cariAdi": "Saf Plast",
+        "miktar": 2000,
+        "birimFiyat": 6,
+        "iskonto": 0,
+        "kdv": 0,
+        "toplam": 12000,
+        "iade": false,
+        "fisId": "s_ms6p10lu106n0"
+      }
+    ],
+    "satislar": [
+      {
+        "id": "s_msgl4ey2v377p",
+        "tarih": "2026-08-05",
+        "belgeNo": "STF-000001",
+        "cariAdi": "Şanal Kuru Temizleme",
+        "miktar": 2000,
+        "birimFiyat": 7.9,
+        "iskonto": 0,
+        "kdv": 0,
+        "toplam": 15800,
+        "iade": false,
+        "fisId": "s_msgl3yzwk90gt"
+      }
+    ]
+  }
+];
+  return true;
+}
+if(ensureStokKartlariGeriYukle()) save();
+
+
 
 // Temmuz 2026: Kullanıcı "market alışverişi masrafları var, onları masrafa yaz" dedi —
 // Garanti BBVA'dan zaten Banka moduline (Para Çek) işlenmiş MAVI MARKET harcamaları
@@ -9352,12 +9460,14 @@ function cloudSyncAndBoot(user){
       if(!state.cariTurFiltre) state.cariTurFiltre = 'hepsi';
       LS.setItem(STORAGE_KEY, JSON.stringify(state));
       window._cv2LastCloudTxCount = cv2CountTx(state);
+      window._cv2LastCloudStokCount = cv2CountStok(state);
     } else if(yerelDamga > 0){
       // Yerel veri aynı veya daha yeni VE en az bir kez gerçekten kaydedilmiş
       // (yerelDamga>0 = kullanıcı en az bir işlem yapıp save() tetiklemiş) —
       // yerelde kal ve bulutu buna göre güncelle.
       fbDb.ref('users/' + user.uid).set(state).then(() => {
         window._cv2LastCloudTxCount = cv2CountTx(state);
+        window._cv2LastCloudStokCount = cv2CountStok(state);
       });
     }
     // else: yerelDamga===0 VE bulut yok/daha eski değil — yani state HİÇ
