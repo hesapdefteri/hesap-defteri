@@ -273,22 +273,28 @@
   .cv2-ek-carikutu{background:#fdf9e0;padding:16px 16px;text-align:center;}
   .cv2-ek-carikutu .ad{font-size:24px;font-weight:800;color:var(--ink);}
   .cv2-ek-carikutu .tur{font-size:16px;color:var(--muted);font-weight:600;margin-top:3px;}
-  .cv2-ek-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-  .cv2-ek-table{width:100%;min-width:560px;border-collapse:collapse;font-size:18px;}
-  .cv2-ek-table thead th{position:sticky;top:0;background:#fff;text-align:left;font-size:15px;
-    font-weight:800;color:var(--muted);letter-spacing:.2px;padding:11px 8px;border-bottom:1px solid var(--line);
-    z-index:1;}
+  .cv2-ek-table-wrap{overflow-x:hidden;}
+  .cv2-ek-table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:12.5px;}
+  .cv2-ek-table col.c-tarih{width:19%;}
+  .cv2-ek-table col.c-aciklama{width:38%;}
+  .cv2-ek-table col.c-miktar{width:21.5%;}
+  .cv2-ek-table col.c-toplam{width:21.5%;}
+  .cv2-ek-table thead th{position:sticky;top:0;background:#fff;text-align:left;font-size:10.5px;
+    font-weight:800;color:var(--muted);letter-spacing:.1px;padding:8px 4px;border-bottom:1px solid var(--line);
+    z-index:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .cv2-ek-table th.num, .cv2-ek-table td.num{text-align:right;}
-  .cv2-ek-table td{padding:13px 8px;border-bottom:1px solid #f0f2f3;color:var(--ink);vertical-align:top;font-size:18px;}
+  .cv2-ek-table td{padding:9px 4px;border-bottom:1px solid #f0f2f3;color:var(--ink);vertical-align:top;
+    font-size:12.5px;word-break:break-word;overflow-wrap:break-word;}
+  .cv2-ek-table td.num{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .cv2-ek-table tr.cv2-ek-alis td, .cv2-ek-table tr.cv2-ek-alis td.num{color:var(--red);}
-  .cv2-ek-table td.cv2-ek-tur{font-weight:800;font-size:18px;}
-  .cv2-ek-dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:8px;
+  .cv2-ek-table td.cv2-ek-tur{font-weight:800;font-size:12.5px;}
+  .cv2-ek-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;
     vertical-align:middle;flex-shrink:0;}
   .cv2-ek-dot.pos{background:var(--green);}
   .cv2-ek-dot.neg{background:var(--red);}
-  .cv2-ek-table tr.cv2-ek-ay td{background:#f6f8f9;font-weight:800;font-size:17px;color:var(--ink);
-    padding:12px 8px;}
-  .cv2-ek-table tr.cv2-ek-ay td.num{color:var(--muted);font-weight:700;font-size:15.5px;}
+  .cv2-ek-table tr.cv2-ek-ay td{background:#f6f8f9;font-weight:800;font-size:11.5px;color:var(--ink);
+    padding:8px 4px;}
+  .cv2-ek-table tr.cv2-ek-ay td.num{color:var(--muted);font-weight:700;font-size:10.5px;}
 
   @media(min-width:700px){
     #cv2Screen .cv2-head{padding:20px 24px 10px 24px;}
@@ -2207,6 +2213,9 @@
     </div>
     <div class="cv2-ek-table-wrap">
       <table class="cv2-ek-table">
+        <colgroup>
+          <col class="c-tarih"><col class="c-aciklama"><col class="c-miktar"><col class="c-toplam">
+        </colgroup>
         <thead>
           <tr><th>TARİH</th><th>AÇIKLAMA</th><th class="num">MİKTAR</th><th class="num">TOPLAM</th></tr>
         </thead>
