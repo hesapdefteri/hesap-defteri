@@ -24,6 +24,14 @@
 <title>Hesap Defteri</title>
 <style>
   @keyframes cv2spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+  @keyframes cv2catrun{
+    0%{left:-42px;transform:translateY(0) scaleX(-1);}
+    48%{transform:translateY(-5px) scaleX(-1);}
+    50%{transform:translateY(0) scaleX(-1);}
+    98%{transform:translateY(-5px) scaleX(-1);}
+    100%{left:100%;transform:translateY(0) scaleX(-1);}
+  }
+  @keyframes cv2popIn{from{opacity:0;transform:scale(.85);}to{opacity:1;transform:scale(1);}}
   :root{
     --bg-top:#c7d6dd;
     --bg-mid:#dbe6ea;
@@ -1026,9 +1034,13 @@
   <div id="recaptcha-container"></div>
 </div>
 
-<div id="cv2SaveToast" style="display:none;position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:99998;background:#1c3566;color:#fff;padding:12px 20px;border-radius:14px;font-size:13px;font-weight:700;line-height:1.5;box-shadow:0 6px 18px rgba(0,0,0,.35);align-items:center;gap:10px;max-width:88%;text-align:center;">
-  <span style="width:16px;height:16px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;display:inline-block;animation:cv2spin .7s linear infinite;flex-shrink:0;"></span>
-  <span>İşleminiz yapılıyor, lütfen bekleyiniz.<br>İşlemleriniz kaydediliyor, lütfen bekleyiniz.</span>
+<div id="cv2SaveToast" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(11,26,61,.55);align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:22px;padding:26px 22px 22px;width:230px;text-align:center;box-shadow:0 14px 34px rgba(0,0,0,.35);animation:cv2popIn .18s ease-out;">
+    <div style="font-size:15px;font-weight:800;color:#1c2b30;">Kaydediliyor…</div>
+    <div style="position:relative;height:46px;margin-top:14px;overflow:hidden;">
+      <span style="position:absolute;left:-42px;top:2px;font-size:32px;animation:cv2catrun 1.1s linear infinite;">🐈</span>
+    </div>
+  </div>
 </div>
 
 <button id="anaMenuFloatBtn" class="glass-fab" style="display:none;position:fixed;right:20px;bottom:92px;width:58px;height:58px;border-radius:50%;z-index:500;align-items:center;justify-content:center;cursor:pointer;">
@@ -2374,6 +2386,8 @@ function getLedger(){ return state[activeLedger]; }
 function cv2SaveToastGoster(){
   const el = document.getElementById('cv2SaveToast');
   if(el) el.style.display = 'flex';
+  clearTimeout(window._cv2SaveToastTimer);
+  window._cv2SaveToastTimer = setTimeout(cv2SaveToastGizle, 2000);
 }
 function cv2SaveToastGizle(){
   const el = document.getElementById('cv2SaveToast');
@@ -2391,8 +2405,6 @@ function save(){
     cv2SaveToastGoster();
     fbDb.ref('users/' + fbAuth.currentUser.uid).set(state).catch(err => {
       console.error('Bulut kayıt hatası:', err);
-    }).finally(() => {
-      cv2SaveToastGizle();
     });
   }
 }
