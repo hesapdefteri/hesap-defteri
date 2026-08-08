@@ -273,7 +273,8 @@
   .cv2-ek-carikutu{background:#fdf9e0;padding:16px 16px;text-align:center;}
   .cv2-ek-carikutu .ad{font-size:24px;font-weight:800;color:var(--ink);}
   .cv2-ek-carikutu .tur{font-size:16px;color:var(--muted);font-weight:600;margin-top:3px;}
-  .cv2-ek-table{width:100%;border-collapse:collapse;font-size:18px;}
+  .cv2-ek-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .cv2-ek-table{width:100%;min-width:560px;border-collapse:collapse;font-size:18px;}
   .cv2-ek-table thead th{position:sticky;top:0;background:#fff;text-align:left;font-size:15px;
     font-weight:800;color:var(--muted);letter-spacing:.2px;padding:11px 8px;border-bottom:1px solid var(--line);
     z-index:1;}
@@ -2204,12 +2205,14 @@
       <div class="ad" id="cv2EkAd">—</div>
       <div class="tur" id="cv2EkTur">—</div>
     </div>
-    <table class="cv2-ek-table">
-      <thead>
-        <tr><th>TARİH</th><th>AÇIKLAMA</th><th class="num">MİKTAR</th><th class="num">TOPLAM</th></tr>
-      </thead>
-      <tbody id="cv2EkBody"></tbody>
-    </table>
+    <div class="cv2-ek-table-wrap">
+      <table class="cv2-ek-table">
+        <thead>
+          <tr><th>TARİH</th><th>AÇIKLAMA</th><th class="num">MİKTAR</th><th class="num">TOPLAM</th></tr>
+        </thead>
+        <tbody id="cv2EkBody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
