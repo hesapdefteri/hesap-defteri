@@ -8850,6 +8850,29 @@ function ensureKasaSifirla20260808(){
 }
 if(ensureKasaSifirla20260808()) save();
 
+// 08 Ağu 2026: Kullanıcı yeni stok kartı istedi — "EM38 Mandallı Askı"
+// (son alış 7₺, satış 9₺, kullanıcı verdi).
+function ensureEm38MandalliAskiEkle(){
+  if(state.stokKartlari.some(k => k.ad === 'EM38 Mandallı Askı')) return false;
+  state.stokKartlari.push({
+    id: 's_em38mandalli' + Date.now(),
+    stokKodu: 'STK-000004',
+    ad: 'EM38 Mandallı Askı',
+    aciklama: '',
+    birim: 'Adet',
+    kdvAlis: 20,
+    kdvSatis: 0,
+    aktif: true,
+    acilisMiktar: 0,
+    fiyatlar: { sonAlis: 7, ortalamaAlis: 7, maliyet: 7, satis1: 9, satis2: 0, satis3: 0 },
+    fiyatGecmisi: [],
+    alislar: [],
+    satislar: []
+  });
+  return true;
+}
+if(ensureEm38MandalliAskiEkle()) save();
+
 // 08 Ağu 2026: Kullanıcı "stok kartlarımı silmişsin, Stoklar ekranı boş" dedi —
 // yine aynı kalıp: cihaz gerçek buluta ulaşamadan koddaki dokunulmamış varsayılan
 // state ile açılmış olmalı (o state.stokKartlari için hiç veri içermiyordu),
