@@ -8591,6 +8591,28 @@ function ensureKalanGarantiHareketleri(){
 }
 if(ensureKalanGarantiHareketleri()) save();
 
+// 08 Ağu 2026: Kullanıcı Şanal Kuru Temizleme hesabının sürekli 5.500₺ alacaklı
+// görünmesinden şikayet etti — kök neden, o hesaba karşılık gelen satışın (2.000
+// adet Süngerli Askı x 7,90₺ = 15.800₺) hiç sisteme girilmemiş olmasıydı (sadece
+// 5.500₺'lık kısmi tahsilatlar kayıtlıydı). Kullanıcı onayıyla eksik satış eklendi;
+// tarih verilmediği için ilk tahsilattan (14 Tem 2026) birkaç gün önceki 10 Tem 2026
+// varsayıldı — kullanıcı isterse Cari Hesap V2 > Hareketler'den kolayca düzeltebilir.
+function ensureSanalSunerliAskiSatisi(){
+  let changed = false;
+  const sanal = state.cari.find(c => normAd(c.name) === normAd('Şanal Kuru Temizleme'));
+  if(sanal && !sanal.transactions.some(t => t.type === 'SATIŞ' && t.amount === 15800)){
+    sanal.transactions.push({
+      type: 'SATIŞ',
+      desc: '2000 adet Süngerli Askı x 7,90₺',
+      amount: 15800.00,
+      date: '2026-07-10T12:00:00.000Z'
+    });
+    changed = true;
+  }
+  return changed;
+}
+if(ensureSanalSunerliAskiSatisi()) save();
+
 // Temmuz 2026: Kullanıcı "market alışverişi masrafları var, onları masrafa yaz" dedi —
 // Garanti BBVA'dan zaten Banka moduline (Para Çek) işlenmiş MAVI MARKET harcamaları
 // (22.07.2026, 185₺ ve 465₺) AYRICA Masraflar moduline de "Mavi Market" kalemi olarak
