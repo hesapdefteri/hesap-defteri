@@ -1041,6 +1041,15 @@
   </div>
 </div>
 
+<div id="cv2BigDropWarn" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(11,26,61,.65);align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:20px;padding:24px 22px;width:280px;text-align:center;box-shadow:0 14px 34px rgba(0,0,0,.35);">
+    <div style="font-size:15px;font-weight:800;color:#c0392b;margin-bottom:10px;">⚠️ Beklenmedik azalma</div>
+    <div id="cv2BigDropMsg" style="font-size:13px;color:#333;font-weight:600;line-height:1.5;margin-bottom:20px;"></div>
+    <button id="cv2BigDropCancel" style="width:100%;padding:13px;border:none;border-radius:12px;background:#eef1f3;color:#1c2b30;font-weight:800;font-size:14px;font-family:inherit;margin-bottom:10px;cursor:pointer;">Vazgeç (buluta yazma)</button>
+    <button id="cv2BigDropConfirm" style="width:100%;padding:13px;border:none;border-radius:12px;background:#c0392b;color:#fff;font-weight:800;font-size:14px;font-family:inherit;cursor:pointer;">Yine de Kaydet</button>
+  </div>
+</div>
+
 <button id="anaMenuFloatBtn" class="glass-fab" style="display:none;position:fixed;right:20px;bottom:92px;width:58px;height:58px;border-radius:50%;z-index:500;align-items:center;justify-content:center;cursor:pointer;">
 </button>
 
@@ -2409,6 +2418,60 @@ function cv2SaveToastGizle(){
 // Geçiş/aksiyon göstergesi — kayıt, silme, ekleme ve ana menü/ekran geçişlerinde
 // de aynı ahtapot animasyonunu göstermek için kullanılan genel isim.
 function cv2GostergeGoster(){ cv2SaveToastGoster(); }
+
+// Toplam işlem sayısı (Cari + Tedarikçi hesaplarındaki tüm hareketler) — buluta
+// yazmadan önce "beklenmedik büyük azalma" tespiti için kullanılıyor.
+function cv2CountTx(s){
+  let c = 0;
+  (s.cari || []).forEach(a => { c += (a.transactions || []).length; });
+  (s.tedarikci || []).forEach(a => { c += (a.transactions || []).length; });
+  return c;
+}
+
+function cv2BuyukDususUyariGoster(oncekiSayi, yeniSayi, onOnayla, onVazgec){
+  const el = document.getElementById('cv2BigDropWarn');
+  if(!el){ onOnayla(); return; }
+  document.getElementById('cv2BigDropMsg').textContent =
+    'Bu cihazdaki toplam işlem sayısı (' + yeniSayi + '), bulutta bilinen sayıdan (' + oncekiSayi +
+    ') çok daha az görünüyor. Bu, bir veri kaybı belirtisi olabilir. Yine de buluta kaydetmek istediğine emin misin?';
+  el.style.display = 'flex';
+  document.getElementById('cv2BigDropCancel').onclick = () => { el.style.display = 'none'; onVazgec(); };
+  document.getElementById('cv2BigDropConfirm').onclick = () => { el.style.display = 'none'; onOnayla(); };
+}
+
+// Her başarılı bulut kaydından sonra ayrıca zaman damgalı bir yedek kopya atılıyor
+// (08 Ağu 2026, kullanıcı istedi) — son 30 yedek tutuluyor, fazlası siliniyor.
+// Bir şey ters giderse Ayarlar üzerinden (ileride eklenecek bir ekranla) ya da
+// doğrudan Firebase konsolundan `yedekler/{uid}` altından geri dönülebilir.
+function cv2YedekEkle(stateKopyasi){
+  if(!fbAuth || !fbAuth.currentUser) return;
+  const yedekRef = fbDb.ref('yedekler/' + fbAuth.currentUser.uid);
+  const yeniRef = yedekRef.push();
+  yeniRef.set({ _kayitZamani: Date.now(), veri: stateKopyasi }).then(() => {
+    yedekRef.orderByKey().once('value').then(snap => {
+      const keys = [];
+      snap.forEach(child => { keys.push(child.key); });
+      const fazla = keys.length - 30;
+      if(fazla > 0){
+        const guncellemeler = {};
+        keys.slice(0, fazla).forEach(k => { guncellemeler[k] = null; });
+        yedekRef.update(guncellemeler);
+      }
+    }).catch(() => {});
+  }).catch(err => { console.error('Yedek kayıt hatası:', err); });
+}
+
+function cv2GercekBulutaYaz(){
+  const yeniSayi = cv2CountTx(state);
+  const stateKopyasi = JSON.parse(JSON.stringify(state));
+  fbDb.ref('users/' + fbAuth.currentUser.uid).set(state).then(() => {
+    window._cv2LastCloudTxCount = yeniSayi;
+    cv2YedekEkle(stateKopyasi);
+  }).catch(err => {
+    console.error('Bulut kayıt hatası:', err);
+  });
+}
+
 function save(){
   // Yerel değişiklik her zaman "en yeni" damgayı taşısın diye — bu, uygulamayı
   // silme/düzenleme sonrası hemen yenileyince Firebase'in henüz tamamlanmamış
@@ -2418,11 +2481,22 @@ function save(){
   cv2SaveToastGoster();
   // Giriş yapılmışsa aynı veriyi buluta da yazıyoruz (localStorage her zaman
   // hızlı yerel bir kopya olarak kalıyor; Firebase gerçek/senkron kopya).
-  if(typeof fbAvailable !== 'undefined' && fbAvailable && fbAuth && fbAuth.currentUser){
-    fbDb.ref('users/' + fbAuth.currentUser.uid).set(state).catch(err => {
-      console.error('Bulut kayıt hatası:', err);
-    });
+  if(typeof fbAvailable === 'undefined' || !fbAvailable || !fbAuth || !fbAuth.currentUser) return;
+  // ÜÇÜNCÜ GÜVENLİK AĞI (08 Ağu 2026): yazılacak yeni veri, bulutta bilinen
+  // işlem sayısının yarısından azsa (ve bilinen sayı en az 5 ise) — büyük
+  // olasılıkla bir veri kaybı/bozuk state durumu — sessizce yazmak yerine
+  // kullanıcıya sor.
+  const yeniSayi = cv2CountTx(state);
+  const oncekiSayi = window._cv2LastCloudTxCount;
+  if(typeof oncekiSayi === 'number' && oncekiSayi >= 5 && yeniSayi < oncekiSayi * 0.5 && !window._cv2BuyukDususOnaylandi){
+    cv2SaveToastGizle();
+    cv2BuyukDususUyariGoster(oncekiSayi, yeniSayi,
+      () => { window._cv2BuyukDususOnaylandi = true; cv2SaveToastGoster(); cv2GercekBulutaYaz(); },
+      () => {}
+    );
+    return;
   }
+  cv2GercekBulutaYaz();
 }
 
 function fmt(n){
@@ -8748,11 +8822,14 @@ function cloudSyncAndBoot(user){
       if(!state.cariFilter) state.cariFilter = 'tumu';
       if(!state.cariTurFiltre) state.cariTurFiltre = 'hepsi';
       LS.setItem(STORAGE_KEY, JSON.stringify(state));
+      window._cv2LastCloudTxCount = cv2CountTx(state);
     } else if(yerelDamga > 0){
       // Yerel veri aynı veya daha yeni VE en az bir kez gerçekten kaydedilmiş
       // (yerelDamga>0 = kullanıcı en az bir işlem yapıp save() tetiklemiş) —
       // yerelde kal ve bulutu buna göre güncelle.
-      fbDb.ref('users/' + user.uid).set(state);
+      fbDb.ref('users/' + user.uid).set(state).then(() => {
+        window._cv2LastCloudTxCount = cv2CountTx(state);
+      });
     }
     // else: yerelDamga===0 VE bulut yok/daha eski değil — yani state HİÇ
     // dokunulmamış kod-içi varsayılan (ilk kurulum) veri. KRİTİK GÜVENLİK AĞI
