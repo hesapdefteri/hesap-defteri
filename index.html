@@ -528,6 +528,16 @@
   .am-badge svg{width:41px;height:41px;}
   .am-badge.b-siparis svg{width:84px;height:84px;}
   .ayar-badge{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 8px rgba(0,0,0,.18);}
+  .cv2-ayar-row{display:flex;align-items:stretch;gap:10px;margin-bottom:12px;cursor:pointer;}
+  .cv2-ayar-icon{width:64px;height:64px;border-radius:18px;background:#f7f2e9;flex-shrink:0;
+    box-shadow:0 3px 8px rgba(0,0,0,.16), inset 0 0 0 1px rgba(0,0,0,.03);
+    display:flex;align-items:center;justify-content:center;}
+  .cv2-ayar-icon svg{width:24px;height:24px;}
+  .cv2-ayar-text{background:#f7f2e9;padding:10px 20px;border-radius:16px;flex:1;
+    display:flex;align-items:center;min-width:0;
+    box-shadow:0 3px 8px rgba(0,0,0,.16), inset 0 0 0 1px rgba(0,0,0,.03);}
+  .cv2-ayar-name{font-size:16px;font-weight:700;color:#3a3229;}
+  .cv2-ayar-name.danger{color:#b5473a;}
   .ayar-badge svg{width:24px;height:24px;}
   .am-label{color:#fff;font-size:12px;font-weight:800;letter-spacing:.4px;text-align:center;opacity:.94;}
   .am-badge.b-cari{background:linear-gradient(135deg,#5b8bf5,#2e56c9);}
@@ -1336,44 +1346,33 @@
 </div>
 
 <!-- ===== Ayarlar ===== -->
-<div class="detail-screen" id="ayarlarScreen">
-  <div class="d-header">
+<div class="detail-screen" id="ayarlarScreen" style="background:#f2ede4;">
+  <div class="d-header" style="background:transparent;">
     <div class="d-title">Ayarlar</div>
     <button class="d-share" style="visibility:hidden;">📄</button>
   </div>
-  <div style="padding:16px 16px 0 16px;">
-    <div class="acct-card">
-      <div class="acct-row" id="ayarYedekleBtn" style="cursor:pointer;">
-        <div style="display:flex;align-items:center;gap:14px;">
-          <span class="ayar-badge" style="background:linear-gradient(135deg,#5b8bf5,#2e56c9);"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 6a8 8 0 1 0 0 12"/><path d="M9.5 12h11M17 8l4 4-4 4"/></svg></span>
-          <span class="name">Dışa Aktar</span>
-        </div>
-        <span style="color:var(--muted);font-size:13px;">JSON indir</span>
-      </div>
-      <div class="acct-row" id="ayarGeriYukleBtn" style="cursor:pointer;">
-        <div style="display:flex;align-items:center;gap:14px;">
-          <span class="ayar-badge" style="background:linear-gradient(135deg,#4ec98a,#1f8a54);"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v10"/><path d="M8 10l4 4 4-4"/><path d="M5 16v2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2"/></svg></span>
-          <span class="name">İçe Aktar</span>
-        </div>
-        <span style="color:var(--muted);font-size:13px;">Dosyadan yükle</span>
-      </div>
-      <div class="acct-row" id="ayarBulutYedekBtn" style="cursor:pointer;">
-        <div style="display:flex;align-items:center;gap:14px;">
-          <span class="ayar-badge" style="background:linear-gradient(135deg,#9a6bd6,#6a3fb8);"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18a4 4 0 0 1-1-7.87A5 5 0 0 1 15 8h.5A4.5 4.5 0 0 1 20 12.5c0 2.5-2 3.5-2 3.5"/><path d="M12 12v8M9 17l3 3 3-3"/></svg></span>
-          <span class="name">Bulut Yedeğinden Cari Geri Yükle</span>
-        </div>
-        <span style="color:var(--muted);font-size:13px;">Silinen hesabı bul</span>
-      </div>
-      <div class="acct-row" id="ayarHareketSifirlaBtn" style="cursor:pointer;">
-        <span class="name" style="color:var(--red);">🔄 Hareketleri Sıfırla</span>
-        <span style="color:var(--muted);font-size:13px;">Fişler silinir, kartlar kalır</span>
-      </div>
-      <div class="acct-row" id="ayarSifirlaBtn" style="cursor:pointer;">
-        <span class="name" style="color:var(--red);">🗑️ Her Şeyi Sıfırla</span>
-        <span style="color:var(--muted);font-size:13px;">Tüm verileri sil</span>
-      </div>
+  <div style="padding:10px 20px 0 20px;">
+    <div class="cv2-ayar-row" id="ayarYedekleBtn">
+      <div class="cv2-ayar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#6b5f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 6a8 8 0 1 0 0 12"/><path d="M9.5 12h11M17 8l4 4-4 4"/></svg></div>
+      <div class="cv2-ayar-text"><span class="cv2-ayar-name">JSON Dışa Aktar</span></div>
     </div>
-    <p style="color:var(--muted);font-size:12.5px;margin:12px 4px;">Dışa Aktar, tüm verilerini (cari hesaplar, stok kartları, fişler, siparişler) tek bir JSON dosyası olarak indirir. İçe Aktar, daha önce indirdiğin bir yedeği seçip tüm verileri o hale getirir — mevcut veriler değişir. Bulut Yedeğinden Cari Geri Yükle, son 30 otomatik buluta kaydetmeden birini seçip içindeki TEK BİR cari hesabı (silinmiş/kaybolmuş olabilir) mevcut verine geri ekler — diğer verilerine dokunmaz. Hareketleri Sıfırla, sadece fiş/işlem geçmişini temizler; cari hesap ve stok kartı tanımların olduğu gibi kalır. Her Şeyi Sıfırla, kartlar dahil her şeyi siler.</p>
+    <div class="cv2-ayar-row" id="ayarGeriYukleBtn">
+      <div class="cv2-ayar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#6b5f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v10"/><path d="M8 10l4 4 4-4"/><path d="M5 16v2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2"/></svg></div>
+      <div class="cv2-ayar-text"><span class="cv2-ayar-name">İçe Aktar</span></div>
+    </div>
+    <div class="cv2-ayar-row" id="ayarBulutYedekBtn">
+      <div class="cv2-ayar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#6b5f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18a4 4 0 0 1-1-7.87A5 5 0 0 1 15 8h.5A4.5 4.5 0 0 1 20 12.5c0 2.5-2 3.5-2 3.5"/><path d="M12 12v8M9 17l3 3 3-3"/></svg></div>
+      <div class="cv2-ayar-text"><span class="cv2-ayar-name">Bulut Yedeğinden Cari Geri Yükle</span></div>
+    </div>
+    <div class="cv2-ayar-row" id="ayarHareketSifirlaBtn">
+      <div class="cv2-ayar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#6b5f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.4M21 12a9 9 0 0 1-15.5 6.4"/><path d="M18 3v4h-4M6 21v-4h4"/></svg></div>
+      <div class="cv2-ayar-text"><span class="cv2-ayar-name danger">Hareketleri Sıfırla</span></div>
+    </div>
+    <div class="cv2-ayar-row" id="ayarSifirlaBtn">
+      <div class="cv2-ayar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#6b5f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-8 0 1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13"/><path d="M10 11v6M14 11v6"/></svg></div>
+      <div class="cv2-ayar-text"><span class="cv2-ayar-name danger">Her Şeyi Sıfırla</span></div>
+    </div>
+    <p style="color:#a39685;font-size:12.5px;margin:16px 4px;">Dışa Aktar, tüm verilerini (cari hesaplar, stok kartları, fişler, siparişler) tek bir JSON dosyası olarak indirir. İçe Aktar, daha önce indirdiğin bir yedeği seçip tüm verileri o hale getirir — mevcut veriler değişir. Bulut Yedeğinden Cari Geri Yükle, son 30 otomatik buluta kaydetmeden birini seçip içindeki TEK BİR cari hesabı (silinmiş/kaybolmuş olabilir) mevcut verine geri ekler — diğer verilerine dokunmaz. Hareketleri Sıfırla, sadece fiş/işlem geçmişini temizler; cari hesap ve stok kartı tanımların olduğu gibi kalır. Her Şeyi Sıfırla, kartlar dahil her şeyi siler.</p>
   </div>
   <input type="file" id="ayarGeriYukleInput" accept="application/json,.json,.txt,text/plain" style="display:none;">
 </div>
