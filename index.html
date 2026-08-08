@@ -1357,6 +1357,13 @@
         </div>
         <span style="color:var(--muted);font-size:13px;">Dosyadan yükle</span>
       </div>
+      <div class="acct-row" id="ayarBulutYedekBtn" style="cursor:pointer;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <span class="ayar-badge" style="background:linear-gradient(135deg,#9a6bd6,#6a3fb8);"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18a4 4 0 0 1-1-7.87A5 5 0 0 1 15 8h.5A4.5 4.5 0 0 1 20 12.5c0 2.5-2 3.5-2 3.5"/><path d="M12 12v8M9 17l3 3 3-3"/></svg></span>
+          <span class="name">Bulut Yedeğinden Cari Geri Yükle</span>
+        </div>
+        <span style="color:var(--muted);font-size:13px;">Silinen hesabı bul</span>
+      </div>
       <div class="acct-row" id="ayarHareketSifirlaBtn" style="cursor:pointer;">
         <span class="name" style="color:var(--red);">🔄 Hareketleri Sıfırla</span>
         <span style="color:var(--muted);font-size:13px;">Fişler silinir, kartlar kalır</span>
@@ -1366,9 +1373,17 @@
         <span style="color:var(--muted);font-size:13px;">Tüm verileri sil</span>
       </div>
     </div>
-    <p style="color:var(--muted);font-size:12.5px;margin:12px 4px;">Dışa Aktar, tüm verilerini (cari hesaplar, stok kartları, fişler, siparişler) tek bir JSON dosyası olarak indirir. İçe Aktar, daha önce indirdiğin bir yedeği seçip tüm verileri o hale getirir — mevcut veriler değişir. Hareketleri Sıfırla, sadece fiş/işlem geçmişini temizler; cari hesap ve stok kartı tanımların olduğu gibi kalır. Her Şeyi Sıfırla, kartlar dahil her şeyi siler.</p>
+    <p style="color:var(--muted);font-size:12.5px;margin:12px 4px;">Dışa Aktar, tüm verilerini (cari hesaplar, stok kartları, fişler, siparişler) tek bir JSON dosyası olarak indirir. İçe Aktar, daha önce indirdiğin bir yedeği seçip tüm verileri o hale getirir — mevcut veriler değişir. Bulut Yedeğinden Cari Geri Yükle, son 30 otomatik buluta kaydetmeden birini seçip içindeki TEK BİR cari hesabı (silinmiş/kaybolmuş olabilir) mevcut verine geri ekler — diğer verilerine dokunmaz. Hareketleri Sıfırla, sadece fiş/işlem geçmişini temizler; cari hesap ve stok kartı tanımların olduğu gibi kalır. Her Şeyi Sıfırla, kartlar dahil her şeyi siler.</p>
   </div>
   <input type="file" id="ayarGeriYukleInput" accept="application/json,.json,.txt,text/plain" style="display:none;">
+</div>
+
+<div class="overlay" id="cv2BulutYedekOverlay" style="z-index:95;">
+  <div class="modal" style="padding-bottom:16px;max-height:80vh;overflow-y:auto;">
+    <h3 id="cv2BulutYedekBaslik" style="margin-bottom:10px;">Bulut Yedeği Seç</h3>
+    <div id="cv2BulutYedekIcerik" style="text-align:left;"></div>
+    <button id="cv2BulutYedekKapat" style="margin-top:14px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Kapat</button>
+  </div>
 </div>
 
 <div class="overlay" id="sifirlaOverlay" style="z-index:90;">
@@ -8184,6 +8199,96 @@ document.getElementById('ayarGeriYukleInput').onchange = (e) => {
     e.target.value = '';
   };
   reader.readAsText(file);
+};
+
+// Bulut Yedeğinden Cari Geri Yükle (08 Ağu 2026, kullanıcı "yanlışlıkla sildim" dedi) —
+// cv2YedekEkle() ile otomatik alınan yedeklerden (yedekler/{uid}/) BİR cari/tedarikçi
+// hesabını seçip mevcut state'e geri ekliyor; diğer verilere DOKUNMUYOR (tüm state'i
+// değiştirmiyor, sadece seçilen tek hesabı id'ye göre ekliyor/değiştiriyor).
+function cv2BulutYedekTarihFmt(ms){
+  const d = new Date(ms);
+  return d.toLocaleDateString('tr-TR', {day:'2-digit', month:'short', year:'numeric'}) + ' ' +
+    d.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+}
+function cv2BulutYedekAc(){
+  document.getElementById('cv2BulutYedekOverlay').classList.add('show');
+  document.getElementById('cv2BulutYedekBaslik').textContent = 'Bulut Yedeği Seç';
+  const icerik = document.getElementById('cv2BulutYedekIcerik');
+  icerik.innerHTML = '<p style="color:var(--muted);font-size:13.5px;">Yükleniyor…</p>';
+  if(!fbAuth || !fbAuth.currentUser){
+    icerik.innerHTML = '<p style="color:var(--muted);font-size:13.5px;">Giriş yapılı değil, buluttaki yedeklere ulaşılamıyor.</p>';
+    return;
+  }
+  fbDb.ref('yedekler/' + fbAuth.currentUser.uid).orderByKey().limitToLast(30).once('value').then(snap => {
+    const kayitlar = [];
+    snap.forEach(child => { kayitlar.push({ key: child.key, val: child.val() }); });
+    kayitlar.reverse(); // en yeni en üstte
+    if(kayitlar.length === 0){
+      icerik.innerHTML = '<p style="color:var(--muted);font-size:13.5px;">Henüz hiç otomatik bulut yedeği yok.</p>';
+      return;
+    }
+    icerik.innerHTML = kayitlar.map(k => {
+      const zaman = k.val && k.val._kayitZamani ? cv2BulutYedekTarihFmt(k.val._kayitZamani) : '(tarih yok)';
+      return '<div class="acct-row cv2-yedek-satir" data-key="' + k.key + '" style="cursor:pointer;">' +
+        '<span class="name">' + zaman + '</span>' +
+        '<span style="color:var(--muted);font-size:13px;">Hesap seç →</span>' +
+      '</div>';
+    }).join('');
+    icerik.querySelectorAll('.cv2-yedek-satir').forEach(row => {
+      row.onclick = () => cv2BulutYedekHesaplariGoster(row.dataset.key);
+    });
+  }).catch(err => {
+    icerik.innerHTML = '<p style="color:#c0392b;font-size:13.5px;">Yedekler okunamadı: ' + (err && err.message ? err.message : 'bilinmeyen hata') + '</p>';
+  });
+}
+function cv2BulutYedekHesaplariGoster(key){
+  document.getElementById('cv2BulutYedekBaslik').textContent = 'Hangi Hesabı Geri Getireyim?';
+  const icerik = document.getElementById('cv2BulutYedekIcerik');
+  icerik.innerHTML = '<p style="color:var(--muted);font-size:13.5px;">Yükleniyor…</p>';
+  fbDb.ref('yedekler/' + fbAuth.currentUser.uid + '/' + key + '/veri').once('value').then(snap => {
+    const veri = snap.val();
+    if(!veri){
+      icerik.innerHTML = '<p style="color:#c0392b;font-size:13.5px;">Bu yedeğin içeriği okunamadı.</p>';
+      return;
+    }
+    const hesaplar = [];
+    (veri.cari || []).forEach(c => hesaplar.push({ tur:'cari', id:c.id, name:c.name }));
+    (veri.tedarikci || []).forEach(c => hesaplar.push({ tur:'tedarikci', id:c.id, name:c.name }));
+    if(hesaplar.length === 0){
+      icerik.innerHTML = '<p style="color:var(--muted);font-size:13.5px;">Bu yedekte hiç cari/tedarikçi hesabı yok.</p>';
+      return;
+    }
+    icerik.innerHTML = hesaplar.map(h =>
+      '<div class="acct-row cv2-yedek-hesap" data-tur="' + h.tur + '" data-id="' + h.id + '" style="cursor:pointer;">' +
+        '<span class="name">' + h.name + '</span>' +
+        '<span style="color:var(--muted);font-size:13px;">Geri getir →</span>' +
+      '</div>'
+    ).join('');
+    icerik.querySelectorAll('.cv2-yedek-hesap').forEach(row => {
+      row.onclick = () => {
+        const hesap = (veri[row.dataset.tur] || []).find(c => c.id === row.dataset.id);
+        if(!hesap) return;
+        openConfirm(
+          '"' + hesap.name + '" Geri Getirilsin mi?',
+          'Bu hesap, seçtiğin yedekteki hâliyle mevcut verine eklenecek (varsa üzerine yazılacak). Diğer hesaplara/verilere dokunulmayacak.',
+          () => {
+            const liste = state[row.dataset.tur] || (state[row.dataset.tur] = []);
+            const mevcutIdx = liste.findIndex(c => c.id === hesap.id);
+            if(mevcutIdx >= 0) liste[mevcutIdx] = hesap; else liste.push(hesap);
+            save();
+            document.getElementById('cv2BulutYedekOverlay').classList.remove('show');
+            if(document.getElementById('cv2Screen').classList.contains('show')) renderCariV2();
+          }
+        );
+      };
+    });
+  }).catch(err => {
+    icerik.innerHTML = '<p style="color:#c0392b;font-size:13.5px;">Okunamadı: ' + (err && err.message ? err.message : 'bilinmeyen hata') + '</p>';
+  });
+}
+document.getElementById('ayarBulutYedekBtn').onclick = () => cv2BulutYedekAc();
+document.getElementById('cv2BulutYedekKapat').onclick = () => {
+  document.getElementById('cv2BulutYedekOverlay').classList.remove('show');
 };
 
 document.getElementById('ayarHareketSifirlaBtn').onclick = () => {
