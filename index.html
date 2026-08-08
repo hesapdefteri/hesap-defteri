@@ -8119,9 +8119,46 @@ document.getElementById('iletisimOverlay').onclick = (e) => {
   if(e.target === document.getElementById('iletisimOverlay')) document.getElementById('iletisimOverlay').classList.remove('show');
 };
 
+function cv2KumSaatiGoster(mesaj, sure){
+  return new Promise((resolve) => {
+    let ov = document.getElementById('cv2KumSaatiOverlay');
+    if(!ov){
+      ov = document.createElement('div');
+      ov.id = 'cv2KumSaatiOverlay';
+      ov.style.cssText = 'position:fixed;inset:0;background:rgba(247,242,233,.95);z-index:10000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;';
+      ov.innerHTML = `
+        <style>
+          @keyframes cv2KsRing{to{transform:rotate(360deg);}}
+          @keyframes cv2KsDrainTop{0%{transform:scaleY(1);opacity:1}85%{transform:scaleY(0.1);opacity:1}100%{transform:scaleY(0.1);opacity:1}}
+          @keyframes cv2KsFillBottom{0%{transform:scaleY(0.1);opacity:1}15%{transform:scaleY(0.1);opacity:1}100%{transform:scaleY(1);opacity:1}}
+          @keyframes cv2KsStream{0%{opacity:0;transform:translateY(0) scaleY(.6)}10%{opacity:1}90%{opacity:1}100%{opacity:0;transform:translateY(1px) scaleY(.6)}}
+        </style>
+        <div style="position:relative;width:88px;height:88px;">
+          <div style="position:absolute;inset:-8px;border-radius:50%;border:3px solid transparent;border-top-color:#3a3229;border-right-color:#3a3229;animation:cv2KsRing 1s linear infinite;"></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#3a3229" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="width:100%;height:100%;display:block;">
+            <path d="M6 2h12"/><path d="M6 22h12"/>
+            <path d="M6 2c0 5 4 6 4 10s-4 5-4 10"/>
+            <path d="M18 2c0 5-4 6-4 10s4 5 4 10"/>
+            <g style="animation:cv2KsDrainTop 1.2s ease-in-out infinite;transform-origin:center;"><path d="M9.5 5h5l-2.5 4z" fill="#c9973f" stroke="none"/></g>
+            <line x1="12" y1="10" x2="12" y2="14" stroke="#c9973f" stroke-width="1.2" style="animation:cv2KsStream 1.2s linear infinite;"/>
+            <g style="animation:cv2KsFillBottom 1.2s ease-in-out infinite;transform-origin:center;"><path d="M9.5 19h5l-2.5-4z" fill="#c9973f" stroke="none"/></g>
+          </svg>
+        </div>
+        <div id="cv2KumSaatiText" style="color:#3a3229;font-size:15px;font-weight:700;letter-spacing:.2px;"></div>
+      `;
+      document.body.appendChild(ov);
+    }
+    document.getElementById('cv2KumSaatiText').textContent = mesaj || '';
+    ov.style.display = 'flex';
+    setTimeout(() => { ov.style.display = 'none'; resolve(); }, sure || 3000);
+  });
+}
+
 document.getElementById('ayarYedekleBtn').onclick = () => {
-  const dataStr = JSON.stringify(state, null, 2);
-  showYedekMetinKutusu(dataStr);
+  cv2KumSaatiGoster('Dışa aktarılıyor…').then(() => {
+    const dataStr = JSON.stringify(state, null, 2);
+    showYedekMetinKutusu(dataStr);
+  });
 };
 
 function showYedekMetinKutusu(dataStr){
@@ -8237,19 +8274,21 @@ document.getElementById('ayarGeriYukleInput').onchange = (e) => {
       return;
     }
     openConfirm('Yedek Geri Yüklensin mi?', 'Mevcut tüm veriler bu dosyadaki verilerle değiştirilecek. Emin misin?', () => {
-      state = parsed;
-      if(!state.cari) state.cari = [];
-      if(!state.tedarikci) state.tedarikci = [];
-      if(!state.stokKartlari) state.stokKartlari = [];
-      if(!state.transactions) state.transactions = [];
-      if(!state.sayaclar) state.sayaclar = { alis:0, satis:0, stok:0, siparis:0 };
-      if(state.sayaclar.siparis === undefined) state.sayaclar.siparis = 0;
-      if(!state.alisFisleri) state.alisFisleri = [];
-      if(!state.satisFisleri) state.satisFisleri = [];
-      if(!state.siparisFisleri) state.siparisFisleri = [];
-      if(!state.cash) state.cash = state.cash || 0;
-      save();
-      showAnaMenu();
+      cv2KumSaatiGoster('İçe aktarılıyor…').then(() => {
+        state = parsed;
+        if(!state.cari) state.cari = [];
+        if(!state.tedarikci) state.tedarikci = [];
+        if(!state.stokKartlari) state.stokKartlari = [];
+        if(!state.transactions) state.transactions = [];
+        if(!state.sayaclar) state.sayaclar = { alis:0, satis:0, stok:0, siparis:0 };
+        if(state.sayaclar.siparis === undefined) state.sayaclar.siparis = 0;
+        if(!state.alisFisleri) state.alisFisleri = [];
+        if(!state.satisFisleri) state.satisFisleri = [];
+        if(!state.siparisFisleri) state.siparisFisleri = [];
+        if(!state.cash) state.cash = state.cash || 0;
+        save();
+        showAnaMenu();
+      });
     });
     e.target.value = '';
   };
