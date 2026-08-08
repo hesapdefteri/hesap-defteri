@@ -8825,6 +8825,19 @@ function ensureCariTedarikciCakismaTemizle(){
 }
 if(ensureCariTedarikciCakismaTemizle()) save();
 
+// 08 Ağu 2026: Kasa bakiyesi (state.cash) koddaki bozuk varsayılan değere
+// (706.888,34₺) yakın bir noktadan (729.288,34₺) birikmiş, gerçek değeri
+// değildi. Kullanıcı onayıyla kasa SIFIRLANDI — tek seferlik düzeltme, bir
+// daha çalışmaması için bayrakla korunuyor (yoksa kullanıcı ileride kasaya
+// gerçek bir bakiye girdiğinde bu fonksiyon onu tekrar sıfırlardı).
+function ensureKasaSifirla20260808(){
+  if(state._kasaDuzeltmesi20260808) return false;
+  state.cash = 0;
+  state._kasaDuzeltmesi20260808 = true;
+  return true;
+}
+if(ensureKasaSifirla20260808()) save();
+
 // 08 Ağu 2026: Kullanıcı "stok kartlarımı silmişsin, Stoklar ekranı boş" dedi —
 // yine aynı kalıp: cihaz gerçek buluta ulaşamadan koddaki dokunulmamış varsayılan
 // state ile açılmış olmalı (o state.stokKartlari için hiç veri içermiyordu),
