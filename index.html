@@ -23,6 +23,7 @@
 <meta http-equiv="Expires" content="0">
 <title>Hesap Defteri</title>
 <style>
+  @keyframes cv2spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
   :root{
     --bg-top:#c7d6dd;
     --bg-mid:#dbe6ea;
@@ -981,17 +982,6 @@
   .fis-toplam-row.fis-genel-toplam{font-size:18px;padding-top:8px;margin-top:4px;border-top:1px solid var(--line);}
   .fis-kdv-row{display:flex;align-items:center;justify-content:space-between;padding:2px 0;}
   .fis-kdv-row label{font-size:14px;font-weight:600;color:var(--ink);}
-
-  #kaydetToast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(14px);
-    display:flex;align-items:center;gap:10px;padding:12px 20px;border-radius:14px;
-    background:rgba(28,32,38,.92);color:#fff;font-size:13.5px;font-weight:700;
-    box-shadow:0 8px 22px rgba(0,0,0,.28);z-index:99999;opacity:0;pointer-events:none;
-    transition:opacity .18s ease, transform .18s ease;white-space:nowrap;}
-  #kaydetToast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-  #kaydetToast .kaydet-toast-spinner{width:15px;height:15px;border-radius:50%;
-    border:2px solid rgba(255,255,255,.35);border-top-color:#fff;flex:0 0 auto;
-    animation:kaydetSpin .7s linear infinite;}
-  @keyframes kaydetSpin{to{transform:rotate(360deg);}}
 </style>
 <!-- Firebase (telefon numarasıyla giriş + bulut senkronizasyonu) -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -1034,6 +1024,11 @@
     </div>
   </div>
   <div id="recaptcha-container"></div>
+</div>
+
+<div id="cv2SaveToast" style="display:none;position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:99998;background:#1c3566;color:#fff;padding:12px 20px;border-radius:14px;font-size:13px;font-weight:700;line-height:1.5;box-shadow:0 6px 18px rgba(0,0,0,.35);align-items:center;gap:10px;max-width:88%;text-align:center;">
+  <span style="width:16px;height:16px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;display:inline-block;animation:cv2spin .7s linear infinite;flex-shrink:0;"></span>
+  <span>İşleminiz yapılıyor, lütfen bekleyiniz.<br>İşlemleriniz kaydediliyor, lütfen bekleyiniz.</span>
 </div>
 
 <button id="anaMenuFloatBtn" class="glass-fab" style="display:none;position:fixed;right:20px;bottom:92px;width:58px;height:58px;border-radius:50%;z-index:500;align-items:center;justify-content:center;cursor:pointer;">
@@ -2376,17 +2371,15 @@ if(!state.transactions) state.transactions = [];
 let activeLedger = 'cari';
 function getLedger(){ return state[activeLedger]; }
 
-let kaydetToastTimer = null;
-function showKaydetToast(){
-  const el = document.getElementById('kaydetToast');
-  if(!el) return;
-  el.classList.add('show');
-  clearTimeout(kaydetToastTimer);
-  kaydetToastTimer = setTimeout(() => el.classList.remove('show'), 900);
+function cv2SaveToastGoster(){
+  const el = document.getElementById('cv2SaveToast');
+  if(el) el.style.display = 'flex';
 }
-
+function cv2SaveToastGizle(){
+  const el = document.getElementById('cv2SaveToast');
+  if(el) el.style.display = 'none';
+}
 function save(){
-  showKaydetToast();
   // Yerel değişiklik her zaman "en yeni" damgayı taşısın diye — bu, uygulamayı
   // silme/düzenleme sonrası hemen yenileyince Firebase'in henüz tamamlanmamış
   // yazmayı geçip ESKİ bulut kopyasını geri getirmesini (yarış durumu) önlüyor.
@@ -2395,8 +2388,11 @@ function save(){
   // Giriş yapılmışsa aynı veriyi buluta da yazıyoruz (localStorage her zaman
   // hızlı yerel bir kopya olarak kalıyor; Firebase gerçek/senkron kopya).
   if(typeof fbAvailable !== 'undefined' && fbAvailable && fbAuth && fbAuth.currentUser){
+    cv2SaveToastGoster();
     fbDb.ref('users/' + fbAuth.currentUser.uid).set(state).catch(err => {
       console.error('Bulut kayıt hatası:', err);
+    }).finally(() => {
+      cv2SaveToastGizle();
     });
   }
 }
@@ -8832,6 +8828,5 @@ try {
 }
 
 </script>
-<div id="kaydetToast"><div class="kaydet-toast-spinner"></div><span>İşlemleriniz kaydediliyor, lütfen bekleyiniz</span></div>
 </body>
 </html>
