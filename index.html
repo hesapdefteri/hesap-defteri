@@ -1007,6 +1007,72 @@
   .fis-toplam-row.fis-genel-toplam{font-size:18px;padding-top:8px;margin-top:4px;border-top:1px solid var(--line);}
   .fis-kdv-row{display:flex;align-items:center;justify-content:space-between;padding:2px 0;}
   .fis-kdv-row label{font-size:14px;font-weight:600;color:var(--ink);}
+/* ===== Grup Alış / Grup Satış ===== */
+.galis-toggle{display:flex;gap:8px;margin:0 4px 14px;}
+.galis-seg{flex:1;padding:11px 0;border-radius:12px;border:1.5px solid var(--line);background:#fff;
+  font-family:inherit;font-size:13.5px;font-weight:700;color:var(--muted);cursor:pointer;}
+.galis-seg.active{background:#3a3229;border-color:#3a3229;color:#f7f2e9;}
+
+.grup-screen{position:fixed;inset:0;background:#ece7dc;z-index:500;display:none;flex-direction:column;overflow:hidden;}
+.grup-screen.show{display:flex;}
+.grup-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 100px;}
+.grup-card{border-radius:18px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.08);margin-bottom:16px;}
+.g-band{padding:16px;}
+.g-band-alis{background:#3a3229;color:#f2ede4;}
+.g-band-alis .g-label{color:#c9973f;font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+.g-band-alis .g-tedarikci{font-size:15px;font-weight:700;margin-bottom:6px;}
+.g-band-alis .g-item-row{display:flex;justify-content:space-between;font-size:14px;opacity:.92;padding:2px 0;}
+.g-band-dagitim{background:#fdfbf7;}
+.g-band-dagitim .g-label{color:#a39685;font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.g-musteri-row{display:flex;align-items:center;gap:9px;padding:11px 0;border-bottom:1px solid #f0ece3;}
+.g-musteri-row:last-child{border-bottom:none;}
+.g-avatar{width:36px;height:36px;border-radius:50%;background:#f7f2e9;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:13px;color:#8a6d3b;flex-shrink:0;}
+.g-info{flex:1;min-width:0;}
+.g-name{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.g-sub{font-size:11.5px;color:#a39685;}
+.g-adet-input{width:50px;padding:7px 3px;border:1px solid #e5ddcf;border-radius:8px;text-align:center;
+  font-size:13.5px;font-weight:700;color:#3a3229;background:#fbf9f5;}
+.g-fiyat-btn{min-width:76px;padding:7px 8px;border:1px solid #e5ddcf;border-radius:8px;background:#fbf9f5;
+  font-size:13px;font-weight:700;color:#3a3229;cursor:pointer;text-align:right;position:relative;font-family:inherit;}
+.g-fiyat-btn .g-clock{position:absolute;top:-6px;right:-6px;width:15px;height:15px;background:#c9973f;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.g-fiyat-btn .g-clock svg{width:9px;height:9px;}
+.g-fiyat-empty{color:#c7bca6;font-weight:600;}
+.g-sil-btn{background:none;border:none;color:#c7897d;font-size:18px;padding:2px 4px;cursor:pointer;flex-shrink:0;}
+.g-btn-ekle{width:100%;padding:11px;border:1.5px dashed #d8cdb8;border-radius:12px;background:transparent;
+  color:#8a6d3b;font-weight:700;font-size:13.5px;margin-top:10px;cursor:pointer;font-family:inherit;}
+.g-band-toplam{background:#c9973f;padding:14px 16px;}
+.g-toplam-satir{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#3a3229;
+  font-weight:700;margin-bottom:6px;}
+.g-toplam-satir .g-ok{background:#3f8a5a;color:#fff;font-size:11px;padding:2px 8px;border-radius:20px;margin-left:6px;}
+.g-toplam-satir .g-warn{background:#b5473a;color:#fff;font-size:11px;padding:2px 8px;border-radius:20px;margin-left:6px;}
+.g-btn-kaydet{width:100%;padding:14px;border:none;border-radius:12px;background:#3a3229;color:#f7f2e9;
+  font-weight:800;font-size:15px;cursor:pointer;margin-top:8px;font-family:inherit;}
+.g-empty{color:#a39685;font-size:13px;text-align:center;padding:14px 0;}
+
+.g-overlay{position:fixed;inset:0;background:rgba(20,16,10,.5);display:none;align-items:flex-end;justify-content:center;z-index:9998;}
+.g-overlay.show{display:flex;}
+.g-sheet{background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:18px 18px 22px;
+  max-height:78vh;overflow-y:auto;}
+.g-sheet-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.g-sheet-title{font-size:15.5px;font-weight:800;color:#3a3229;}
+.g-sheet-sub{font-size:12.5px;color:#a39685;margin-bottom:14px;}
+.g-sheet-close{background:none;border:none;font-size:20px;color:#a39685;cursor:pointer;padding:4px;}
+.g-yenifiyat-box{display:flex;gap:8px;margin-bottom:16px;}
+.g-yenifiyat-box input{flex:1;padding:12px;border:1.5px solid #e5ddcf;border-radius:10px;font-size:15px;font-weight:700;font-family:inherit;}
+.g-yenifiyat-box button{padding:12px 16px;border:none;border-radius:10px;background:#3a3229;color:#f7f2e9;
+  font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;}
+.g-tarihce-label{font-size:12px;font-weight:800;color:#a39685;text-transform:uppercase;letter-spacing:.4px;margin:4px 0 8px;}
+.g-tarihce-item{display:flex;justify-content:space-between;align-items:center;padding:12px 12px;border-radius:12px;
+  background:#faf8f4;margin-bottom:8px;cursor:pointer;border:1.5px solid transparent;}
+.g-tarihce-fiyat{font-weight:800;font-size:15px;color:#3a3229;}
+.g-tarihce-meta{font-size:12px;color:#a39685;}
+.g-tarihce-son .g-tarihce-fiyat{color:#3f8a5a;}
+.g-tarihce-tag{font-size:10.5px;font-weight:800;background:#e9f4ec;color:#3f8a5a;padding:2px 7px;border-radius:20px;margin-left:6px;}
+.g-use-btn{font-size:12.5px;font-weight:700;color:#8a6d3b;}
+.g-musteri-list-item{display:flex;align-items:center;gap:10px;padding:12px 4px;border-bottom:1px solid #f0ece3;cursor:pointer;}
+.g-musteri-list-item:last-child{border-bottom:none;}
 </style>
 <!-- Firebase (telefon numarasıyla giriş + bulut senkronizasyonu) -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -1849,6 +1915,49 @@
   <div class="fis-footer">
     <button id="fisVazgec" style="background:#eef1f2;color:var(--ink);">Vazgeç</button>
     <button id="fisKaydet" style="background:var(--green);color:#fff;">Kaydet</button>
+  </div>
+</div>
+
+<!-- ===== Grup Satış — Dağıtım Ekranı ===== -->
+<div class="grup-screen" id="grupDagitimScreen">
+  <div class="sk-dhead" style="padding-bottom:14px;">
+    <div class="sk-dhead-top">
+      <button class="d-back" id="grupDagitimBack">‹</button>
+      <div class="d-title">Grup Satış</div>
+      <span style="width:38px;"></span>
+    </div>
+  </div>
+  <div class="grup-body" id="grupDagitimBody"></div>
+</div>
+
+<!-- Grup Satış: Fiyat Tarihçesi -->
+<div class="g-overlay" id="grupFiyatOverlay">
+  <div class="g-sheet">
+    <div class="g-sheet-header">
+      <div>
+        <div class="g-sheet-title" id="grupFiyatMusteriAdi">Fiyat Seç</div>
+        <div class="g-sheet-sub" id="grupFiyatUrunAdi"></div>
+      </div>
+      <button class="g-sheet-close" id="grupFiyatKapat">✕</button>
+    </div>
+    <div class="g-yenifiyat-box">
+      <input type="text" id="grupYeniFiyatInput" placeholder="Yeni fiyat gir (₺)" inputmode="decimal">
+      <button id="grupYeniFiyatBtn">Kullan</button>
+    </div>
+    <div class="g-tarihce-label">Fiyat Tarihçesi</div>
+    <div id="grupTarihceListe"></div>
+  </div>
+</div>
+
+<!-- Grup Satış: Müşteri Seç -->
+<div class="g-overlay" id="grupMusteriSecOverlay">
+  <div class="g-sheet">
+    <div class="g-sheet-header">
+      <div class="g-sheet-title">Müşteri Seç</div>
+      <button class="g-sheet-close" id="grupMusteriKapat">✕</button>
+    </div>
+    <input type="text" id="grupMusteriSearch" placeholder="müşteri ara" style="width:100%;padding:12px;border:1.5px solid #e5ddcf;border-radius:10px;font-size:14px;margin-bottom:10px;font-family:inherit;box-sizing:border-box;">
+    <div id="grupMusteriListe"></div>
   </div>
 </div>
 
@@ -7720,7 +7829,8 @@ function openFisDetay(id){
       aciklama: '',
       kdvDahil: false,
       kalemler: [],
-      toplam: 0
+      toplam: 0,
+      grupAlis: false
     };
     document.getElementById('fisDetayTitle').textContent = fisTuru==='alis' ? 'Yeni Alış Fişi' : 'Yeni Satış Fişi';
     document.getElementById('fisDetaySil').style.display = 'none';
@@ -7743,7 +7853,13 @@ function renderFisDetayBody(){
   if(d.kalemler.length) d.toplam = genelToplam;
   const cariLabel = fisTuru==='alis' ? 'Cari Hesap (Tedarikçi)' : 'Cari Hesap (Müşteri)';
   const datalistId = fisTuru==='alis' ? 'skTedarikciList' : 'skMusteriList';
+  const grupToggleHtml = (fisTuru==='alis' && !editingFisId) ? `
+    <div class="galis-toggle">
+      <button type="button" class="galis-seg ${!d.grupAlis?'active':''}" id="galisNormalBtn">Normal Alış</button>
+      <button type="button" class="galis-seg ${d.grupAlis?'active':''}" id="galisGrupBtn">Grup Alış</button>
+    </div>` : '';
   document.getElementById('fisDetayBody').innerHTML = `
+    ${grupToggleHtml}
     <div class="sk-form-card">
       <div class="field-ios-block"><label>${cariLabel}</label>
         <div class="cari-input-row">
@@ -7807,6 +7923,12 @@ function bindFisDetayEvents(){
   document.querySelectorAll('.fatura-table .fatura-row').forEach(row=>{
     row.onclick = () => openKalemDuzenle(parseInt(row.dataset.idx,10));
   });
+  const galisNormalBtn = document.getElementById('galisNormalBtn');
+  const galisGrupBtn = document.getElementById('galisGrupBtn');
+  if(galisNormalBtn){
+    galisNormalBtn.onclick = () => { draftFis.grupAlis = false; renderFisDetayBody(); };
+    galisGrupBtn.onclick = () => { draftFis.grupAlis = true; renderFisDetayBody(); };
+  }
 }
 
 document.getElementById('fisDetayBack').onclick = () => {
@@ -7934,11 +8056,261 @@ document.getElementById('fisKaydet').onclick = () => {
   }
   if(wasLegacy){
     openCariEkstrePopup(wasLegacy.cariId, wasLegacy.ledgerKey);
+  } else if(fisTuru === 'alis' && d.grupAlis){
+    openGrupDagitim(d);
   } else {
     document.getElementById('fisListScreen').classList.add('show');
     renderFisList();
     nudge();
   }
+};
+
+// ===== Grup Satış — Alıştan sonra çoklu müşteriye dağıtım =====
+let grupDraft = null;
+let grupFiyatAktifSatirId = null;
+let grupMusteriAktifSatirId = null;
+let grupMusteriSearch = '';
+
+function openGrupDagitim(alisFis){
+  grupDraft = {
+    kaynakFisId: alisFis.id,
+    tedarikciAdi: alisFis.cariAdi,
+    tarih: alisFis.tarih,
+    kalemler: alisFis.kalemler.map(k => ({ stokKartId: k.stokKartId, ad: k.ad, alinanMiktar: toNum(k.miktar) })),
+    satirlar: []
+  };
+  document.getElementById('fisDetayScreen').classList.remove('show');
+  document.getElementById('grupDagitimScreen').classList.add('show');
+  renderGrupDagitim();
+  nudge();
+}
+
+function grupDagitilanMiktar(stokKartId){
+  return grupDraft.satirlar.filter(s=>s.stokKartId===stokKartId).reduce((s,x)=>s+toNum(x.adet),0);
+}
+
+function renderGrupDagitim(){
+  const g = grupDraft;
+  const tekUrun = g.kalemler.length === 1;
+
+  const kalemlerHtml = g.kalemler.map(k=>`<div class="g-item-row"><span>${k.ad}</span><span>${fmtPlain(k.alinanMiktar)} adet</span></div>`).join('');
+
+  const satirlarHtml = g.satirlar.length ? g.satirlar.map(s=>{
+    const urunSecHtml = tekUrun ? '' : `
+      <select class="g-urun-sec" data-id="${s.id}" style="font-size:11.5px;color:#a39685;border:none;background:none;font-family:inherit;padding:0;max-width:120px;">
+        ${g.kalemler.map(k=>`<option value="${k.stokKartId}" ${k.stokKartId===s.stokKartId?'selected':''}>${k.ad}</option>`).join('')}
+      </select>`;
+    const initials = (s.cariAdi||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    return `
+    <div class="g-musteri-row">
+      <div class="g-avatar">${initials||'?'}</div>
+      <div class="g-info">
+        <div class="g-name">${s.cariAdi||'—'}</div>
+        <div class="g-sub">${tekUrun ? (g.kalemler[0]?g.kalemler[0].ad:'') : urunSecHtml}</div>
+      </div>
+      <input class="g-adet-input" type="text" inputmode="decimal" data-id="${s.id}" value="${s.adet||''}">
+      <button type="button" class="g-fiyat-btn ${s.fiyat?'':'g-fiyat-empty'}" data-id="${s.id}">
+        <span class="g-clock"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="10"/></svg></span>
+        ${s.fiyat ? fmt(toNum(s.fiyat)) : 'Fiyat gir'}
+      </button>
+      <button type="button" class="g-sil-btn" data-id="${s.id}">✕</button>
+    </div>`;
+  }).join('') : '<div class="g-empty">Henüz müşteri eklenmedi</div>';
+
+  const toplamHtml = g.kalemler.map(k=>{
+    const dag = grupDagitilanMiktar(k.stokKartId);
+    const ok = dag === k.alinanMiktar;
+    const asim = dag > k.alinanMiktar;
+    return `<div class="g-toplam-satir"><span>${tekUrun?'Dağıtılan / Alınan':k.ad}</span><span>${fmtPlain(dag)} / ${fmtPlain(k.alinanMiktar)} adet ${ok?'<span class="g-ok">✓</span>':(asim?'<span class="g-warn">FAZLA</span>':'')}</span></div>`;
+  }).join('');
+
+  const hepsiTam = g.kalemler.every(k => grupDagitilanMiktar(k.stokKartId) === k.alinanMiktar);
+  const asimVar = g.kalemler.some(k => grupDagitilanMiktar(k.stokKartId) > k.alinanMiktar);
+  const satirlarTam = g.satirlar.length > 0 && g.satirlar.every(s=>toNum(s.adet)>0 && toNum(s.fiyat)>0 && s.cariAdi);
+
+  document.getElementById('grupDagitimBody').innerHTML = `
+    <div class="grup-card">
+      <div class="g-band g-band-alis">
+        <div class="g-label">Grup Alış — Kaynak</div>
+        <div class="g-tedarikci">${g.tedarikciAdi||'—'}</div>
+        ${kalemlerHtml}
+      </div>
+      <div class="g-band g-band-dagitim">
+        <div class="g-label">Müşterilere Dağıtım</div>
+        ${satirlarHtml}
+        <button type="button" class="g-btn-ekle" id="grupMusteriEkleBtn">+ Müşteri Ekle</button>
+      </div>
+      <div class="g-band g-band-toplam">
+        ${toplamHtml}
+        <button type="button" class="g-btn-kaydet" id="grupKaydetBtn" ${(!satirlarTam || asimVar) ? 'style="opacity:.5;"' : ''}>Grup Satışı Kaydet</button>
+      </div>
+    </div>
+  `;
+  bindGrupDagitimEvents(hepsiTam, satirlarTam, asimVar);
+}
+
+function bindGrupDagitimEvents(hepsiTam, satirlarTam, asimVar){
+  document.getElementById('grupMusteriEkleBtn').onclick = () => openGrupMusteriSec(null);
+  document.querySelectorAll('.g-adet-input').forEach(inp=>{
+    inp.oninput = () => {
+      const s = grupDraft.satirlar.find(x=>x.id===inp.dataset.id);
+      if(s) s.adet = toNum(inp.value);
+      renderGrupDagitimTopluGuncelle();
+    };
+  });
+  document.querySelectorAll('.g-urun-sec').forEach(sel=>{
+    sel.onchange = () => {
+      const s = grupDraft.satirlar.find(x=>x.id===sel.dataset.id);
+      if(s){ s.stokKartId = sel.value; s.fiyat = null; }
+      renderGrupDagitim();
+    };
+  });
+  document.querySelectorAll('.g-fiyat-btn').forEach(btn=>{
+    btn.onclick = () => openGrupFiyatTarihce(btn.dataset.id);
+  });
+  document.querySelectorAll('.g-sil-btn').forEach(btn=>{
+    btn.onclick = () => {
+      const idx = grupDraft.satirlar.findIndex(x=>x.id===btn.dataset.id);
+      if(idx!==-1) grupDraft.satirlar.splice(idx,1);
+      renderGrupDagitim();
+    };
+  });
+  const kaydetBtn = document.getElementById('grupKaydetBtn');
+  kaydetBtn.onclick = () => {
+    if(!grupDraft.satirlar.length){ return; }
+    if(!satirlarTam){ alertBox('Her satırda müşteri, adet ve fiyat girilmeli.'); return; }
+    if(asimVar){ alertBox('Dağıtılan miktar alınan miktarı geçemez.'); return; }
+    if(!hepsiTam){
+      openConfirm('Eksik Dağıtım', 'Alınan malın bir kısmı henüz dağıtılmadı, kalanı stokta bekleyecek. Devam edilsin mi?', () => grupSatisiKaydet());
+    } else {
+      grupSatisiKaydet();
+    }
+  };
+}
+function renderGrupDagitimTopluGuncelle(){
+  // Sadece toplam bandını ve kaydet butonunu güncellemek için tam render yeterli (liste küçük).
+  const activeEl = document.activeElement;
+  const activeId = activeEl && activeEl.classList.contains('g-adet-input') ? activeEl.dataset.id : null;
+  renderGrupDagitim();
+  if(activeId){
+    const el = document.querySelector(`.g-adet-input[data-id="${activeId}"]`);
+    if(el){ el.focus(); const v = el.value; el.value=''; el.value=v; }
+  }
+}
+
+function openGrupMusteriSec(satirId){
+  grupMusteriAktifSatirId = satirId;
+  grupMusteriSearch = '';
+  document.getElementById('grupMusteriSearch').value = '';
+  renderGrupMusteriListe();
+  document.getElementById('grupMusteriSecOverlay').classList.add('show');
+}
+function renderGrupMusteriListe(){
+  const term = grupMusteriSearch.toLocaleLowerCase('tr-TR');
+  const list = state.cari.filter(c => !term || c.name.toLocaleLowerCase('tr-TR').includes(term))
+    .slice().sort((a,b)=>a.name.localeCompare(b.name,'tr'));
+  document.getElementById('grupMusteriListe').innerHTML = list.length ? list.map(c=>{
+    const initials = c.name.trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    return `<div class="g-musteri-list-item" data-name="${c.name.replace(/"/g,'&quot;')}">
+      <div class="g-avatar">${initials}</div>
+      <div class="g-name">${c.name}</div>
+    </div>`;
+  }).join('') : '<div class="g-empty">Müşteri bulunamadı</div>';
+  document.querySelectorAll('.g-musteri-list-item').forEach(item=>{
+    item.onclick = () => grupMusteriSecildi(item.dataset.name);
+  });
+}
+document.getElementById('grupMusteriSearch').oninput = e => { grupMusteriSearch = e.target.value; renderGrupMusteriListe(); };
+document.getElementById('grupMusteriKapat').onclick = () => document.getElementById('grupMusteriSecOverlay').classList.remove('show');
+document.getElementById('grupMusteriSecOverlay').onclick = (e) => { if(e.target.id==='grupMusteriSecOverlay') document.getElementById('grupMusteriSecOverlay').classList.remove('show'); };
+
+function grupMusteriSecildi(cariAdi){
+  const ilkKalem = grupDraft.kalemler[0];
+  grupDraft.satirlar.push({ id: genId(), cariAdi, stokKartId: ilkKalem.stokKartId, adet: '', fiyat: null });
+  document.getElementById('grupMusteriSecOverlay').classList.remove('show');
+  renderGrupDagitim();
+}
+
+function openGrupFiyatTarihce(satirId){
+  grupFiyatAktifSatirId = satirId;
+  const s = grupDraft.satirlar.find(x=>x.id===satirId);
+  const k = grupDraft.kalemler.find(x=>x.stokKartId===s.stokKartId);
+  const card = state.stokKartlari.find(c=>c.id===s.stokKartId);
+  document.getElementById('grupFiyatMusteriAdi').textContent = s.cariAdi;
+  document.getElementById('grupFiyatUrunAdi').textContent = (k?k.ad:'') + ' için geçmiş fiyatlar';
+  document.getElementById('grupYeniFiyatInput').value = '';
+  const ad = normAd(s.cariAdi);
+  const gecmis = card ? (card.satislar||[]).filter(x=>!x.iade && normAd(x.cariAdi)===ad).sort((a,b)=>new Date(b.tarih)-new Date(a.tarih)).slice(0,6) : [];
+  document.getElementById('grupTarihceListe').innerHTML = gecmis.length ? gecmis.map((h,i)=>`
+    <div class="g-tarihce-item ${i===0?'g-tarihce-son':''}" data-fiyat="${toNum(h.birimFiyat)}">
+      <div>
+        <div class="g-tarihce-fiyat">${fmt(toNum(h.birimFiyat))} ${i===0?'<span class="g-tarihce-tag">Son verilen</span>':''}</div>
+        <div class="g-tarihce-meta">${trDate(h.tarih)} — ${fmtPlain(h.miktar)} adet</div>
+      </div>
+      <div class="g-use-btn">Kullan ›</div>
+    </div>`).join('') : '<div class="g-empty">Bu müşteriye bu üründen daha önce satış yapılmamış</div>';
+  document.querySelectorAll('#grupTarihceListe .g-tarihce-item').forEach(item=>{
+    item.onclick = () => grupFiyatSec(toNum(item.dataset.fiyat));
+  });
+  document.getElementById('grupFiyatOverlay').classList.add('show');
+}
+document.getElementById('grupFiyatKapat').onclick = () => document.getElementById('grupFiyatOverlay').classList.remove('show');
+document.getElementById('grupFiyatOverlay').onclick = (e) => { if(e.target.id==='grupFiyatOverlay') document.getElementById('grupFiyatOverlay').classList.remove('show'); };
+document.getElementById('grupYeniFiyatBtn').onclick = () => {
+  const v = toNum(document.getElementById('grupYeniFiyatInput').value);
+  if(!v) return;
+  grupFiyatSec(v);
+};
+function grupFiyatSec(fiyat){
+  const s = grupDraft.satirlar.find(x=>x.id===grupFiyatAktifSatirId);
+  if(s) s.fiyat = fiyat;
+  document.getElementById('grupFiyatOverlay').classList.remove('show');
+  renderGrupDagitim();
+}
+
+function grupSatisiKaydet(){
+  const g = grupDraft;
+  const grupFisId = genId();
+  const belgeNo = 'GRS-' + String((state.sayaclar.grup||0)+1).padStart(6,'0');
+  const now = new Date().toISOString();
+
+  g.satirlar.forEach(s=>{
+    const card = state.stokKartlari.find(c=>c.id===s.stokKartId);
+    if(!card) return;
+    const tutar = toNum(s.adet) * toNum(s.fiyat);
+    card.satislar = card.satislar || [];
+    card.satislar.push({
+      id: genId(), tarih: g.tarih, belgeNo, cariAdi: s.cariAdi,
+      miktar: toNum(s.adet), birimFiyat: toNum(s.fiyat),
+      iskonto: 0, kdv: 0, toplam: tutar, iade: false,
+      fisId: grupFisId, grupKaynakFisId: g.kaynakFisId
+    });
+    const cari = bulYadaEkleCari('cari', s.cariAdi);
+    cari.transactions.push({
+      type: 'SATIŞ',
+      desc: `Grup Satış · ${card.ad} · ${fmtPlain(s.adet)} adet` + (belgeNo?' · '+belgeNo:''),
+      amount: tutar,
+      date: now,
+      skRef: grupFisId
+    });
+  });
+
+  state.sayaclar.grup = (state.sayaclar.grup||0) + 1;
+  save();
+  document.getElementById('grupDagitimScreen').classList.remove('show');
+  renderUrunler();
+  document.getElementById('fisListScreen').classList.add('show');
+  renderFisList();
+  nudge();
+}
+
+document.getElementById('grupDagitimBack').onclick = () => {
+  openConfirm('Grup Satıştan Çık', 'Alış fişi kaydedildi ama müşterilere dağıtım henüz tamamlanmadı. Şimdi çıkarsan bu malı daha sonra Ayarlar dışında bir yerden dağıtamazsın; yine de çıkmak ister misin?', () => {
+    document.getElementById('grupDagitimScreen').classList.remove('show');
+    document.getElementById('fisListScreen').classList.add('show');
+    renderFisList();
+    nudge();
+  });
 };
 
 function silFisKalemleri(fisId){
