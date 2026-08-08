@@ -967,6 +967,7 @@
   .fis-daterange select{width:100%;border:1px solid #dfe5e7;border-radius:10px;padding:9px 10px;font-size:13px;background:#fff;color:var(--ink);font-weight:600;}
   .fis-card-durum{display:inline-block;margin-top:8px;padding:5px 12px;border-radius:20px;background:#f2f2f2;color:#8a6d1f;font-size:11.5px;font-weight:700;}
   .fis-card-durum.taslak{background:#fdeceb;color:var(--red);}
+  .fis-card-belgeno{font-size:12px;font-weight:600;color:var(--muted);}
 
   .picker-screen{position:fixed;inset:0;background:#fff;z-index:35;display:none;flex-direction:column;}
   .picker-screen.show{display:flex;}
@@ -7771,13 +7772,13 @@ function renderFisList(){
       <div class="sk-card swipe-content" data-id="${f.id}">
         <div class="sk-card-top">
           <div>
-            <div class="sk-card-name">${trDate(f.tarih)}</div>
-            <div class="sk-card-code">${f.cariAdi || '—'}</div>
+            <div class="sk-card-name">${f.cariAdi || '—'}</div>
+            <div class="sk-card-code">${trDate(f.tarih)}</div>
           </div>
           <div class="sk-card-qty">${fmt(toNum(f.toplam))}</div>
         </div>
         <div class="sk-card-bottom">
-          <span>${f.belgeNo || '—'}</span>
+          <span class="fis-card-belgeno">${f.belgeNo || '—'}</span>
           <span class="fis-card-durum ${f.tur==='siparis'?'taslak':''}">${fisDurumEtiketi(f.tur)}</span>
         </div>
       </div>
