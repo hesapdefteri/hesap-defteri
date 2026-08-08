@@ -8737,6 +8737,338 @@ function ensureSanalEksikTahsilat2500(){
 }
 if(ensureSanalEksikTahsilat2500()) save();
 
+// 08 Ağu 2026: Kullanıcı "Saf Plast'ı yanlışlıkla sildim" dedi — silme, otomatik
+// bulut yedekleme özelliğinden (bugün eklendi) ÖNCE olduğu için hiçbir bulut
+// yedeğinde bu hesap yoktu. Kullanıcının 06 Ağustos'ta paylaştığı JSON yedeğindeki
+// Saf Plast verisi (52 işlem, 27 Temmuz 2026'ya kadar — o tarihten sonrası zaten
+// ayrı bir senkron sorunundan dolayı hiç sisteme girmemişti) buraya gömülüp geri
+// koyuldu, kullanıcı onayıyla. BU DA BİR "ensureX" TOHUMLAYICI — kritik dersteki
+// uyarı burada da geçerli.
+function ensureSafPlastGeriYukle(){
+  if(state.cari.some(c => c.id === 'safplast')) return false;
+  state.cari.push({
+    id: 'safplast',
+    name: 'Saf Plast',
+    transactions: [
+  {
+    "amount": -16500,
+    "date": "2025-09-01T00:00:00",
+    "desc": "Açılış (önceki bakiye)",
+    "type": "AÇILIŞ"
+  },
+  {
+    "amount": 9075,
+    "date": "2025-09-09T21:38:00",
+    "desc": "Best Tatvan",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 15000,
+    "date": "2025-09-17T13:20:00",
+    "desc": "",
+    "type": "ÖDEME"
+  },
+  {
+    "amount": 22050,
+    "date": "2025-09-24T15:53:00",
+    "desc": "Cihan",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 9475,
+    "date": "2025-09-30T22:43:00",
+    "desc": "",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 2100,
+    "date": "2025-10-10T13:56:00",
+    "desc": "",
+    "type": "ÖDEME"
+  },
+  {
+    "amount": 10000,
+    "date": "2025-10-13T13:24:00",
+    "desc": "",
+    "type": "ÖDEME"
+  },
+  {
+    "amount": 6600,
+    "date": "2025-10-14T03:50:00",
+    "desc": "PERTEK",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 20000,
+    "date": "2025-10-17T15:55:00",
+    "desc": "Yarım altın",
+    "type": "ÖDEME"
+  },
+  {
+    "amount": 6600,
+    "date": "2025-10-17T15:57:00",
+    "desc": "",
+    "type": "ÖDEME"
+  },
+  {
+    "amount": 15000,
+    "date": "2025-10-20T18:30:00",
+    "desc": "",
+    "type": "ÖDEME"
+  },
+  {
+    "amount": 4400,
+    "date": "2025-10-20T18:30:30",
+    "desc": "1000 normal",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 2400,
+    "date": "2025-10-20T18:31:00",
+    "desc": "500 süngerli x4.8",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 1800,
+    "date": "2025-10-20T18:33:00",
+    "desc": "",
+    "type": "ÖDEME"
+  },
+  {
+    "amount": 11000,
+    "date": "2025-10-23T19:21:00",
+    "desc": "Drysan 2500 ad x 4.4",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 7200,
+    "date": "2025-10-27T15:10:00",
+    "desc": "Nişantaşı",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 10200,
+    "date": "2025-11-08T01:37:00",
+    "desc": "",
+    "type": "ÖDEME"
+  },
+  {
+    "amount": 5000,
+    "date": "2025-11-10T11:20:00",
+    "desc": "",
+    "type": "ÖDEME"
+  },
+  {
+    "amount": 7200,
+    "date": "2025-11-10T19:52:00",
+    "desc": "Şanal",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 20000,
+    "date": "2025-11-21T20:01:00",
+    "desc": "Alinçe çek Samsun çeki",
+    "type": "ÖDEME"
+  },
+  {
+    "amount": 27000,
+    "date": "2025-11-21T21:47:00",
+    "desc": "Alinçe çek",
+    "type": "ÖDEME"
+  },
+  {
+    "amount": 9960,
+    "date": "2025-11-28T22:30:00",
+    "desc": "Best",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 9800,
+    "date": "2025-12-04T06:25:00",
+    "desc": "Alinçe KDV",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 26000,
+    "date": "2025-12-09T19:55:00",
+    "desc": "",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 8960,
+    "date": "2025-12-16T16:30:00",
+    "desc": "",
+    "type": "ÖDEME"
+  },
+  {
+    "amount": 19700,
+    "date": "2025-12-21T10:00:00",
+    "desc": "",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 19700,
+    "date": "2025-12-21T10:01:00",
+    "desc": "",
+    "type": "ÖDEME"
+  },
+  {
+    "amount": 6600,
+    "date": "2026-01-24T21:22:00",
+    "desc": "Pertek",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 11000,
+    "date": "2026-01-24T21:23:00",
+    "desc": "Drysan",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 10000,
+    "date": "2026-01-24T21:23:30",
+    "desc": "",
+    "type": "ÖDEME"
+  },
+  {
+    "amount": 6600,
+    "date": "2026-02-03T11:56:00",
+    "desc": "Ritz carlton",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 4000,
+    "date": "2026-02-10T17:33:00",
+    "desc": "",
+    "type": "ÖDEME"
+  },
+  {
+    "amount": 8250,
+    "date": "2026-03-13T15:44:00",
+    "desc": "Nişantaşı 1500 süngerli",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 8250,
+    "date": "2026-03-13T15:45:00",
+    "desc": "Şanal 1500 süngerli",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 135000,
+    "date": "2026-03-27T19:20:00",
+    "desc": "",
+    "type": "ÖDEME"
+  },
+  {
+    "amount": 5000,
+    "date": "2026-03-30T19:29:00",
+    "desc": "Uğur k tmz TATVAN",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 20300,
+    "date": "2026-03-31T20:08:00",
+    "desc": "KDV",
+    "type": "TAHSİLAT"
+  },
+  {
+    "amount": 9100,
+    "date": "2026-04-07T17:16:00",
+    "desc": "Greatdry",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 9125,
+    "date": "2026-04-13T18:04:00",
+    "desc": "",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 27500,
+    "date": "2026-05-07T21:01:00",
+    "desc": "Alinçe çek",
+    "type": "ÖDEME"
+  },
+  {
+    "amount": 27500,
+    "date": "2026-05-07T21:01:30",
+    "desc": "Alinçe çek",
+    "type": "ÖDEME"
+  },
+  {
+    "amount": 41650,
+    "date": "2026-05-14T21:00:00",
+    "desc": "PERTEK Ritz Peköz Nişantaşı",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 12750,
+    "date": "2026-06-04T11:23:00",
+    "desc": "Cemal kuru temizleme",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 7925,
+    "date": "2026-06-04T11:24:00",
+    "desc": "Dengeleme",
+    "type": "ÖDEME"
+  },
+  {
+    "amount": 13750,
+    "date": "2026-06-09T10:36:00",
+    "desc": "Drysan",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 14375,
+    "date": "2026-06-18T13:47:00",
+    "desc": "Best TATVAN",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 150000,
+    "date": "2026-06-18T19:50:00",
+    "desc": "",
+    "type": "ÖDEME"
+  },
+  {
+    "amount": 36680,
+    "date": "2026-06-19T10:51:00",
+    "desc": "Alinçe kdv",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 19900,
+    "date": "2026-07-07T15:29:00",
+    "desc": "Nişantaşı greatdry",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 34000,
+    "date": "2026-07-07T15:54:00",
+    "desc": "Cihan kuru temizleme",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 1950,
+    "date": "2026-07-08T23:40:00",
+    "desc": "300 mandalı x 6.5 PERTEK",
+    "type": "ALIŞ"
+  },
+  {
+    "amount": 12000,
+    "date": "2026-07-27T00:00:00",
+    "desc": "İrsaliye No 2864 - 2000 adet süngerli askı (Şalal-8 kat) x6",
+    "type": "ALIŞ"
+  }
+]
+  });
+  return true;
+}
+if(ensureSafPlastGeriYukle()) save();
+
+
 // Temmuz 2026: Kullanıcı "market alışverişi masrafları var, onları masrafa yaz" dedi —
 // Garanti BBVA'dan zaten Banka moduline (Para Çek) işlenmiş MAVI MARKET harcamaları
 // (22.07.2026, 185₺ ve 465₺) AYRICA Masraflar moduline de "Mavi Market" kalemi olarak
