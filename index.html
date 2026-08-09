@@ -24,14 +24,6 @@
 <title>Hesap Defteri</title>
 <style>
   @keyframes cv2spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
-  @keyframes cv2popIn{from{opacity:0;transform:scale(.85);}to{opacity:1;transform:scale(1);}}
-  .cv2-octo-arm{position:absolute;left:50%;top:50%;width:9px;height:50px;background:#d92626;border-radius:8px;
-    transform-origin:50% 5px;margin-left:-4.5px;margin-top:-5px;animation:cv2octowiggle .7s ease-in-out infinite;}
-  @keyframes cv2octowiggle{
-    0%{transform:rotate(var(--rot)) scaleY(1);}
-    50%{transform:rotate(calc(var(--rot) + 26deg)) scaleY(1.28);}
-    100%{transform:rotate(var(--rot)) scaleY(1);}
-  }
   :root{
     --bg-top:#c7d6dd;
     --bg-mid:#dbe6ea;
@@ -1119,13 +1111,6 @@
     </div>
   </div>
   <div id="recaptcha-container"></div>
-</div>
-
-<div id="cv2SaveToast" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(11,26,61,.55);align-items:center;justify-content:center;">
-  <div style="background:#fff;border-radius:22px;padding:26px 22px 22px;width:230px;text-align:center;box-shadow:0 14px 34px rgba(0,0,0,.35);animation:cv2popIn .18s ease-out;">
-    <div style="font-size:15px;font-weight:800;color:#1c2b30;">İşlem yapılıyor lütfen bekleyiniz</div>
-    <div id="cv2OctopusStage" style="position:relative;width:130px;height:130px;margin:14px auto 0;"></div>
-  </div>
 </div>
 
 <div id="cv2BigDropWarn" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(11,26,61,.65);align-items:center;justify-content:center;">
@@ -2545,35 +2530,6 @@ if(!state.transactions) state.transactions = [];
 let activeLedger = 'cari';
 function getLedger(){ return state[activeLedger]; }
 
-function cv2SaveToastGoster(){
-  const el = document.getElementById('cv2SaveToast');
-  if(!el) return;
-  const stage = document.getElementById('cv2OctopusStage');
-  if(stage && !stage.dataset.built){
-    const n = 10;
-    for(let i=0;i<n;i++){
-      const rot = (360/n)*i;
-      const arm = document.createElement('div');
-      arm.className = 'cv2-octo-arm';
-      arm.style.setProperty('--rot', rot+'deg');
-      arm.style.transform = 'rotate('+rot+'deg)';
-      arm.style.animationDelay = (i*0.07)+'s';
-      stage.appendChild(arm);
-    }
-    stage.dataset.built = '1';
-  }
-  el.style.display = 'flex';
-  clearTimeout(window._cv2SaveToastTimer);
-  window._cv2SaveToastTimer = setTimeout(cv2SaveToastGizle, 2000);
-}
-function cv2SaveToastGizle(){
-  const el = document.getElementById('cv2SaveToast');
-  if(el) el.style.display = 'none';
-}
-// Geçiş/aksiyon göstergesi — kayıt, silme, ekleme ve ana menü/ekran geçişlerinde
-// de aynı ahtapot animasyonunu göstermek için kullanılan genel isim.
-function cv2GostergeGoster(){ cv2SaveToastGoster(); }
-
 // Toplam işlem sayısı (Cari + Tedarikçi hesaplarındaki tüm hareketler) — buluta
 // yazmadan önce "beklenmedik büyük azalma" tespiti için kullanılıyor.
 function cv2CountTx(s){
@@ -2638,7 +2594,6 @@ function save(){
   // yazmayı geçip ESKİ bulut kopyasını geri getirmesini (yarış durumu) önlüyor.
   state._lastSaved = Date.now();
   LS.setItem(STORAGE_KEY, JSON.stringify(state));
-  cv2SaveToastGoster();
   // Giriş yapılmışsa aynı veriyi buluta da yazıyoruz (localStorage her zaman
   // hızlı yerel bir kopya olarak kalıyor; Firebase gerçek/senkron kopya).
   if(typeof fbAvailable === 'undefined' || !fbAvailable || !fbAuth || !fbAuth.currentUser) return;
@@ -2655,17 +2610,15 @@ function save(){
   // stok kartları silinmiş olabilir), bilinen kart sayısı ≥1 iken TÜMÜ birden
   // kayboluyorsa da uyar.
   if(typeof oncekiStokSayi === 'number' && oncekiStokSayi >= 1 && yeniStokSayi === 0 && !window._cv2BuyukDususOnaylandi){
-    cv2SaveToastGizle();
     cv2BuyukDususUyariGoster(oncekiStokSayi + ' stok kartı', '0 stok kartı',
-      () => { window._cv2BuyukDususOnaylandi = true; cv2SaveToastGoster(); cv2GercekBulutaYaz(); },
+      () => { window._cv2BuyukDususOnaylandi = true; cv2GercekBulutaYaz(); },
       () => {}
     );
     return;
   }
   if(typeof oncekiSayi === 'number' && oncekiSayi >= 5 && yeniSayi < oncekiSayi * 0.5 && !window._cv2BuyukDususOnaylandi){
-    cv2SaveToastGizle();
     cv2BuyukDususUyariGoster(oncekiSayi, yeniSayi,
-      () => { window._cv2BuyukDususOnaylandi = true; cv2SaveToastGoster(); cv2GercekBulutaYaz(); },
+      () => { window._cv2BuyukDususOnaylandi = true; cv2GercekBulutaYaz(); },
       () => {}
     );
     return;
