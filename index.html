@@ -1071,6 +1071,8 @@
   font-weight:700;font-size:14.5px;margin-bottom:8px;cursor:pointer;text-align:left;font-family:inherit;}
 .cv2-lp-btn:last-child{margin-bottom:0;}
 .cv2-lp-btn:active{background:#efe6d5;}
+#cv2LpOverlay{align-items:center;padding:24px;}
+#cv2LpOverlay .g-sheet{border-radius:20px;max-height:70vh;}
 .g-musteri-list-item{display:flex;align-items:center;gap:10px;padding:12px 4px;border-bottom:1px solid #f0ece3;cursor:pointer;}
 .g-musteri-list-item:last-child{border-bottom:none;}
 </style>
@@ -4890,7 +4892,6 @@ function cv2BindCards(){
           lpFired = true;
           dragging = false;
           card.classList.remove('cv2-pressed');
-          if(navigator.vibrate) navigator.vibrate(15);
           cv2UzunBasMenuAc(card.dataset.id, card.dataset.tur);
         }
       }, 500);
