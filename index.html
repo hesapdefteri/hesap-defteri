@@ -8296,7 +8296,7 @@ function renderSablonList(){
       <div class="sk-card-top">
         <div>
           <div class="sk-card-name">${s.ad || '(İsimsiz şablon)'}</div>
-          <div class="sk-card-code">${s.tedarikciAdi||'—'} → ${s.musteriAdi||'—'}</div>
+          <div class="sk-card-code">${s.tedarikciAdi||'—'} → ${(s.musteriler||[]).length} müşteri</div>
         </div>
         <div class="sk-card-qty" style="color:var(--green);">+${fmt(toplamSatis-toplamAlis)}</div>
       </div>
@@ -8314,10 +8314,12 @@ function openSablonDetay(id){
   if(id){
     const s = state.sablonlar.find(x=>x.id===id);
     sablonDraft = JSON.parse(JSON.stringify(s));
+    if(!sablonDraft.musteriler) sablonDraft.musteriler = [];
+    if(!sablonDraft.kullanimlar) sablonDraft.kullanimlar = [];
     document.getElementById('sablonDetayTitle').textContent = s.ad || 'Şablon';
     document.getElementById('sablonDetaySil').style.display = '';
   } else {
-    sablonDraft = { id: genId(), ad: '', tedarikciAdi: '', musteriAdi: '', kalemler: [] };
+    sablonDraft = { id: genId(), ad: '', tedarikciAdi: '', kalemler: [], musteriler: [], kullanimlar: [] };
     document.getElementById('sablonDetayTitle').textContent = 'Yeni Şablon';
     document.getElementById('sablonDetaySil').style.display = 'none';
   }
@@ -8331,6 +8333,7 @@ function renderSablonDetayBody(){
   const s = sablonDraft;
   const toplamAlis = s.kalemler.reduce((t,k)=>t + toNum(k.miktar)*toNum(k.alisFiyat), 0);
   const toplamSatis = s.kalemler.reduce((t,k)=>t + toNum(k.miktar)*toNum(k.satisFiyat), 0);
+  const tekUrun = s.kalemler.length <= 1;
   const kalemlerHtml = s.kalemler.length ? s.kalemler.map((k,idx)=>`
     <div class="fatura-row" data-idx="${idx}">
       <div class="f-ad">${k.ad}</div>
@@ -8338,6 +8341,36 @@ function renderSablonDetayBody(){
       <div class="f-fiyat">A:${fmt(toNum(k.alisFiyat))}</div>
       <div class="f-toplam">S:${fmt(toNum(k.satisFiyat))}</div>
     </div>`).join('') : '<div class="sk-empty" style="padding:14px 0;">Henüz ürün eklenmedi</div>';
+
+  const musteriler = s.musteriler || [];
+  const musterilerHtml = musteriler.length ? musteriler.map(m=>{
+    const urunSecHtml = tekUrun ? '' : `
+      <select class="sablon-urun-sec" data-id="${m.id}" style="font-size:11.5px;color:var(--muted);border:none;background:none;font-family:inherit;padding:0;margin-top:2px;max-width:150px;">
+        ${s.kalemler.map(k=>`<option value="${k.stokKartId}" ${k.stokKartId===m.stokKartId?'selected':''}>${k.ad}</option>`).join('')}
+      </select>`;
+    return `
+    <div class="cari-input-row" style="align-items:center;gap:8px;margin-bottom:8px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:14px;">${m.cariAdi}</div>
+        ${urunSecHtml}
+      </div>
+      <input type="text" class="sablon-musteri-adet" data-id="${m.id}" inputmode="decimal" value="${m.adet||''}" placeholder="adet" style="width:70px;padding:9px;border:1px solid var(--line);border-radius:8px;text-align:center;font-weight:700;font-family:inherit;">
+      <button type="button" class="sablon-musteri-sil" data-id="${m.id}" style="background:none;border:none;color:var(--red);font-size:18px;padding:4px;cursor:pointer;">✕</button>
+    </div>`;
+  }).join('') : '<div class="sk-empty" style="padding:10px 0;">Henüz müşteri eklenmedi</div>';
+
+  const kontrolHtml = s.kalemler.map(k=>{
+    const dagitilan = musteriler.filter(m=>m.stokKartId===k.stokKartId).reduce((t,m)=>t+toNum(m.adet),0);
+    const ok = dagitilan === toNum(k.miktar);
+    return `<div class="fis-toplam-row" style="font-size:12.5px;"><span>${tekUrun?'Dağıtılan / Alış Adeti':k.ad}</span><span>${fmtPlain(dagitilan)} / ${fmtPlain(k.miktar)} ${ok?'<span style="color:var(--green);">✓</span>':'<span style="color:var(--red);">✗</span>'}</span></div>`;
+  }).join('');
+
+  const kullanimlar = s.kullanimlar || [];
+  const kullanimHtml = kullanimlar.length ? kullanimlar.slice().reverse().map(k=>`
+    <div class="fatura-row" style="cursor:default;">
+      <div class="f-ad">${trDate(k.tarih)}</div>
+      <div class="f-toplam" style="flex:1;text-align:right;font-size:12px;color:var(--muted);">${k.alisBelgeNo} · ${(k.satisBelgeNolar||[]).join(', ')}</div>
+    </div>`).join('') : '<div class="sk-empty" style="padding:10px 0;">Henüz kullanılmadı</div>';
 
   document.getElementById('sablonDetayBody').innerHTML = `
     <div class="sk-form-card">
@@ -8350,33 +8383,78 @@ function renderSablonDetayBody(){
           <button type="button" class="cari-sec-btn" id="sablonTedarikciSecBtn">▾</button>
         </div>
       </div>
-      <div class="field-ios-block"><label>Müşteri (Satış)</label>
-        <div class="cari-input-row">
-          <input type="text" id="sablonMusteriInput" value="${s.musteriAdi||''}" placeholder="müşteri adı" readonly>
-          <button type="button" class="cari-sec-btn" id="sablonMusteriSecBtn">▾</button>
-        </div>
-      </div>
     </div>
     <div class="sk-form-card">
       <div class="fatura-table">${kalemlerHtml}</div>
       <button type="button" class="fis-ekle-btn" id="sablonKalemEkleBtn">＋ Ürün Ekle</button>
+    </div>
+    <div class="sk-form-card">
+      <div class="cv2-ayar-section-title" style="margin:0 0 10px;">Müşteriler (Satış)</div>
+      ${musterilerHtml}
+      <button type="button" class="fis-ekle-btn" id="sablonMusteriEkleBtn">＋ Müşteri Ekle</button>
+      <input type="hidden" id="sablonMusteriPicker">
+      <div style="margin-top:10px;">${kontrolHtml}</div>
+    </div>
+    <div class="sk-form-card">
       <div class="fis-toplam-row"><span>Toplam Alış</span><span>${fmt(toplamAlis)}</span></div>
       <div class="fis-toplam-row"><span>Toplam Satış</span><span>${fmt(toplamSatis)}</span></div>
       <div class="fis-toplam-row fis-genel-toplam"><span>Tahmini Kâr</span><span style="color:var(--green);">${fmt(toplamSatis-toplamAlis)}</span></div>
     </div>
-    ${editingSablonId ? `<button type="button" id="sablonKullanBtn" style="width:100%;padding:15px;border:none;border-radius:14px;background:#2f6690;color:#fff;font-weight:800;font-size:15px;font-family:inherit;cursor:pointer;margin-top:4px;">Bu Şablonu Kullan (Alış + Satış Oluştur)</button>` : ''}
+    ${editingSablonId ? `
+    <button type="button" id="sablonKullanBtn" style="width:100%;padding:15px;border:none;border-radius:14px;background:#2f6690;color:#fff;font-weight:800;font-size:15px;font-family:inherit;cursor:pointer;margin-top:4px;">Bu Şablonu Kullan (Alış + Satış Oluştur)</button>
+    <div class="sk-form-card" style="margin-top:14px;">
+      <div class="cv2-ayar-section-title" style="margin:0 0 10px;">Toplu İşlemler</div>
+      ${kullanimHtml}
+    </div>` : ''}
   `;
   document.getElementById('sablonAdInput').oninput = e => { sablonDraft.ad = e.target.value; };
   document.getElementById('sablonTedarikciSecBtn').onclick = () => openCariSec('tedarikci', 'sablonTedarikciInput');
-  document.getElementById('sablonMusteriSecBtn').onclick = () => openCariSec('cari', 'sablonMusteriInput');
   document.getElementById('sablonTedarikciInput').oninput = e => { sablonDraft.tedarikciAdi = e.target.value; };
-  document.getElementById('sablonMusteriInput').oninput = e => { sablonDraft.musteriAdi = e.target.value; };
   document.getElementById('sablonKalemEkleBtn').onclick = () => openUrunSec('sablon');
+  document.getElementById('sablonMusteriEkleBtn').onclick = () => openCariSec('cari', 'sablonMusteriPicker');
+  document.getElementById('sablonMusteriPicker').oninput = e => {
+    const cariAdi = e.target.value;
+    if(!cariAdi) return;
+    const ilkKalem = sablonDraft.kalemler[0];
+    sablonDraft.musteriler = sablonDraft.musteriler || [];
+    sablonDraft.musteriler.push({ id: genId(), cariAdi, stokKartId: ilkKalem ? ilkKalem.stokKartId : null, adet: '' });
+    e.target.value = '';
+    renderSablonDetayBody();
+  };
+  document.querySelectorAll('.sablon-musteri-adet').forEach(inp=>{
+    inp.oninput = () => {
+      const m = sablonDraft.musteriler.find(x=>x.id===inp.dataset.id);
+      if(m) m.adet = toNum(inp.value);
+      sablonDetayToplamGuncelle();
+    };
+  });
+  document.querySelectorAll('.sablon-urun-sec').forEach(sel=>{
+    sel.onchange = () => {
+      const m = sablonDraft.musteriler.find(x=>x.id===sel.dataset.id);
+      if(m) m.stokKartId = sel.value;
+      renderSablonDetayBody();
+    };
+  });
+  document.querySelectorAll('.sablon-musteri-sil').forEach(btn=>{
+    btn.onclick = () => {
+      sablonDraft.musteriler = sablonDraft.musteriler.filter(x=>x.id!==btn.dataset.id);
+      renderSablonDetayBody();
+    };
+  });
   const kullanBtn = document.getElementById('sablonKullanBtn');
   if(kullanBtn) kullanBtn.onclick = () => sablonKullan(editingSablonId);
-  document.querySelectorAll('#sablonDetayBody .fatura-row').forEach(row=>{
+  document.querySelectorAll('#sablonDetayBody .fatura-table .fatura-row').forEach(row=>{
     row.onclick = () => openSablonKalemDuzenle(parseInt(row.dataset.idx,10));
   });
+}
+function sablonDetayToplamGuncelle(){
+  const activeEl = document.activeElement;
+  const activeId = activeEl && activeEl.classList.contains('sablon-musteri-adet') ? activeEl.dataset.id : null;
+  renderSablonDetayBody();
+  if(activeId){
+    const el = document.querySelector(`.sablon-musteri-adet[data-id="${activeId}"]`);
+    if(el){ el.focus(); const v = el.value; el.value=''; el.value=v; }
+  }
 }
 
 function openSablonKalemModal(stokKartId){
@@ -8410,7 +8488,11 @@ document.getElementById('sablonKalemVazgec').onclick = () => {
   nudge();
 };
 document.getElementById('sablonKalemSil').onclick = () => {
-  if(editingSablonKalemIdx !== null) sablonDraft.kalemler.splice(editingSablonKalemIdx, 1);
+  if(editingSablonKalemIdx !== null){
+    const removed = sablonDraft.kalemler[editingSablonKalemIdx];
+    sablonDraft.kalemler.splice(editingSablonKalemIdx, 1);
+    if(removed) sablonDraft.musteriler = (sablonDraft.musteriler||[]).filter(m=>m.stokKartId !== removed.stokKartId);
+  }
   document.getElementById('sablonKalemOverlay').classList.remove('show');
   renderSablonDetayBody();
   nudge();
@@ -8442,8 +8524,15 @@ document.getElementById('sablonVazgec').onclick = () => document.getElementById(
 
 document.getElementById('sablonKaydet').onclick = () => {
   if(!sablonDraft.ad.trim()){ alertBox('Şablona bir ad verin.'); return; }
-  if(!sablonDraft.tedarikciAdi.trim() || !sablonDraft.musteriAdi.trim()){ alertBox('Tedarikçi ve müşteri seçilmeli.'); return; }
+  if(!sablonDraft.tedarikciAdi.trim()){ alertBox('Tedarikçi seçilmeli.'); return; }
   if(!sablonDraft.kalemler.length){ alertBox('En az bir ürün eklenmeli.'); return; }
+  if(!sablonDraft.musteriler || !sablonDraft.musteriler.length){ alertBox('En az bir müşteri eklenmeli.'); return; }
+  if(sablonDraft.musteriler.some(m=>!toNum(m.adet))){ alertBox('Her müşteri satırında adet girilmeli.'); return; }
+  const uyumsuz = sablonDraft.kalemler.some(k=>{
+    const dagitilan = sablonDraft.musteriler.filter(m=>m.stokKartId===k.stokKartId).reduce((t,m)=>t+toNum(m.adet),0);
+    return dagitilan !== toNum(k.miktar);
+  });
+  if(uyumsuz){ alertBox('Müşterilere dağıtılan adet, alış adetiyle eşit olmalı.'); return; }
   const idx = state.sablonlar.findIndex(x=>x.id===sablonDraft.id);
   if(idx !== -1) state.sablonlar[idx] = sablonDraft; else state.sablonlar.push(sablonDraft);
   save();
@@ -8464,15 +8553,18 @@ document.getElementById('sablonDetaySil').onclick = () => {
   });
 };
 
-// Şablonu "kullan": aynı anda normal bir Alış Fişi + normal bir Satış Fişi oluşturur.
+// Şablonu "kullan": tedarikçiye TEK bir Alış Fişi + her müşteriye AYRI bir Satış
+// Fişi oluşturur (ikisi de tamamen normal fatura — Alışlar/Satışlar listelerinde
+// görünür). Her kullanım "Toplu İşlemler" günlüğüne kaydedilir.
 function sablonKullan(id){
   const s = state.sablonlar.find(x=>x.id===id);
   if(!s) return;
-  openConfirm('Şablonu Kullan', `"${s.ad}" şablonundan bugünün tarihiyle bir Alış Fişi (${s.tedarikciAdi}) ve bir Satış Fişi (${s.musteriAdi}) oluşturulacak. Devam edilsin mi?`, () => {
+  const musteriSayisi = new Set((s.musteriler||[]).map(m=>m.cariAdi)).size;
+  openConfirm('Şablonu Kullan', `"${s.ad}" şablonundan bugünün tarihiyle bir Alış Fişi (${s.tedarikciAdi}) ve ${musteriSayisi} Satış Fişi oluşturulacak. Devam edilsin mi?`, () => {
     const tarih = todayInputVal();
     const now = new Date().toISOString();
 
-    // --- Alış Fişi ---
+    // --- Alış Fişi (tek, tedarikçiye toplam kalemlerle) ---
     const alisFisId = genId();
     const alisBelgeNo = sonrakiFisNo('alis');
     const alisKalemler = s.kalemler.map(k => ({ stokKartId: k.stokKartId, ad: k.ad, birim: k.birim, miktar: toNum(k.miktar), birimFiyat: toNum(k.alisFiyat), tutar: toNum(k.miktar)*toNum(k.alisFiyat) }));
@@ -8488,25 +8580,43 @@ function sablonKullan(id){
     tedarikci.transactions.push({ type:'ALIŞ', desc:`${alisBelgeNo} · Şablon: ${s.ad}`, amount: alisToplam, date: now, skRef: alisFisId });
     state.sayaclar.alis = (state.sayaclar.alis||0) + 1;
 
-    // --- Satış Fişi ---
-    const satisFisId = genId();
-    const satisBelgeNo = sonrakiFisNo('satis');
-    const satisKalemler = s.kalemler.map(k => ({ stokKartId: k.stokKartId, ad: k.ad, birim: k.birim, miktar: toNum(k.miktar), birimFiyat: toNum(k.satisFiyat), tutar: toNum(k.miktar)*toNum(k.satisFiyat) }));
-    const satisToplam = satisKalemler.reduce((t,k)=>t+k.tutar,0);
-    state.satisFisleri.push({ id: satisFisId, tur:'fatura', belgeNo: satisBelgeNo, cariAdi: s.musteriAdi, tarih, vadeTarihi: tarih, aciklama: `Şablon: ${s.ad}`, kdvDahil:false, kalemler: satisKalemler, toplam: satisToplam });
-    satisKalemler.forEach(k=>{
-      const card = state.stokKartlari.find(c=>c.id===k.stokKartId);
-      if(!card) return;
-      card.satislar = card.satislar || [];
-      card.satislar.push({ id: genId(), tarih, belgeNo: satisBelgeNo, cariAdi: s.musteriAdi, miktar: k.miktar, birimFiyat: k.birimFiyat, iskonto:0, kdv:0, toplam: k.tutar, iade:false, fisId: satisFisId });
+    // --- Satış Fişleri (her müşteriye ayrı) ---
+    const musterilerGrup = {};
+    (s.musteriler||[]).forEach(m=>{
+      if(!musterilerGrup[m.cariAdi]) musterilerGrup[m.cariAdi] = [];
+      musterilerGrup[m.cariAdi].push(m);
     });
-    const musteri = bulYadaEkleCari('cari', s.musteriAdi);
-    musteri.transactions.push({ type:'SATIŞ', desc:`${satisBelgeNo} · Şablon: ${s.ad}`, amount: satisToplam, date: now, skRef: satisFisId });
-    state.sayaclar.satis = (state.sayaclar.satis||0) + 1;
+    const satisBelgeNolar = [];
+    Object.keys(musterilerGrup).forEach(cariAdi=>{
+      const satirlar = musterilerGrup[cariAdi];
+      const satisFisId = genId();
+      const satisBelgeNo = sonrakiFisNo('satis');
+      const satisKalemler = satirlar.map(m=>{
+        const k = s.kalemler.find(x=>x.stokKartId===m.stokKartId);
+        return { stokKartId: m.stokKartId, ad: k?k.ad:'', birim: k?k.birim:'', miktar: toNum(m.adet), birimFiyat: k?toNum(k.satisFiyat):0, tutar: toNum(m.adet)*(k?toNum(k.satisFiyat):0) };
+      });
+      const satisToplam = satisKalemler.reduce((t,k)=>t+k.tutar,0);
+      state.satisFisleri.push({ id: satisFisId, tur:'fatura', belgeNo: satisBelgeNo, cariAdi, tarih, vadeTarihi: tarih, aciklama: `Şablon: ${s.ad}`, kdvDahil:false, kalemler: satisKalemler, toplam: satisToplam });
+      satisKalemler.forEach(k=>{
+        const card = state.stokKartlari.find(c=>c.id===k.stokKartId);
+        if(!card) return;
+        card.satislar = card.satislar || [];
+        card.satislar.push({ id: genId(), tarih, belgeNo: satisBelgeNo, cariAdi, miktar: k.miktar, birimFiyat: k.birimFiyat, iskonto:0, kdv:0, toplam: k.tutar, iade:false, fisId: satisFisId });
+      });
+      const musteri = bulYadaEkleCari('cari', cariAdi);
+      musteri.transactions.push({ type:'SATIŞ', desc:`${satisBelgeNo} · Şablon: ${s.ad}`, amount: satisToplam, date: now, skRef: satisFisId });
+      state.sayaclar.satis = (state.sayaclar.satis||0) + 1;
+      satisBelgeNolar.push(satisBelgeNo);
+    });
+
+    s.kullanimlar = s.kullanimlar || [];
+    s.kullanimlar.push({ tarih, alisBelgeNo, satisBelgeNolar });
+    if(sablonDraft && sablonDraft.id === s.id) sablonDraft.kullanimlar = s.kullanimlar;
 
     save();
     renderUrunler();
-    alertBox(`Oluşturuldu: ${alisBelgeNo} (Alış) ve ${satisBelgeNo} (Satış).`);
+    renderSablonDetayBody();
+    alertBox(`Oluşturuldu: ${alisBelgeNo} (Alış) ve ${satisBelgeNolar.join(', ')} (Satış).`);
   });
 }
 
