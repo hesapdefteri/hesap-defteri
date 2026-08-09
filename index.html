@@ -2,14 +2,15 @@
 <html lang="tr">
 <head>
 <script>
-  // Ana ekrana eklenmiş kısayoldan (standalone) her açılışta, sayfayı benzersiz
-  // bir sürüm parametresiyle bir kerelik yeniden yükleyip iOS'un webclip
-  // önbelleğini atlıyoruz. Kullanıcı hiçbir şey yapmadan, sadece dokununca çalışır.
+  // Her sayfa yüklemesinde (standalone/webclip VEYA normal Safari sekmesi fark
+  // etmeksizin) benzersiz bir sürüm parametresiyle bir kerelik yeniden yükleyip
+  // GitHub Pages'in sunucu tarafı (CDN) önbelleğini atlıyoruz — meta etiketleri
+  // sadece tarayıcı önbelleğini etkiliyor, CDN'i etkilemiyor (09 Ağu 2026,
+  // tekrar tekrar eski veri gösterme sorunu sonrası eklendi).
   (function(){
     try {
-      var isStandalone = window.navigator.standalone === true;
       var url = new URL(window.location.href);
-      if(isStandalone && !url.searchParams.has('_fresh')){
+      if(!url.searchParams.has('_fresh')){
         url.searchParams.set('_fresh', Date.now().toString());
         window.location.replace(url.toString());
       }
