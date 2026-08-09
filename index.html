@@ -1670,10 +1670,20 @@
 
 <div class="overlay islem-overlay" id="islemYapiliyorOverlay" style="z-index:200;">
   <div class="modal islem-modal">
-    <div class="islem-spinner"></div>
-    <div style="font-weight:800;font-size:18px;color:var(--ink);">İşleminiz Yapılıyor</div>
-    <div style="color:var(--muted);font-size:14px;margin-top:5px;">Lütfen bekleyin...</div>
-    <div class="islem-progress-track"><div class="islem-progress-fill" id="islemProgressFill"></div></div>
+    <div id="islemSpinnerBox">
+      <div class="islem-spinner"></div>
+      <div style="font-weight:800;font-size:18px;color:var(--ink);">İşleminiz Yapılıyor</div>
+      <div style="color:var(--muted);font-size:14px;margin-top:5px;">Lütfen bekleyin...</div>
+      <div class="islem-progress-track"><div class="islem-progress-fill" id="islemProgressFill"></div></div>
+    </div>
+    <div id="islemFisOzetiBox" style="display:none;text-align:left;">
+      <div id="islemFisOzetiBaslik" style="font-weight:800;font-size:17px;color:var(--ink);margin-bottom:10px;text-align:center;"></div>
+      <div id="islemFisOzetiKalemler" style="max-height:220px;overflow-y:auto;"></div>
+      <div style="display:flex;justify-content:space-between;border-top:2px solid var(--line);margin-top:8px;padding-top:10px;font-weight:800;font-size:16px;color:var(--ink);">
+        <span>Toplam</span><span id="islemFisOzetiToplam"></span>
+      </div>
+      <button id="islemFisTamamBtn" type="button" style="width:100%;margin-top:18px;padding:14px 0;border:none;border-radius:12px;background:var(--green);color:#fff;font-weight:700;font-size:15px;cursor:pointer;">Tamam</button>
+    </div>
   </div>
 </div>
 
@@ -4427,6 +4437,8 @@ function showIslemYapiliyor(callback, duration){
   duration = duration || 2000;
   const overlay = document.getElementById('islemYapiliyorOverlay');
   const fill = document.getElementById('islemProgressFill');
+  document.getElementById('islemSpinnerBox').style.display = '';
+  document.getElementById('islemFisOzetiBox').style.display = 'none';
   fill.style.transition = 'none';
   fill.style.width = '0%';
   overlay.classList.add('show');
@@ -4436,6 +4448,42 @@ function showIslemYapiliyor(callback, duration){
   setTimeout(() => {
     overlay.classList.remove('show');
     if(callback) callback();
+  }, duration);
+}
+// Satış/Alış Fatura kaydından sonra: spinner bitince aynı ekranda ALTINDA
+// fiş özeti (kalemler + toplam) gösterir, kapanmaz — "Tamam"a basınca kapanır.
+// saveFn: spinner süresi bitince çalışır (asıl veri kaydı). navigateFn: Tamam'a
+// basınca çalışır (ekran geçişleri). 09 Ağu 2026, kullanıcı isteği.
+function showIslemYapiliyorFisOzeti(fisOzet, duration, saveFn, navigateFn){
+  duration = duration || 2000;
+  const overlay = document.getElementById('islemYapiliyorOverlay');
+  const fill = document.getElementById('islemProgressFill');
+  document.getElementById('islemSpinnerBox').style.display = '';
+  document.getElementById('islemFisOzetiBox').style.display = 'none';
+  fill.style.transition = 'none';
+  fill.style.width = '0%';
+  overlay.classList.add('show');
+  void fill.offsetWidth;
+  fill.style.transition = 'width ' + duration + 'ms linear';
+  fill.style.width = '100%';
+  setTimeout(() => {
+    if(saveFn) saveFn();
+    document.getElementById('islemSpinnerBox').style.display = 'none';
+    const box = document.getElementById('islemFisOzetiBox');
+    document.getElementById('islemFisOzetiBaslik').textContent =
+      (fisOzet.tur === 'alis' ? 'Alış Fişi Kaydedildi' : 'Satış Fişi Kaydedildi');
+    document.getElementById('islemFisOzetiKalemler').innerHTML = (fisOzet.kalemler || []).map(k =>
+      '<div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px;">' +
+        '<span style="color:var(--ink);flex:1;">' + (k.ad || '') + '<br><span style="color:var(--muted);font-size:12px;">' + fmtPlain(k.miktar) + ' ' + (k.birim || '') + '</span></span>' +
+        '<span style="font-weight:700;white-space:nowrap;color:var(--ink);">' + fmtPlain(k.tutar) + ' ₺</span>' +
+      '</div>'
+    ).join('');
+    document.getElementById('islemFisOzetiToplam').textContent = fmtPlain(fisOzet.toplam) + ' ₺';
+    box.style.display = 'block';
+    document.getElementById('islemFisTamamBtn').onclick = () => {
+      overlay.classList.remove('show');
+      if(navigateFn) navigateFn();
+    };
   }, duration);
 }
 function openConfirm(title, text, action, yesLabel){
@@ -8018,6 +8066,15 @@ document.getElementById('fisKaydet').onclick = () => {
   const kalemToplam = d.kalemler.reduce((s,k)=>s+toNum(k.tutar),0);
   d.toplam = d.kdvDahil ? kalemToplam * 1.20 : kalemToplam;
 
+  const fisOzetVerisi = {
+    tur: fisTuru,
+    kalemler: d.kalemler.map(k=>({ad:k.ad, miktar:k.miktar, birim:k.birim, tutar:k.tutar})),
+    toplam: d.toplam
+  };
+  let wasLegacy = null;
+
+  showIslemYapiliyorFisOzeti(fisOzetVerisi, 2000, function(){
+  // ---- asıl kaydetme (spinner süresi bitince çalışır) ----
   if(editingFisId) silFisKalemleri(editingFisId);
 
   d.kalemler.forEach(k=>{
@@ -8072,7 +8129,6 @@ document.getElementById('fisKaydet').onclick = () => {
     skRef: d.id
   });
 
-  let wasLegacy = null;
   if(editingLegacyTx){
     wasLegacy = { cariId: editingLegacyTx.cari.id, ledgerKey };
     const i = editingLegacyTx.cari.transactions.indexOf(editingLegacyTx.tx);
@@ -8091,6 +8147,8 @@ document.getElementById('fisKaydet').onclick = () => {
   save();
   document.getElementById('fisDetayScreen').classList.remove('show');
   renderUrunler();
+  }, function(){
+  // ---- Tamam'a basınca çalışır (ekran geçişleri) ----
   if(cv2ReturnCtx){
     const ctx = cv2ReturnCtx; cv2ReturnCtx = null;
     renderCariV2();
@@ -8104,6 +8162,7 @@ document.getElementById('fisKaydet').onclick = () => {
     renderFisList();
     nudge();
   }
+  });
 };
 
 function silFisKalemleri(fisId){
