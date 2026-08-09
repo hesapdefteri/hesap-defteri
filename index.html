@@ -2597,6 +2597,13 @@ function cv2CountTx(s){
 function cv2CountStok(s){
   return (s.stokKartlari || []).length;
 }
+// Alış/Satış fişleri ve Şablonlar için ayrı sayaç (09 Ağu 2026, birden fazla
+// cihazın birbirinin verisini sessizce ezmesi sonucu alisFisleri/satisFisleri/
+// sablonlar'ın TAMAMEN silinmesi olayından sonra eklendi — eskiden bu üçü hiç
+// kontrol edilmiyordu).
+function cv2CountFisler(s){
+  return (s.alisFisleri || []).length + (s.satisFisleri || []).length + (s.sablonlar || []).length;
+}
 
 function cv2BuyukDususUyariGoster(oncekiSayi, yeniSayi, onOnayla, onVazgec){
   const el = document.getElementById('cv2BigDropWarn');
@@ -2634,10 +2641,12 @@ function cv2YedekEkle(stateKopyasi){
 function cv2GercekBulutaYaz(){
   const yeniSayi = cv2CountTx(state);
   const yeniStokSayi = cv2CountStok(state);
+  const yeniFisSayi = cv2CountFisler(state);
   const stateKopyasi = JSON.parse(JSON.stringify(state));
   fbDb.ref('users/' + fbAuth.currentUser.uid).set(state).then(() => {
     window._cv2LastCloudTxCount = yeniSayi;
     window._cv2LastCloudStokCount = yeniStokSayi;
+    window._cv2LastCloudFisSayisi = yeniFisSayi;
     cv2YedekEkle(stateKopyasi);
   }).catch(err => {
     console.error('Bulut kayıt hatası:', err);
@@ -2667,6 +2676,21 @@ function save(){
   // kayboluyorsa da uyar.
   if(typeof oncekiStokSayi === 'number' && oncekiStokSayi >= 1 && yeniStokSayi === 0 && !window._cv2BuyukDususOnaylandi){
     cv2BuyukDususUyariGoster(oncekiStokSayi + ' stok kartı', '0 stok kartı',
+      () => { window._cv2BuyukDususOnaylandi = true; cv2GercekBulutaYaz(); },
+      () => {}
+    );
+    return;
+  }
+  // DÖRDÜNCÜ GÜVENLİK AĞI (09 Ağu 2026, "Toplu satış" şablonu ve alış/satış
+  // fişlerinin sessizce tamamen kaybolması olayından sonra eklendi): bilinen
+  // toplam fiş+şablon sayısı ≥1 iken bu cihazın yazacağı sayı yarısından azına
+  // düşüyorsa (veya sıfırlanıyorsa) uyar. Eskiden alisFisleri/satisFisleri/
+  // sablonlar hiç bu kontrole dahil değildi, o yüzden birden fazla cihaz
+  // birbirinin verisini sessizce ezebiliyordu.
+  const yeniFisSayi = cv2CountFisler(state);
+  const oncekiFisSayi = window._cv2LastCloudFisSayisi;
+  if(typeof oncekiFisSayi === 'number' && oncekiFisSayi >= 1 && yeniFisSayi < oncekiFisSayi * 0.5 && !window._cv2BuyukDususOnaylandi){
+    cv2BuyukDususUyariGoster(oncekiFisSayi + ' alış/satış fişi+şablon', yeniFisSayi + ' alış/satış fişi+şablon',
       () => { window._cv2BuyukDususOnaylandi = true; cv2GercekBulutaYaz(); },
       () => {}
     );
@@ -9907,6 +9931,7 @@ function cloudSyncAndBoot(user){
       LS.setItem(STORAGE_KEY, JSON.stringify(state));
       window._cv2LastCloudTxCount = cv2CountTx(state);
       window._cv2LastCloudStokCount = cv2CountStok(state);
+      window._cv2LastCloudFisSayisi = cv2CountFisler(state);
     } else if(yerelDamga > 0){
       // Yerel veri aynı veya daha yeni VE en az bir kez gerçekten kaydedilmiş
       // (yerelDamga>0 = kullanıcı en az bir işlem yapıp save() tetiklemiş) —
@@ -9914,6 +9939,7 @@ function cloudSyncAndBoot(user){
       fbDb.ref('users/' + user.uid).set(state).then(() => {
         window._cv2LastCloudTxCount = cv2CountTx(state);
         window._cv2LastCloudStokCount = cv2CountStok(state);
+        window._cv2LastCloudFisSayisi = cv2CountFisler(state);
       });
     }
     // else: yerelDamga===0 VE bulut yok/daha eski değil — yani state HİÇ
