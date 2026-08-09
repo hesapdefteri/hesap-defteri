@@ -8290,7 +8290,7 @@ function renderSablonList(){
   const el = document.getElementById('sablonList');
   el.innerHTML = list.length ? list.map(s=>{
     const toplamAlis = (s.kalemler||[]).reduce((t,k)=>t + toNum(k.miktar)*toNum(k.alisFiyat), 0);
-    const toplamSatis = (s.kalemler||[]).reduce((t,k)=>t + toNum(k.miktar)*toNum(k.satisFiyat), 0);
+    const toplamSatis = (s.musteriler||[]).reduce((t,m)=>t + toNum(m.adet)*toNum(m.fiyat), 0);
     return `
     <div class="sk-card" data-id="${s.id}">
       <div class="sk-card-top">
@@ -8332,7 +8332,7 @@ function openSablonDetay(id){
 function renderSablonDetayBody(){
   const s = sablonDraft;
   const toplamAlis = s.kalemler.reduce((t,k)=>t + toNum(k.miktar)*toNum(k.alisFiyat), 0);
-  const toplamSatis = s.kalemler.reduce((t,k)=>t + toNum(k.miktar)*toNum(k.satisFiyat), 0);
+  const toplamSatis = (s.musteriler||[]).reduce((t,m)=>t + toNum(m.adet)*toNum(m.fiyat), 0);
   const tekUrun = s.kalemler.length <= 1;
   const kalemlerHtml = s.kalemler.length ? s.kalemler.map((k,idx)=>`
     <div class="fatura-row" data-idx="${idx}">
@@ -8345,17 +8345,24 @@ function renderSablonDetayBody(){
   const musteriler = s.musteriler || [];
   const musterilerHtml = musteriler.length ? musteriler.map(m=>{
     const urunSecHtml = tekUrun ? '' : `
-      <select class="sablon-urun-sec" data-id="${m.id}" style="font-size:11.5px;color:var(--muted);border:none;background:none;font-family:inherit;padding:0;margin-top:2px;max-width:150px;">
+      <select class="sablon-urun-sec" data-id="${m.id}" style="font-size:11.5px;color:var(--muted);border:none;background:none;font-family:inherit;padding:0;margin-bottom:4px;max-width:200px;">
         ${s.kalemler.map(k=>`<option value="${k.stokKartId}" ${k.stokKartId===m.stokKartId?'selected':''}>${k.ad}</option>`).join('')}
       </select>`;
+    const satirToplam = toNum(m.adet) * toNum(m.fiyat);
     return `
-    <div class="cari-input-row" style="align-items:center;gap:8px;margin-bottom:8px;">
-      <div style="flex:1;min-width:0;">
-        <div style="font-weight:700;font-size:14px;">${m.cariAdi}</div>
-        ${urunSecHtml}
+    <div style="padding:10px 0;border-bottom:1px solid var(--line);">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <div style="flex:1;min-width:0;font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.cariAdi}</div>
+        <button type="button" class="sablon-musteri-sil" data-id="${m.id}" style="background:none;border:none;color:var(--red);font-size:18px;padding:2px 4px;cursor:pointer;flex-shrink:0;">✕</button>
       </div>
-      <input type="text" class="sablon-musteri-adet" data-id="${m.id}" inputmode="decimal" value="${m.adet||''}" placeholder="adet" style="width:70px;padding:9px;border:1px solid var(--line);border-radius:8px;text-align:center;font-weight:700;font-family:inherit;">
-      <button type="button" class="sablon-musteri-sil" data-id="${m.id}" style="background:none;border:none;color:var(--red);font-size:18px;padding:4px;cursor:pointer;">✕</button>
+      ${urunSecHtml}
+      <div style="display:flex;align-items:center;gap:6px;">
+        <input type="text" class="sablon-musteri-adet" data-id="${m.id}" inputmode="decimal" value="${m.adet||''}" placeholder="adet" style="flex:1;min-width:0;padding:9px;border:1px solid var(--line);border-radius:8px;text-align:center;font-weight:700;font-family:inherit;">
+        <span style="color:var(--muted);font-size:13px;">×</span>
+        <input type="text" class="sablon-musteri-fiyat" data-id="${m.id}" inputmode="decimal" value="${m.fiyat||''}" placeholder="0,00" style="flex:1;min-width:0;padding:9px;border:1px solid var(--line);border-radius:8px;text-align:center;font-weight:700;font-family:inherit;">
+        <span style="color:var(--muted);font-size:13px;">=</span>
+        <div style="flex:1;min-width:0;text-align:right;font-weight:800;font-size:13.5px;color:var(--ink);">${fmt(satirToplam)}</div>
+      </div>
     </div>`;
   }).join('') : '<div class="sk-empty" style="padding:10px 0;">Henüz müşteri eklenmedi</div>';
 
@@ -8416,8 +8423,10 @@ function renderSablonDetayBody(){
     const cariAdi = e.target.value;
     if(!cariAdi) return;
     const ilkKalem = sablonDraft.kalemler[0];
+    const card = ilkKalem ? state.stokKartlari.find(c=>c.id===ilkKalem.stokKartId) : null;
+    const son = card ? skSonFiyatCariden(card.satislar, cariAdi) : null;
     sablonDraft.musteriler = sablonDraft.musteriler || [];
-    sablonDraft.musteriler.push({ id: genId(), cariAdi, stokKartId: ilkKalem ? ilkKalem.stokKartId : null, adet: '' });
+    sablonDraft.musteriler.push({ id: genId(), cariAdi, stokKartId: ilkKalem ? ilkKalem.stokKartId : null, adet: '', fiyat: son ? toNum(son.birimFiyat) : 0 });
     e.target.value = '';
     renderSablonDetayBody();
   };
@@ -8428,10 +8437,22 @@ function renderSablonDetayBody(){
       sablonDetayToplamGuncelle();
     };
   });
+  document.querySelectorAll('.sablon-musteri-fiyat').forEach(inp=>{
+    inp.oninput = () => {
+      const m = sablonDraft.musteriler.find(x=>x.id===inp.dataset.id);
+      if(m) m.fiyat = toNum(inp.value);
+      sablonDetayToplamGuncelle();
+    };
+  });
   document.querySelectorAll('.sablon-urun-sec').forEach(sel=>{
     sel.onchange = () => {
       const m = sablonDraft.musteriler.find(x=>x.id===sel.dataset.id);
-      if(m) m.stokKartId = sel.value;
+      if(m){
+        m.stokKartId = sel.value;
+        const card = state.stokKartlari.find(c=>c.id===m.stokKartId);
+        const son = card ? skSonFiyatCariden(card.satislar, m.cariAdi) : null;
+        m.fiyat = son ? toNum(son.birimFiyat) : 0;
+      }
       renderSablonDetayBody();
     };
   });
@@ -8449,10 +8470,12 @@ function renderSablonDetayBody(){
 }
 function sablonDetayToplamGuncelle(){
   const activeEl = document.activeElement;
-  const activeId = activeEl && activeEl.classList.contains('sablon-musteri-adet') ? activeEl.dataset.id : null;
+  const isRelevant = activeEl && (activeEl.classList.contains('sablon-musteri-adet') || activeEl.classList.contains('sablon-musteri-fiyat'));
+  const activeId = isRelevant ? activeEl.dataset.id : null;
+  const activeCls = isRelevant ? (activeEl.classList.contains('sablon-musteri-adet') ? 'sablon-musteri-adet' : 'sablon-musteri-fiyat') : null;
   renderSablonDetayBody();
   if(activeId){
-    const el = document.querySelector(`.sablon-musteri-adet[data-id="${activeId}"]`);
+    const el = document.querySelector(`.${activeCls}[data-id="${activeId}"]`);
     if(el){ el.focus(); const v = el.value; el.value=''; el.value=v; }
   }
 }
@@ -8593,7 +8616,7 @@ function sablonKullan(id){
       const satisBelgeNo = sonrakiFisNo('satis');
       const satisKalemler = satirlar.map(m=>{
         const k = s.kalemler.find(x=>x.stokKartId===m.stokKartId);
-        return { stokKartId: m.stokKartId, ad: k?k.ad:'', birim: k?k.birim:'', miktar: toNum(m.adet), birimFiyat: k?toNum(k.satisFiyat):0, tutar: toNum(m.adet)*(k?toNum(k.satisFiyat):0) };
+        return { stokKartId: m.stokKartId, ad: k?k.ad:'', birim: k?k.birim:'', miktar: toNum(m.adet), birimFiyat: toNum(m.fiyat), tutar: toNum(m.adet)*toNum(m.fiyat) };
       });
       const satisToplam = satisKalemler.reduce((t,k)=>t+k.tutar,0);
       state.satisFisleri.push({ id: satisFisId, tur:'fatura', belgeNo: satisBelgeNo, cariAdi, tarih, vadeTarihi: tarih, aciklama: `Şablon: ${s.ad}`, kdvDahil:false, kalemler: satisKalemler, toplam: satisToplam });
