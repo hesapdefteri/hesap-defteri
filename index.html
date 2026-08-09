@@ -132,7 +132,7 @@
 
   .cv2-card{position:relative;z-index:2;background:#fff;border-radius:18px;padding:14px 16px;
     display:flex;align-items:center;gap:12px;cursor:pointer;touch-action:pan-y;will-change:transform;
-    border:1px solid rgba(16,24,32,.04);}
+    border:1px solid rgba(16,24,32,.04);-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
   .cv2-card.cv2-pressed{transform:scale(.985);transition:transform .12s ease;}
   .cv2-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
   .cv2-dot.debt{background:var(--red);} .cv2-dot.credit{background:var(--green);} .cv2-dot.zero{background:#c7ced1;}
@@ -1067,6 +1067,10 @@
 .g-tarihce-son .g-tarihce-fiyat{color:#3f8a5a;}
 .g-tarihce-tag{font-size:10.5px;font-weight:800;background:#e9f4ec;color:#3f8a5a;padding:2px 7px;border-radius:20px;margin-left:6px;}
 .g-use-btn{font-size:12.5px;font-weight:700;color:#8a6d3b;}
+.cv2-lp-btn{width:100%;padding:14px;border:none;border-radius:12px;background:#f7f2e9;color:#3a3229;
+  font-weight:700;font-size:14.5px;margin-bottom:8px;cursor:pointer;text-align:left;font-family:inherit;}
+.cv2-lp-btn:last-child{margin-bottom:0;}
+.cv2-lp-btn:active{background:#efe6d5;}
 .g-musteri-list-item{display:flex;align-items:center;gap:10px;padding:12px 4px;border-bottom:1px solid #f0ece3;cursor:pointer;}
 .g-musteri-list-item:last-child{border-bottom:none;}
 </style>
@@ -1947,6 +1951,17 @@
     </div>
     <input type="text" id="grupMusteriSearch" placeholder="müşteri ara" style="width:100%;padding:12px;border:1.5px solid #e5ddcf;border-radius:10px;font-size:14px;margin-bottom:10px;font-family:inherit;box-sizing:border-box;">
     <div id="grupMusteriListe"></div>
+  </div>
+</div>
+
+<!-- Cari Hesap: Uzun Basma Menüsü -->
+<div class="g-overlay" id="cv2LpOverlay">
+  <div class="g-sheet">
+    <div class="g-sheet-header">
+      <div class="g-sheet-title" id="cv2LpTitle">Hesap</div>
+      <button class="g-sheet-close" id="cv2LpKapat">✕</button>
+    </div>
+    <div id="cv2LpButtons"></div>
   </div>
 </div>
 
@@ -4859,15 +4874,26 @@ function cv2CloseOpenInstant(){
 function cv2BindCards(){
   document.querySelectorAll('.cv2-card').forEach(card=>{
     let startX=0, startY=0, curX=0, dragging=false, decided=false, horizontal=false;
+    let lpTimer=null, lpFired=false;
     const uid = card.dataset.uid;
 
     card.addEventListener('pointerdown', e=>{
       if(e.pointerType === 'mouse' && e.button !== 0) return;
       startX = e.clientX; startY = e.clientY;
       curX = parseFloat(card.dataset.tx || '0');
-      dragging = true; decided = false; horizontal = false;
+      dragging = true; decided = false; horizontal = false; lpFired = false;
       card.style.transition = 'none';
       card.classList.add('cv2-pressed');
+      clearTimeout(lpTimer);
+      lpTimer = setTimeout(()=>{
+        if(!decided){
+          lpFired = true;
+          dragging = false;
+          card.classList.remove('cv2-pressed');
+          if(navigator.vibrate) navigator.vibrate(15);
+          cv2UzunBasMenuAc(card.dataset.id, card.dataset.tur);
+        }
+      }, 500);
     });
 
     card.addEventListener('pointermove', e=>{
@@ -4876,6 +4902,7 @@ function cv2BindCards(){
       if(!decided){
         if(Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
         decided = true;
+        clearTimeout(lpTimer);
         horizontal = Math.abs(dx) > Math.abs(dy);
         if(horizontal){
           try{ card.setPointerCapture(e.pointerId); }catch(err){}
@@ -4895,6 +4922,7 @@ function cv2BindCards(){
     });
 
     const finish = () => {
+      clearTimeout(lpTimer);
       card.classList.remove('cv2-pressed');
       if(!dragging) return;
       dragging = false;
@@ -4909,6 +4937,7 @@ function cv2BindCards(){
     card.addEventListener('pointercancel', finish);
 
     card.addEventListener('click', () => {
+      if(lpFired){ lpFired = false; return; }
       const tx = parseFloat(card.dataset.tx || '0');
       if(Math.abs(tx) > 4){ cv2CloseOpen(null); return; }
       cv2Hareketler(card.dataset.id, card.dataset.tur);
@@ -4923,17 +4952,43 @@ function cv2BindCards(){
       const tur = uid.slice(0, sep), id = uid.slice(sep + 1);
       const act = btn.dataset.act;
       cv2CloseOpenInstant();
-      if(act === 'tahsilat') openQuickTx(id, tur, 'TAHSİLAT');
-      else if(act === 'odeme') openQuickTx(id, tur, 'ÖDEME');
-      else if(act === 'satis') cv2Satis(id, tur);
-      else if(act === 'alis') cv2Alis(id, tur);
-      else if(act === 'duzenle') cv2Duzenle(id, tur);
-      else if(act === 'hareketler') cv2Hareketler(id, tur);
-      else if(act === 'ekstre') cv2Ekstre(id, tur);
-      else if(act === 'daha') cv2DahaFazla(id, tur);
+      cv2AksiyonUygula(id, tur, act);
     });
   });
 }
+
+// Kart aksiyonları (sağ/sol kaydırma butonları VE uzun basma menüsü ortak kullanır)
+function cv2AksiyonUygula(id, tur, act){
+  if(act === 'tahsilat') openQuickTx(id, tur, 'TAHSİLAT');
+  else if(act === 'odeme') openQuickTx(id, tur, 'ÖDEME');
+  else if(act === 'satis') cv2Satis(id, tur);
+  else if(act === 'alis') cv2Alis(id, tur);
+  else if(act === 'duzenle') cv2Duzenle(id, tur);
+  else if(act === 'hareketler') cv2Hareketler(id, tur);
+  else if(act === 'ekstre') cv2Ekstre(id, tur);
+  else if(act === 'daha') cv2DahaFazla(id, tur);
+}
+
+// Cari hesap satırını uzun basınca açılan hızlı işlem menüsü (titreşimle birlikte).
+function cv2UzunBasMenuAc(id, tur){
+  const c = state[tur].find(x=>x.id===id);
+  document.getElementById('cv2LpTitle').textContent = c ? c.name : 'Hesap';
+  const items = tur === 'tedarikci'
+    ? [['alis','Alış'],['odeme','Ödeme'],['duzenle','Düzenle'],['hareketler','Hareketler'],['ekstre','Ekstre'],['daha','Daha Fazla']]
+    : [['tahsilat','Tahsilat'],['satis','Satış'],['duzenle','Düzenle'],['hareketler','Hareketler'],['ekstre','Ekstre'],['daha','Daha Fazla']];
+  document.getElementById('cv2LpButtons').innerHTML = items.map(([act,label])=>
+    `<button type="button" class="cv2-lp-btn" data-act="${act}">${label}</button>`
+  ).join('');
+  document.querySelectorAll('#cv2LpButtons .cv2-lp-btn').forEach(btn=>{
+    btn.onclick = () => {
+      document.getElementById('cv2LpOverlay').classList.remove('show');
+      cv2AksiyonUygula(id, tur, btn.dataset.act);
+    };
+  });
+  document.getElementById('cv2LpOverlay').classList.add('show');
+}
+document.getElementById('cv2LpKapat').onclick = () => document.getElementById('cv2LpOverlay').classList.remove('show');
+document.getElementById('cv2LpOverlay').onclick = (e) => { if(e.target.id==='cv2LpOverlay') document.getElementById('cv2LpOverlay').classList.remove('show'); };
 
 /* ---------- ekran ---------- */
 function cv2SegBtnleriGuncelle(){
