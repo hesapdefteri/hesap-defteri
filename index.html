@@ -4443,6 +4443,7 @@ function openConfirm(title, text, action, yesLabel){
   document.getElementById('confirmDeleteText').textContent = text;
   document.getElementById('confirmDeleteYes').textContent = yesLabel || 'Evet, Sil';
   document.getElementById('confirmDeleteYes').style.display = '';
+  document.getElementById('confirmDeleteNo').textContent = 'Vazgeç';
   confirmDeleteAction = action;
   document.getElementById('confirmDeleteOverlay').classList.add('show');
 }
@@ -9069,6 +9070,7 @@ function alertBox(msg){
   document.getElementById('confirmDeleteTitle').textContent = 'Bilgi';
   document.getElementById('confirmDeleteText').textContent = msg;
   document.getElementById('confirmDeleteYes').style.display = 'none';
+  document.getElementById('confirmDeleteNo').textContent = 'Tamam';
   confirmDeleteAction = null;
   document.getElementById('confirmDeleteOverlay').classList.add('show');
 }
