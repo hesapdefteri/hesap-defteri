@@ -537,6 +537,14 @@
     box-shadow:0 3px 8px rgba(0,0,0,.16), inset 0 0 0 1px rgba(0,0,0,.03);}
   .cv2-ayar-name{font-size:16px;font-weight:700;color:#3a3229;}
   .cv2-ayar-name.danger{color:#b5473a;}
+  .cv2-ayar-section-title{font-size:11.5px;font-weight:800;color:#a39685;text-transform:uppercase;letter-spacing:.5px;margin:4px 4px 8px;}
+  .cv2-ayar-row.toggle-row{cursor:default;}
+  .cv2-toggle{position:relative;width:46px;height:27px;border-radius:20px;background:#d8cdb8;flex-shrink:0;
+    cursor:pointer;transition:background .2s;align-self:center;}
+  .cv2-toggle.on{background:#6b5f4f;}
+  .cv2-toggle .knob{position:absolute;top:2.5px;left:2.5px;width:22px;height:22px;border-radius:50%;background:#fff;
+    box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s;}
+  .cv2-toggle.on .knob{transform:translateX(19px);}
   .ayar-badge svg{width:24px;height:24px;}
   .am-label{color:#fff;font-size:12px;font-weight:800;letter-spacing:.4px;text-align:center;opacity:.94;}
   .am-badge.b-cari{background:linear-gradient(135deg,#5b8bf5,#2e56c9);}
@@ -1420,6 +1428,15 @@
     <button class="d-share" style="visibility:hidden;">📄</button>
   </div>
   <div style="padding:10px 20px 0 20px;">
+    <div class="cv2-ayar-section-title">Kullanıcı Ayarları</div>
+    <div class="cv2-ayar-row toggle-row" id="ayarUzunBasmaRow">
+      <div class="cv2-ayar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#6b5f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></div>
+      <div class="cv2-ayar-text" style="justify-content:space-between;">
+        <span class="cv2-ayar-name">Cari Hesap Uzun Basma Menüsü</span>
+        <div class="cv2-toggle" id="ayarUzunBasmaToggle"><div class="knob"></div></div>
+      </div>
+    </div>
+    <div class="cv2-ayar-section-title">Veri</div>
     <div class="cv2-ayar-row" id="ayarYedekleBtn">
       <div class="cv2-ayar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#6b5f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 6a8 8 0 1 0 0 12"/><path d="M9.5 12h11M17 8l4 4-4 4"/></svg></div>
       <div class="cv2-ayar-text"><span class="cv2-ayar-name">JSON Dışa Aktar</span></div>
@@ -2544,6 +2561,8 @@ if(!state.masrafKategorileri) state.masrafKategorileri = [];
 if(!state.masrafHesaplari) state.masrafHesaplari = [];
 if(!state.stokKartlari) state.stokKartlari = [];
 if(!state.transactions) state.transactions = [];
+if(state.ayarlar === undefined) state.ayarlar = {};
+if(state.ayarlar.cv2UzunBasmaAcik === undefined) state.ayarlar.cv2UzunBasmaAcik = true;
 let activeLedger = 'cari';
 function getLedger(){ return state[activeLedger]; }
 
@@ -4888,7 +4907,7 @@ function cv2BindCards(){
       card.classList.add('cv2-pressed');
       clearTimeout(lpTimer);
       lpTimer = setTimeout(()=>{
-        if(!decided){
+        if(!decided && state.ayarlar.cv2UzunBasmaAcik){
           lpFired = true;
           dragging = false;
           card.classList.remove('cv2-pressed');
@@ -8538,6 +8557,17 @@ function cv2KumSaatiGoster(mesaj, sure){
     setTimeout(() => { ov.style.display = 'none'; resolve(); }, sure || 3000);
   });
 }
+
+function cv2UzunBasmaToggleSync(){
+  const el = document.getElementById('ayarUzunBasmaToggle');
+  if(el) el.classList.toggle('on', !!state.ayarlar.cv2UzunBasmaAcik);
+}
+document.getElementById('ayarUzunBasmaToggle').onclick = () => {
+  state.ayarlar.cv2UzunBasmaAcik = !state.ayarlar.cv2UzunBasmaAcik;
+  cv2UzunBasmaToggleSync();
+  save();
+};
+cv2UzunBasmaToggleSync();
 
 document.getElementById('ayarYedekleBtn').onclick = () => {
   cv2KumSaatiGoster('Dışa aktarılıyor…').then(() => {
