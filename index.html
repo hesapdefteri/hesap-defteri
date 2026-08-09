@@ -1427,16 +1427,31 @@
     <div class="d-title">Ayarlar</div>
     <button class="d-share" style="visibility:hidden;">📄</button>
   </div>
-  <div style="padding:10px 20px 0 20px;">
-    <div class="cv2-ayar-section-title">Kullanıcı Ayarları</div>
-    <div class="cv2-ayar-row toggle-row" id="ayarUzunBasmaRow">
-      <div class="cv2-ayar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#6b5f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></div>
+
+  <!-- Ayarlar ana menü -->
+  <div id="ayarAnaMenu" style="padding:10px 20px 0 20px;">
+    <div class="cv2-ayar-row" id="ayarMenuYedeklemeBtn">
+      <div class="cv2-ayar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#6b5f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 6a8 8 0 1 0 0 12"/><path d="M9.5 12h11M17 8l4 4-4 4"/></svg></div>
       <div class="cv2-ayar-text" style="justify-content:space-between;">
-        <span class="cv2-ayar-name">Cari Hesap Uzun Basma Menüsü</span>
-        <div class="cv2-toggle" id="ayarUzunBasmaToggle"><div class="knob"></div></div>
+        <span class="cv2-ayar-name">Yedekleme</span>
+        <span style="color:#c7bca6;font-size:20px;">›</span>
       </div>
     </div>
-    <div class="cv2-ayar-section-title">Veri</div>
+    <div class="cv2-ayar-row" id="ayarMenuKullaniciBtn">
+      <div class="cv2-ayar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#6b5f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c1-4 4.5-6 7-6s6 2 7 6"/></svg></div>
+      <div class="cv2-ayar-text" style="justify-content:space-between;">
+        <span class="cv2-ayar-name">Kullanıcı Ayarları</span>
+        <span style="color:#c7bca6;font-size:20px;">›</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alt menü: Yedekleme -->
+  <div id="ayarAltYedekleme" style="display:none;padding:10px 20px 0 20px;">
+    <div class="cv2-ayar-row" id="ayarAltGeriBtn1" style="margin-bottom:18px;">
+      <div class="cv2-ayar-text"><span style="color:#6b5f4f;font-size:20px;margin-right:8px;">‹</span><span class="cv2-ayar-name">Ayarlar</span></div>
+    </div>
+    <div class="cv2-ayar-section-title">Yedekleme</div>
     <div class="cv2-ayar-row" id="ayarYedekleBtn">
       <div class="cv2-ayar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#6b5f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 6a8 8 0 1 0 0 12"/><path d="M9.5 12h11M17 8l4 4-4 4"/></svg></div>
       <div class="cv2-ayar-text"><span class="cv2-ayar-name">JSON Dışa Aktar</span></div>
@@ -1458,6 +1473,31 @@
       <div class="cv2-ayar-text"><span class="cv2-ayar-name danger">Her Şeyi Sıfırla</span></div>
     </div>
     <p id="cv2AyarAciklamaText" onclick="cv2AciklamaOku()" style="color:#a39685;font-size:12.5px;margin:16px 4px;cursor:pointer;">Dışa Aktar, tüm verilerini (cari hesaplar, stok kartları, fişler, siparişler) tek bir JSON dosyası olarak indirir. İçe Aktar, daha önce indirdiğin bir yedeği seçip tüm verileri o hale getirir — mevcut veriler değişir. Bulut Yedeğinden Cari Geri Yükle, son 30 otomatik buluta kaydetmeden birini seçip içindeki TEK BİR cari hesabı (silinmiş/kaybolmuş olabilir) mevcut verine geri ekler — diğer verilerine dokunmaz. Hareketleri Sıfırla, sadece fiş/işlem geçmişini temizler; cari hesap ve stok kartı tanımların olduğu gibi kalır. Her Şeyi Sıfırla, kartlar dahil her şeyi siler.</p>
+  </div>
+
+  <!-- Alt menü: Kullanıcı Ayarları -->
+  <div id="ayarAltKullanici" style="display:none;padding:10px 20px 0 20px;">
+    <div class="cv2-ayar-row" id="ayarAltGeriBtn2" style="margin-bottom:18px;">
+      <div class="cv2-ayar-text"><span style="color:#6b5f4f;font-size:20px;margin-right:8px;">‹</span><span class="cv2-ayar-name">Ayarlar</span></div>
+    </div>
+    <div class="cv2-ayar-section-title">Kullanıcı Ayarları</div>
+    <div class="cv2-ayar-row toggle-row" id="ayarUzunBasmaRow">
+      <div class="cv2-ayar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#6b5f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></div>
+      <div class="cv2-ayar-text" style="justify-content:space-between;">
+        <span class="cv2-ayar-name">Açılır Menü</span>
+        <div class="cv2-toggle" id="ayarUzunBasmaToggle"><div class="knob"></div></div>
+      </div>
+    </div>
+    <div class="cv2-ayar-row toggle-row" id="ayarKayarMenuRow">
+      <div class="cv2-ayar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#6b5f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l-4 5 4 5M16 7l4 5-4 5"/></svg></div>
+      <div class="cv2-ayar-text" style="justify-content:space-between;">
+        <span class="cv2-ayar-name">Kayar Menü</span>
+        <div class="cv2-toggle" id="ayarKayarMenuToggle"><div class="knob"></div></div>
+      </div>
+    </div>
+    <p style="color:#a39685;font-size:12.5px;margin:16px 4px;">Cari hesap satırında hızlı işlemlere (Tahsilat/Satış, Alış/Ödeme, Düzenle vb.) erişim yolları. Açılır Menü: satıra basılı tutunca ortada açılan menü. Kayar Menü: satırı sağa/sola kaydırma. En az biri her zaman açık kalır.</p>
+  </div>
+
   </div>
   <input type="file" id="ayarGeriYukleInput" accept="application/json,.json,.txt,text/plain" style="display:none;">
 </div>
@@ -2563,6 +2603,7 @@ if(!state.stokKartlari) state.stokKartlari = [];
 if(!state.transactions) state.transactions = [];
 if(state.ayarlar === undefined) state.ayarlar = {};
 if(state.ayarlar.cv2UzunBasmaAcik === undefined) state.ayarlar.cv2UzunBasmaAcik = true;
+if(state.ayarlar.cv2KayarMenuAcik === undefined) state.ayarlar.cv2KayarMenuAcik = true;
 let activeLedger = 'cari';
 function getLedger(){ return state[activeLedger]; }
 
@@ -4578,6 +4619,7 @@ document.getElementById('anaMenu').querySelectorAll('.am-tile').forEach(tile=>{
       nudge();
     } else if(mod === 'ayarlar'){
       hideAllScreens();
+      if(typeof ayarAnaMenuGoster === 'function') ayarAnaMenuGoster();
       document.getElementById('ayarlarScreen').classList.add('show');
       nudge();
     } else if(mod === 'iletisim'){
@@ -4924,6 +4966,11 @@ function cv2BindCards(){
         decided = true;
         clearTimeout(lpTimer);
         horizontal = Math.abs(dx) > Math.abs(dy);
+        if(horizontal && !state.ayarlar.cv2KayarMenuAcik){
+          dragging = false;
+          card.classList.remove('cv2-pressed');
+          return;
+        }
         if(horizontal){
           try{ card.setPointerCapture(e.pointerId); }catch(err){}
           cv2CloseOpen(uid);
@@ -8561,13 +8608,44 @@ function cv2KumSaatiGoster(mesaj, sure){
 function cv2UzunBasmaToggleSync(){
   const el = document.getElementById('ayarUzunBasmaToggle');
   if(el) el.classList.toggle('on', !!state.ayarlar.cv2UzunBasmaAcik);
+  const el2 = document.getElementById('ayarKayarMenuToggle');
+  if(el2) el2.classList.toggle('on', !!state.ayarlar.cv2KayarMenuAcik);
 }
 document.getElementById('ayarUzunBasmaToggle').onclick = () => {
-  state.ayarlar.cv2UzunBasmaAcik = !state.ayarlar.cv2UzunBasmaAcik;
+  const yeni = !state.ayarlar.cv2UzunBasmaAcik;
+  state.ayarlar.cv2UzunBasmaAcik = yeni;
+  if(!yeni && !state.ayarlar.cv2KayarMenuAcik) state.ayarlar.cv2KayarMenuAcik = true;
+  cv2UzunBasmaToggleSync();
+  save();
+};
+document.getElementById('ayarKayarMenuToggle').onclick = () => {
+  const yeni = !state.ayarlar.cv2KayarMenuAcik;
+  state.ayarlar.cv2KayarMenuAcik = yeni;
+  if(!yeni && !state.ayarlar.cv2UzunBasmaAcik) state.ayarlar.cv2UzunBasmaAcik = true;
   cv2UzunBasmaToggleSync();
   save();
 };
 cv2UzunBasmaToggleSync();
+
+// Ayarlar ekranı içinde ana menü ↔ alt menü geçişleri
+function ayarAnaMenuGoster(){
+  document.getElementById('ayarAltYedekleme').style.display = 'none';
+  document.getElementById('ayarAltKullanici').style.display = 'none';
+  document.getElementById('ayarAnaMenu').style.display = 'block';
+  nudge();
+}
+document.getElementById('ayarMenuYedeklemeBtn').onclick = () => {
+  document.getElementById('ayarAnaMenu').style.display = 'none';
+  document.getElementById('ayarAltYedekleme').style.display = 'block';
+  nudge();
+};
+document.getElementById('ayarMenuKullaniciBtn').onclick = () => {
+  document.getElementById('ayarAnaMenu').style.display = 'none';
+  document.getElementById('ayarAltKullanici').style.display = 'block';
+  nudge();
+};
+document.getElementById('ayarAltGeriBtn1').onclick = () => ayarAnaMenuGoster();
+document.getElementById('ayarAltGeriBtn2').onclick = () => ayarAnaMenuGoster();
 
 document.getElementById('ayarYedekleBtn').onclick = () => {
   cv2KumSaatiGoster('Dışa aktarılıyor…').then(() => {
