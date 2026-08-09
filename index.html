@@ -692,6 +692,8 @@
   .spacer{height:14px;}
 
   .overlay{position:fixed;inset:0;background:rgba(20,30,35,.45);display:none;align-items:flex-end;justify-content:center;z-index:50;}
+  #confirmDeleteOverlay{align-items:center;padding:24px;}
+  #confirmDeleteOverlay .modal{border-radius:20px;}
   .islem-overlay{align-items:center !important;}
   .islem-overlay .islem-modal{width:auto;min-width:250px;max-width:320px;border-radius:24px;padding:34px 26px 28px 26px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.25);}
   .islem-spinner{width:54px;height:54px;margin:0 auto 18px auto;border-radius:50%;border:4.5px solid #e8ecee;border-top-color:#2e56c9;animation:islemSpin .8s linear infinite;}
@@ -8640,7 +8642,7 @@ function sablonKullan(id){
     renderUrunler();
     renderSablonDetayBody();
     alertBox(`Oluşturuldu: ${alisBelgeNo} (Alış) ve ${satisBelgeNolar.join(', ')} (Satış).`);
-  });
+  }, 'Evet, Oluştur');
 }
 
 // ===== Ayarlar: Yedekle / Geri Yükle / Sıfırla =====
@@ -8861,7 +8863,7 @@ document.getElementById('ayarGeriYukleInput').onchange = (e) => {
         save();
         showAnaMenu();
       });
-    });
+    }, 'Evet, Geri Yükle');
     e.target.value = '';
   };
   reader.readAsText(file);
@@ -8944,7 +8946,8 @@ function cv2BulutYedekHesaplariGoster(key){
             save();
             document.getElementById('cv2BulutYedekOverlay').classList.remove('show');
             if(document.getElementById('cv2Screen').classList.contains('show')) renderCariV2();
-          }
+          },
+          'Evet, Geri Getir'
         );
       };
     });
