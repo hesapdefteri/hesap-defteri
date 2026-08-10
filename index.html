@@ -1420,6 +1420,10 @@
       <div class="cv2-ayar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#6b5f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 6a8 8 0 1 0 0 12"/><path d="M9.5 12h11M17 8l4 4-4 4"/></svg></div>
       <div class="cv2-ayar-text"><span class="cv2-ayar-name">JSON Dışa Aktar</span></div>
     </div>
+    <div class="cv2-ayar-row" id="ayarHtmlYedekleBtn">
+      <div class="cv2-ayar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#6b5f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2Z"/><path d="M9 15l1.5 3L12 15l1.5 3L15 15"/></svg></div>
+      <div class="cv2-ayar-text"><span class="cv2-ayar-name">HTML Dosyasını Yedekle</span></div>
+    </div>
     <div class="cv2-ayar-row" id="ayarGeriYukleBtn">
       <div class="cv2-ayar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#6b5f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v10"/><path d="M8 10l4 4 4-4"/><path d="M5 16v2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2"/></svg></div>
       <div class="cv2-ayar-text"><span class="cv2-ayar-name">İçe Aktar</span></div>
@@ -1436,7 +1440,7 @@
       <div class="cv2-ayar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#6b5f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-8 0 1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13"/><path d="M10 11v6M14 11v6"/></svg></div>
       <div class="cv2-ayar-text"><span class="cv2-ayar-name danger">Her Şeyi Sıfırla</span></div>
     </div>
-    <p id="cv2AyarAciklamaText" onclick="cv2AciklamaOku()" style="color:#a39685;font-size:12.5px;margin:16px 4px;cursor:pointer;">Dışa Aktar, tüm verilerini (cari hesaplar, stok kartları, fişler, siparişler) tek bir JSON dosyası olarak indirir. İçe Aktar, daha önce indirdiğin bir yedeği seçip tüm verileri o hale getirir — mevcut veriler değişir. Bulut Yedeğinden Cari Geri Yükle, son 30 otomatik buluta kaydetmeden birini seçip içindeki TEK BİR cari hesabı (silinmiş/kaybolmuş olabilir) mevcut verine geri ekler — diğer verilerine dokunmaz. Hareketleri Sıfırla, sadece fiş/işlem geçmişini temizler; cari hesap ve stok kartı tanımların olduğu gibi kalır. Her Şeyi Sıfırla, kartlar dahil her şeyi siler.</p>
+    <p id="cv2AyarAciklamaText" onclick="cv2AciklamaOku()" style="color:#a39685;font-size:12.5px;margin:16px 4px;cursor:pointer;">Dışa Aktar, tüm verilerini (cari hesaplar, stok kartları, fişler, siparişler) tek bir JSON dosyası olarak indirir. HTML Dosyasını Yedekle, uygulamanın kendi kod dosyasını (verilerini değil) indirir. İçe Aktar, daha önce indirdiğin bir yedeği seçip tüm verileri o hale getirir — mevcut veriler değişir. Bulut Yedeğinden Cari Geri Yükle, son 30 otomatik buluta kaydetmeden birini seçip içindeki TEK BİR cari hesabı (silinmiş/kaybolmuş olabilir) mevcut verine geri ekler — diğer verilerine dokunmaz. Hareketleri Sıfırla, sadece fiş/işlem geçmişini temizler; cari hesap ve stok kartı tanımların olduğu gibi kalır. Her Şeyi Sıfırla, kartlar dahil her şeyi siler.</p>
   </div>
 
   <!-- Alt menü: Kullanıcı Ayarları -->
@@ -8730,6 +8734,36 @@ document.getElementById('ayarYedekleBtn').onclick = () => {
     const dataStr = JSON.stringify(state, null, 2);
     showYedekMetinKutusu(dataStr);
   });
+};
+
+// HTML dosyasının kendisini yedekleme (10 Ağu 2026, kullanıcı isteği) — uygulamanın
+// çalıştığı canlı sayfanın kendi HTML kaynağını indirir. Bu SADECE KOD yedeğidir,
+// gerçek veriye (cari/stok/fiş) dokunmaz — o zaten "JSON Dışa Aktar" ile veya
+// bulutta ayrıca korunuyor.
+document.getElementById('ayarHtmlYedekleBtn').onclick = async () => {
+  const durum = cv2KumSaatiGoster('HTML hazırlanıyor…');
+  try {
+    const res = await fetch(location.href.split('?')[0], { cache: 'no-store' });
+    const htmlStr = await res.text();
+    await durum;
+    const tarih = new Date().toISOString().slice(0,10);
+    const filename = `hesap-defteri-kod-yedek-${tarih}.html`;
+    let file = null;
+    try { file = new File([new Blob([htmlStr], { type: 'text/html' })], filename, { type: 'text/html' }); } catch(e){}
+    if(navigator.share && file && navigator.canShare && navigator.canShare({ files: [file] })){
+      try { await navigator.share({ files: [file] }); return; } catch(err){ if(err && err.name === 'AbortError') return; }
+    }
+    const dlBlob = new Blob([htmlStr], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(dlBlob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+    alertBox('İndirildi: ' + filename + ' — Dosyalar uygulamasında "İndirilenler" klasörüne kaydedildi. NOT: bu sadece kod yedeği, verilerin JSON Dışa Aktar veya bulutta ayrıca duruyor.');
+  } catch(err){
+    await durum;
+    alertBox('HTML dosyası alınamadı: ' + (err && err.message ? err.message : 'bilinmeyen hata'));
+  }
 };
 
 function showYedekMetinKutusu(dataStr){
