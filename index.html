@@ -2531,6 +2531,10 @@ function save(){
   // silme/düzenleme sonrası hemen yenileyince Firebase'in henüz tamamlanmamış
   // yazmayı geçip ESKİ bulut kopyasını geri getirmesini (yarış durumu) önlüyor.
   state._lastSaved = Date.now();
+  // 10 Ağu 2026: yerel kayıt hangi hesaba ait olduğunu da taşısın — farklı bir
+  // hesaba geçildiğinde eski hesabın yerel kopyasının "daha yeni" görünüp
+  // yanlışlıkla kullanılmasını (ya da buluta yazılmasını) önlemek için.
+  if(typeof fbAuth !== 'undefined' && fbAuth && fbAuth.currentUser) state._ownerUid = fbAuth.currentUser.uid;
   LS.setItem(STORAGE_KEY, JSON.stringify(state));
   // Giriş yapılmışsa aynı veriyi buluta da yazıyoruz (localStorage her zaman
   // hızlı yerel bir kopya olarak kalıyor; Firebase gerçek/senkron kopya).
@@ -9784,7 +9788,13 @@ function cloudSyncAndBoot(user){
   document.getElementById('authStepPhone').style.display = 'none';
   document.getElementById('authBootError').style.display = 'none';
   authShowLoading(true);
-  const yerelDamga = state._lastSaved || 0;
+  // 10 Ağu 2026: yerel kayıt başka bir hesaba (farklı UID) aitse zaman damgası
+  // ne olursa olsun GEÇERSİZ sayılır — aksi halde bu cihazda daha önce
+  // kullanılmış farklı bir hesabın (ör. eski test hesabı) yerel kopyası,
+  // "daha yeni" göründüğü için doğru buluttaki veriyi hiç çekmeden ekranda
+  // kalmaya devam ediyordu (gün boyu yaşanan "yanlış veri görünüyor" sorunu).
+  const yerelSahibi = state._ownerUid || null;
+  const yerelDamga = (yerelSahibi === user.uid) ? (state._lastSaved || 0) : 0;
   fbDb.ref('users/' + user.uid).once('value').then(snap => {
     const bulut = snap.exists() ? snap.val() : null;
     const bulutDamga = (bulut && bulut._lastSaved) || 0;
@@ -9800,14 +9810,15 @@ function cloudSyncAndBoot(user){
       if(!state.transactions) state.transactions = [];
       if(!state.cariFilter) state.cariFilter = 'tumu';
       if(!state.cariTurFiltre) state.cariTurFiltre = 'hepsi';
+      state._ownerUid = user.uid;
       LS.setItem(STORAGE_KEY, JSON.stringify(state));
       window._cv2LastCloudTxCount = cv2CountTx(state);
       window._cv2LastCloudStokCount = cv2CountStok(state);
       window._cv2LastCloudFisSayisi = cv2CountFisler(state);
     } else if(yerelDamga > 0){
       // Yerel veri aynı veya daha yeni VE en az bir kez gerçekten kaydedilmiş
-      // (yerelDamga>0 = kullanıcı en az bir işlem yapıp save() tetiklemiş) —
-      // yerelde kal ve bulutu buna göre güncelle.
+      // (yerelDamga>0 = kullanıcı en az bir işlem yapıp save() tetiklemiş) VE
+      // bu AYNI hesaba ait — yerelde kal ve bulutu buna göre güncelle.
       fbDb.ref('users/' + user.uid).set(state).then(() => {
         window._cv2LastCloudTxCount = cv2CountTx(state);
         window._cv2LastCloudStokCount = cv2CountStok(state);
