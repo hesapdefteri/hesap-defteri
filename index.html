@@ -907,6 +907,22 @@
   .sk-card-qty.neg{color:var(--red);}
   .sk-card-bottom{display:flex;justify-content:space-between;margin-top:12px;font-size:15px;font-weight:800;color:var(--ink);}
 
+  /* Stoklar ana listesi (#urunList) — ikon + pill adet rozeti düzeni */
+  #urunList.sk-list{padding:10px 14px;}
+  #urunList .sk-card{display:flex;align-items:flex-start;gap:12px;padding:16px 4px;}
+  #urunList .sk-card-icon{flex:0 0 auto;width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:#e8f3ec;}
+  #urunList .sk-card-icon svg{width:20px;height:20px;stroke:#2f8557;}
+  #urunList .sk-card-icon.warn{background:#fdeceb;}
+  #urunList .sk-card-icon.warn svg{stroke:#d1453b;}
+  #urunList .sk-card-main{flex:1;min-width:0;}
+  #urunList .sk-card-top{align-items:center;}
+  #urunList .sk-card-name{font-size:17px;font-weight:800;color:#20282b;line-height:1.25;}
+  #urunList .sk-card-code{font-size:12.5px;font-weight:600;color:var(--muted);margin-top:2px;}
+  #urunList .sk-card-qty-wrap{flex:0 0 auto;display:flex;align-items:center;gap:6px;}
+  #urunList .sk-card-qty-pill{font-size:13px;font-weight:800;white-space:nowrap;padding:5px 12px;border-radius:999px;background:#e5f5ea;color:#1c8a4f;}
+  #urunList .sk-card-qty-pill.neg{background:#fdeceb;color:#d1453b;}
+  #urunList .sk-card-chevron{color:#c6ccce;font-size:18px;font-weight:700;}
+
   .sk-detail{position:fixed;inset:0;background:#f4f7f8;z-index:30;display:none;flex-direction:column;}
   .sk-detail.show{display:flex;}
   .sk-dhead{background:#0f3d44;padding:14px 14px 0 14px;flex-shrink:0;}
@@ -6911,19 +6927,29 @@ function renderUrunler(){
   const urunList = document.getElementById('urunList');
   urunList.innerHTML = list.length ? list.map(c=>{
     const miktar = skMiktar(c);
+    const neg = miktar < 0;
     const fiyatlar = c.fiyatlar || {};
+    const icon = neg
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a1.5 1.5 0 0 0 1.29 2.25h17.78A1.5 1.5 0 0 0 22.18 18L13.71 3.86a1.5 1.5 0 0 0-2.42 0Z"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>';
     return `
       <div class="sk-card ${c.aktif ? '' : 'pasif'}" data-id="${c.id}">
-        <div class="sk-card-top">
-          <div>
-            <div class="sk-card-name">${c.ad || '(İsimsiz ürün)'}</div>
-            <div class="sk-card-code">${c.stokKodu || '—'}</div>
+        <div class="sk-card-icon ${neg ? 'warn' : ''}">${icon}</div>
+        <div class="sk-card-main">
+          <div class="sk-card-top">
+            <div>
+              <div class="sk-card-name">${c.ad || '(İsimsiz ürün)'}</div>
+              <div class="sk-card-code">${c.stokKodu || '—'}</div>
+            </div>
+            <div class="sk-card-qty-wrap">
+              <span class="sk-card-qty-pill ${neg ? 'neg' : ''}">${fmtPlain(miktar)} ${c.birim || ''}</span>
+              <span class="sk-card-chevron">›</span>
+            </div>
           </div>
-          <div class="sk-card-qty ${miktar < 0 ? 'neg' : ''}">${fmtPlain(miktar)} ${c.birim || ''}</div>
-        </div>
-        <div class="sk-card-bottom">
-          <span>Alış: ${fmt(toNum(fiyatlar.sonAlis))}</span>
-          <span>Satış: ${fmt(toNum(fiyatlar.satis1))}</span>
+          <div class="sk-card-bottom">
+            <span>Alış: ${fmt(toNum(fiyatlar.sonAlis))}</span>
+            <span>Satış: ${fmt(toNum(fiyatlar.satis1))}</span>
+          </div>
         </div>
       </div>`;
   }).join('') : '<div class="sk-empty">Henüz stok kartı yok — sağ alttaki ＋ ile ekleyin</div>';
