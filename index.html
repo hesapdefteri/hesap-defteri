@@ -2626,7 +2626,7 @@ function signedAmount(t){
 // Kapsamı sınırlı: sadece Satış Faturası kaydı ve Tahsilat/Ödeme hızlı ekle akışları.
 // Sessiz çalışır — sync başarısız olsa bile Hesap Defteri'nin kendi kaydını ASLA etkilemez.
 const SHEETS_SYNC_URL = 'https://script.google.com/macros/s/AKfycbzT9CQqmhyLoW9rp-0wQ7my9ioZbEdHGmYGe6fpJ3fnNDsdjmkiDfTR_IUH2GH4vVHT/exec';
-function syncCariHareketToSheets(cariAdi, tur, aciklama, tutarSigned, tarihIso){
+function syncCariHareketToSheets(cariAdi, tur, aciklama, tutarSigned, tarihIso, tip){
   try{
     if(!cariAdi) return;
     const d = new Date(tarihIso);
@@ -2634,7 +2634,7 @@ function syncCariHareketToSheets(cariAdi, tur, aciklama, tutarSigned, tarihIso){
     fetch(SHEETS_SYNC_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ cariAdi, tarih: tarihStr, tur, aciklama: aciklama || '', tutar: tutarSigned })
+      body: JSON.stringify({ cariAdi, tarih: tarihStr, tur, aciklama: aciklama || '', tutar: tutarSigned, tip: tip || 'cari' })
     }).catch(()=>{});
   }catch(e){ /* sessizce yut, ana akışı asla bozma */ }
 }
@@ -3807,9 +3807,7 @@ document.getElementById('quickTxSave').onclick = () => {
     };
   }
   c.transactions.push(tx);
-  if(quickTxLedger === 'cari'){
-    syncCariHareketToSheets(c.name, tx.type, tx.desc, signedAmount(tx), tx.date);
-  }
+  syncCariHareketToSheets(c.name, tx.type, tx.desc, signedAmount(tx), tx.date, quickTxLedger === 'tedarikci' ? 'tedarikci' : 'cari');
 
   if(quickTxType === 'ÖDEME') state.cash -= amount;
   if(quickTxType === 'TAHSİLAT') state.cash += amount;
@@ -6553,6 +6551,7 @@ function cekCikisiUygula(tedarikciId){
     cekDetay: Object.assign({}, t.cekDetay)
   };
   tedarikci.transactions.push(odemeTx);
+  syncCariHareketToSheets(tedarikci.name, odemeTx.type, odemeTx.desc, signedAmount(odemeTx), odemeTx.date, 'tedarikci');
   state.cash -= amount;
   save();
   document.getElementById('cekCikisOverlay').classList.remove('show');
@@ -7511,13 +7510,15 @@ document.getElementById('skAlisSave').onclick = () => {
   silLinkliCariHareket(kayit.id);
   if(kayit.cariAdi){
     const cari = bulYadaEkleCari('tedarikci', kayit.cariAdi);
-    cari.transactions.push({
+    const yeniHareket = {
       type: kayit.iade ? 'ALIŞ İADE' : 'ALIŞ',
       desc: `${c.ad} · ${fmtPlain(kayit.miktar)} ${c.birim} x ${fmt(kayit.birimFiyat)}` + (kayit.belgeNo ? ' · ' + kayit.belgeNo : ''),
       amount: kayit.toplam,
       date: new Date(kayit.tarih).toISOString(),
       skRef: kayit.id
-    });
+    };
+    cari.transactions.push(yeniHareket);
+    syncCariHareketToSheets(cari.name, yeniHareket.type, yeniHareket.desc, signedAmount(yeniHareket), yeniHareket.date, 'tedarikci');
   }
   if(editingAlisId){
     const idx = c.alislar.findIndex(x=>x.id===editingAlisId);
@@ -7654,13 +7655,15 @@ document.getElementById('skSatisSave').onclick = () => {
   silLinkliCariHareket(kayit.id);
   if(kayit.cariAdi){
     const cari = bulYadaEkleCari('cari', kayit.cariAdi);
-    cari.transactions.push({
+    const yeniHareket = {
       type: kayit.iade ? 'SATIŞ İADE' : 'SATIŞ',
       desc: `${c.ad} · ${fmtPlain(kayit.miktar)} ${c.birim} x ${fmt(kayit.birimFiyat)}` + (kayit.belgeNo ? ' · ' + kayit.belgeNo : ''),
       amount: kayit.toplam,
       date: new Date(kayit.tarih).toISOString(),
       skRef: kayit.id
-    });
+    };
+    cari.transactions.push(yeniHareket);
+    syncCariHareketToSheets(cari.name, yeniHareket.type, yeniHareket.desc, signedAmount(yeniHareket), yeniHareket.date, 'cari');
   }
   if(editingSatisId){
     const idx = c.satislar.findIndex(x=>x.id===editingSatisId);
@@ -8080,9 +8083,7 @@ document.getElementById('fisKaydet').onclick = () => {
     skRef: d.id
   };
   cari.transactions.push(yeniCariHareket);
-  if(ledgerKey === 'cari'){
-    syncCariHareketToSheets(cari.name, yeniCariHareket.type, yeniCariHareket.desc, signedAmount(yeniCariHareket), yeniCariHareket.date);
-  }
+  syncCariHareketToSheets(cari.name, yeniCariHareket.type, yeniCariHareket.desc, signedAmount(yeniCariHareket), yeniCariHareket.date, ledgerKey === 'tedarikci' ? 'tedarikci' : 'cari');
 
   if(editingLegacyTx){
     wasLegacy = { cariId: editingLegacyTx.cari.id, ledgerKey };
@@ -8648,7 +8649,9 @@ function sablonKullan(id){
       card.alislar.push({ id: genId(), tarih, belgeNo: alisBelgeNo, cariAdi: s.tedarikciAdi, miktar: k.miktar, birimFiyat: k.birimFiyat, iskonto:0, kdv:0, toplam: k.tutar, iade:false, fisId: alisFisId });
     });
     const tedarikci = bulYadaEkleCari('tedarikci', s.tedarikciAdi);
-    tedarikci.transactions.push({ type:'ALIŞ', desc:`${alisBelgeNo} · Şablon: ${s.ad}`, amount: alisToplam, date: now, skRef: alisFisId });
+    const alisHareket = { type:'ALIŞ', desc:`${alisBelgeNo} · Şablon: ${s.ad}`, amount: alisToplam, date: now, skRef: alisFisId };
+    tedarikci.transactions.push(alisHareket);
+    syncCariHareketToSheets(tedarikci.name, alisHareket.type, alisHareket.desc, signedAmount(alisHareket), alisHareket.date, 'tedarikci');
     state.sayaclar.alis = (state.sayaclar.alis||0) + 1;
 
     // --- Satış Fişleri (her müşteriye ayrı) ---
@@ -8676,7 +8679,9 @@ function sablonKullan(id){
         card.satislar.push({ id: genId(), tarih, belgeNo: satisBelgeNo, cariAdi, miktar: k.miktar, birimFiyat: k.birimFiyat, iskonto:0, kdv:0, toplam: k.tutar, iade:false, fisId: satisFisId });
       });
       const musteri = bulYadaEkleCari('cari', cariAdi);
-      musteri.transactions.push({ type:'SATIŞ', desc:`${satisBelgeNo} · Şablon: ${s.ad}`, amount: satisToplam, date: now, skRef: satisFisId });
+      const satisHareket = { type:'SATIŞ', desc:`${satisBelgeNo} · Şablon: ${s.ad}`, amount: satisToplam, date: now, skRef: satisFisId };
+      musteri.transactions.push(satisHareket);
+      syncCariHareketToSheets(musteri.name, satisHareket.type, satisHareket.desc, signedAmount(satisHareket), satisHareket.date, 'cari');
       state.sayaclar.satis = (state.sayaclar.satis||0) + 1;
       satisBelgeNolar.push(satisBelgeNo);
       satisDetaylar.push({ fisId: satisFisId, cariAdi, belgeNo: satisBelgeNo, kalemler: satisKalemler, toplam: satisToplam });
