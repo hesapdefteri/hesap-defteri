@@ -2622,6 +2622,23 @@ function signedAmount(t){
   return positive ? Math.abs(t.amount) : -Math.abs(t.amount);
 }
 
+// ---------- Google Sheets senkronu (11 Ağu 2026, sadece Müşteri/cari hareketleri) ----------
+// Kapsamı sınırlı: sadece Satış Faturası kaydı ve Tahsilat/Ödeme hızlı ekle akışları.
+// Sessiz çalışır — sync başarısız olsa bile Hesap Defteri'nin kendi kaydını ASLA etkilemez.
+const SHEETS_SYNC_URL = 'https://script.google.com/macros/s/AKfycbzT9CQqmhyLoW9rp-0wQ7my9ioZbEdHGmYGe6fpJ3fnNDsdjmkiDfTR_IUH2GH4vVHT/exec';
+function syncCariHareketToSheets(cariAdi, tur, aciklama, tutarSigned, tarihIso){
+  try{
+    if(!cariAdi) return;
+    const d = new Date(tarihIso);
+    const tarihStr = String(d.getDate()).padStart(2,'0') + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + d.getFullYear();
+    fetch(SHEETS_SYNC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ cariAdi, tarih: tarihStr, tur, aciklama: aciklama || '', tutar: tutarSigned })
+    }).catch(()=>{});
+  }catch(e){ /* sessizce yut, ana akışı asla bozma */ }
+}
+
 // ---------- Stok Kartı ↔ Cari Hesap Entegrasyonu ----------
 function normAd(s){ return (s||'').trim().toLocaleLowerCase('tr-TR'); }
 
@@ -3790,6 +3807,9 @@ document.getElementById('quickTxSave').onclick = () => {
     };
   }
   c.transactions.push(tx);
+  if(quickTxLedger === 'cari'){
+    syncCariHareketToSheets(c.name, tx.type, tx.desc, signedAmount(tx), tx.date);
+  }
 
   if(quickTxType === 'ÖDEME') state.cash -= amount;
   if(quickTxType === 'TAHSİLAT') state.cash += amount;
@@ -8052,13 +8072,17 @@ document.getElementById('fisKaydet').onclick = () => {
     ledgerKey = fisTuru === 'alis' ? 'tedarikci' : 'cari';
     cari = bulYadaEkleCari(ledgerKey, d.cariAdi);
   }
-  cari.transactions.push({
+  const yeniCariHareket = {
     type: fisTuru === 'alis' ? 'ALIŞ' : 'SATIŞ',
     desc: `${d.kalemler.length} kalem` + (d.belgeNo ? ' · ' + d.belgeNo : '') + (d.aciklama && d.aciklama.trim() ? ' — ' + d.aciklama.trim() : ''),
     amount: d.toplam,
     date: new Date(d.tarih).toISOString(),
     skRef: d.id
-  });
+  };
+  cari.transactions.push(yeniCariHareket);
+  if(ledgerKey === 'cari'){
+    syncCariHareketToSheets(cari.name, yeniCariHareket.type, yeniCariHareket.desc, signedAmount(yeniCariHareket), yeniCariHareket.date);
+  }
 
   if(editingLegacyTx){
     wasLegacy = { cariId: editingLegacyTx.cari.id, ledgerKey };
