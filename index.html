@@ -139,6 +139,8 @@
   .cv2-card{position:relative;z-index:2;background:#fff;border-radius:18px;padding:14px 16px;
     display:flex;align-items:center;gap:12px;cursor:pointer;touch-action:pan-y;will-change:transform;
     border:1px solid rgba(16,24,32,.04);-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
+  .cv2-card[data-tur="cari"]{border-color:#4285f4;}
+  .cv2-card[data-tur="tedarikci"]{border-color:#e8792c;}
   .cv2-card.cv2-pressed{transform:scale(.985);transition:transform .12s ease;}
   .cv2-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
   .cv2-dot.debt{background:var(--red);} .cv2-dot.credit{background:var(--green);} .cv2-dot.zero{background:#c7ced1;}
