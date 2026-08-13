@@ -4946,11 +4946,15 @@ function CariCardV2(c, tur){
       <span class="cv2-ring-badge" style="background:${renk};">${rozetYazi}</span>
     </div>`;
   }
-  // Bekleyen sipariş varsa daire, ödeme-tarihi halkasının bile ÖNÜNE geçer —
-  // sipariş sevkiyatı genelde ödeme takibinden daha acil/güncel bir aksiyon.
+  // Bekleyen sipariş varsa: EĞER ödeme tarihi halkası YOKSA dairenin kendisi
+  // sipariş rozetine döner; ödeme tarihi halkası VARSA ona dokunulmaz (14 Ağu'daki
+  // hata buydu — sipariş rozeti "-2 gün kaldı" halkasını tamamen gizliyordu).
+  // Her iki durumda da alt yazı ve sağdaki "Sipariş: X₺" metni gösterilir.
   let siparisTutarHtml = '';
   if(hasPendingSiparis){
-    circleHtml = `<span class="siparis-date-circle siparis-bekleyen" style="background:${siparisRenk};"><b>+${siparisGunFarki}</b>GÜN</span>`;
+    if(!c.odemeTarihi){
+      circleHtml = `<span class="siparis-date-circle siparis-bekleyen" style="background:${siparisRenk};"><b>+${siparisGunFarki}</b>GÜN</span>`;
+    }
     altYazi = `Sipariş bekliyor · ${siparisGunFarki} gün önce`;
     const siparisToplam = pendingSiparisler.reduce((sum, f) => {
       let fisToplam = f.kalemler.reduce((s, k) => s + toNum(k.tutar), 0);
