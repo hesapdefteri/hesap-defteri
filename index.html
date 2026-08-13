@@ -3044,6 +3044,7 @@ function openSiparisGorPopup(id, ledgerKey){
   el.querySelectorAll('.irsaliye-card[data-id]').forEach(card=>{
     card.onclick = () => {
       document.getElementById('siparisGorOverlay').classList.remove('show');
+      siparisDetayDonusEkran = 'cv2';
       openSiparisDetay(card.dataset.id);
     };
   });
@@ -3055,6 +3056,7 @@ document.getElementById('siparisGorOverlay').onclick = (e) => {
 };
 
 let tamamlaCariId = null, tamamlaLedger = null;
+let siparisDetayDonusEkran = 'siparisler'; // 'siparisler' | 'cv2' — Sipariş Gör'den açılınca Cari Hesap'a dönsün diye 14 Ağu 2026'da eklendi
 function openTamamlaPopup(id, ledgerKey){
   tamamlaCariId = id; tamamlaLedger = ledgerKey;
   const pending = state.siparisFisleri.filter(f=>f.cariId===id && !f.tamamlandi);
@@ -3250,18 +3252,20 @@ document.getElementById('siparisKalemEkle').onclick = () => {
   renderSiparisDetayBody();
 };
 
-document.getElementById('siparisDetayBack').onclick = () => {
+function siparisDetayGeriDon(){
   hideAllScreens();
-  document.getElementById('siparisListScreen').classList.add('show');
-  renderSiparisList();
+  if(siparisDetayDonusEkran === 'cv2'){
+    renderCariV2();
+    document.getElementById('cv2Screen').classList.add('show');
+  } else {
+    document.getElementById('siparisListScreen').classList.add('show');
+    renderSiparisList();
+  }
+  siparisDetayDonusEkran = 'siparisler';
   nudge();
-};
-document.getElementById('siparisVazgec').onclick = () => {
-  hideAllScreens();
-  document.getElementById('siparisListScreen').classList.add('show');
-  renderSiparisList();
-  nudge();
-};
+}
+document.getElementById('siparisDetayBack').onclick = () => { siparisDetayGeriDon(); };
+document.getElementById('siparisVazgec').onclick = () => { siparisDetayGeriDon(); };
 document.getElementById('siparisFisKaydet').onclick = () => {
   const d = draftSiparis;
   if(!d.cariAdi || !d.cariAdi.trim()) return;
@@ -3278,11 +3282,8 @@ document.getElementById('siparisFisKaydet').onclick = () => {
     state.sayaclar.siparis = (state.sayaclar.siparis||0) + 1;
   }
   save();
-  hideAllScreens();
-  document.getElementById('siparisListScreen').classList.add('show');
-  renderSiparisList();
   render();
-  nudge();
+  siparisDetayGeriDon();
 };
 document.getElementById('siparisDetaySil').onclick = () => {
   if(!draftSiparis.id) return;
@@ -3320,11 +3321,12 @@ function renderSiparisList(){
     card.onclick = () => {
       if(card.__isSwipeMoved && card.__isSwipeMoved()) return;
       if(card.classList.contains('swiped')){ card.style.transform=''; card.classList.remove('swiped'); return; }
+      siparisDetayDonusEkran = 'siparisler';
       openSiparisDetay(card.dataset.id);
     };
   });
   list.querySelectorAll('.sip-list-duzenle').forEach(btn=>{
-    btn.onclick = (e) => { e.stopPropagation(); openSiparisDetay(btn.dataset.id); };
+    btn.onclick = (e) => { e.stopPropagation(); siparisDetayDonusEkran = 'siparisler'; openSiparisDetay(btn.dataset.id); };
   });
   list.querySelectorAll('.sip-list-sil').forEach(btn=>{
     btn.onclick = (e) => {
@@ -4846,7 +4848,8 @@ function CariCardV2(c, tur){
   // (12 hizasından başlayarak) dolan bir ilerleme halkası + sol üst köşede kalan
   // gün sayısını gösteren minik rozet ekleniyor (05 Ağu 2026, kullanıcı isteği).
   if(c.odemeTarihi){
-    const odeme = new Date(c.odemeTarihi + 'T12:00:00');
+    const odemeStr = c.odemeTarihi.includes('T') ? c.odemeTarihi : (c.odemeTarihi + 'T11:00');
+    const odeme = new Date(odemeStr);
     const now = new Date();
     const baslangic = sh || new Date(odeme.getTime() - 30*86400000);
     let toplamSure = odeme - baslangic;
@@ -5675,7 +5678,7 @@ function cv2DahaFazla(id, tur){
   // "Ödeme Tarihini Kaydet" butonu kaldırıldı — "Tamam" artık tarihi de kaydedip kapatıyor.
   const hasPending = state.siparisFisleri.some(f=>f.cariId===id && !f.tamamlandi);
   const formHtml =
-    '<div class="cv2-field"><label>ÖDEME TARİHİ</label><input id="cv2OdemeTarihiInput" type="date" value="' + (c.odemeTarihi || '') + '"></div>' +
+    '<div class="cv2-field"><label>ÖDEME TARİHİ</label><input id="cv2OdemeTarihiInput" type="datetime-local" value="' + (c.odemeTarihi ? (c.odemeTarihi.includes('T') ? c.odemeTarihi : c.odemeTarihi + 'T11:00') : (new Date().toISOString().slice(0,10) + 'T11:00')) + '"></div>' +
     '<button class="cv2-more-row" data-act="siparis">Sipariş</button>' +
     '<button class="cv2-more-row" data-act="siparisgor">Sipariş Gör</button>' +
     '<button class="cv2-more-row"' + (hasPending ? '' : ' disabled') + ' data-act="tamamla">Tamamlandı</button>';
