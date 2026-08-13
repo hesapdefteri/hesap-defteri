@@ -148,8 +148,10 @@
   .cv2-name{font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .cv2-date{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:3px;}
   .cv2-date.cv2-relzaman{color:#1f7a4d;font-weight:700;}
+  .cv2-bal-wrap{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;gap:2px;}
   .cv2-bal{font-size:16px;font-weight:800;letter-spacing:-.4px;white-space:nowrap;flex-shrink:0;}
   .cv2-bal.debt{color:var(--red);} .cv2-bal.credit{color:var(--green);} .cv2-bal.zero{color:var(--ink);}
+  .cv2-siparis-tutar{font-size:10.5px;font-weight:800;white-space:nowrap;letter-spacing:-.1px;}
 
   /* ---- Hareketler bottom sheet ---- */
   #cv2Sheet{position:fixed;inset:0;z-index:820;display:none;}
@@ -688,6 +690,8 @@
   .siparis-date-circle.son-hareket{background:#1c3566;color:#fff;box-shadow:none;}
   .siparis-teslimat-row.son-hareket-text{color:#1f7a4d;font-weight:700;}
   .siparis-date-circle-empty{background:#e4e8ea;box-shadow:none;}
+  .siparis-date-circle.siparis-bekleyen{box-shadow:0 3px 10px rgba(229,72,77,.3);}
+  .siparis-date-circle.siparis-bekleyen b{font-size:17px;}
   .cv2-ring{position:relative;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
   .cv2-ring-badge{position:absolute;top:-3px;left:-3px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;
     color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;
@@ -4840,6 +4844,21 @@ function CariCardV2(c, tur){
   const cls = cv2BalClass(bal);
   const sh = sonHareketTarihi(c);
   const uid = tur + ':' + c.id;
+  // Bekleyen (henüz sevk edilmemiş/tamamlanmamış) sipariş var mı? (14 Ağu 2026 eklendi)
+  // Bu tutar cariBalance()'a KATILMAZ — sadece bilgi amaçlı ayrı gösterilir,
+  // sipariş "Tamamlandı" olarak işaretlenince (openTamamlaPopup akışı) gerçek
+  // hareket olarak c.transactions'a eklenip bakiyeye o zaman dahil olur.
+  const pendingSiparisler = (state.siparisFisleri || []).filter(f => f.cariId === c.id && !f.tamamlandi);
+  const hasPendingSiparis = pendingSiparisler.length > 0;
+  let siparisGunFarki = 0, siparisRenk = '#dd7a2c';
+  if(hasPendingSiparis){
+    const enEskiTarih = pendingSiparisler.reduce((min, f) => {
+      const t = new Date(f.tarih);
+      return (!min || t < min) ? t : min;
+    }, null);
+    siparisGunFarki = Math.max(0, Math.floor((new Date() - enEskiTarih) / 86400000));
+    siparisRenk = siparisGunFarki >= 7 ? '#e5484d' : '#dd7a2c';
+  }
   // CH1'deki (Cari Hesaplar) tarih rozeti + "X gün/ay önce" mantığıyla birebir aynı
   // (siparis-date-circle CSS'i ve relativeZaman() fonksiyonu doğrudan yeniden kullanılıyor).
   let circleHtml, altYazi;
@@ -4875,6 +4894,19 @@ function CariCardV2(c, tur){
       <span class="cv2-ring-badge" style="background:${renk};">${rozetYazi}</span>
     </div>`;
   }
+  // Bekleyen sipariş varsa daire, ödeme-tarihi halkasının bile ÖNÜNE geçer —
+  // sipariş sevkiyatı genelde ödeme takibinden daha acil/güncel bir aksiyon.
+  let siparisTutarHtml = '';
+  if(hasPendingSiparis){
+    circleHtml = `<span class="siparis-date-circle siparis-bekleyen" style="background:${siparisRenk};"><b>+${siparisGunFarki}</b>GÜN</span>`;
+    altYazi = `Sipariş bekliyor · ${siparisGunFarki} gün önce`;
+    const siparisToplam = pendingSiparisler.reduce((sum, f) => {
+      let fisToplam = f.kalemler.reduce((s, k) => s + toNum(k.tutar), 0);
+      if(f.kdvDahil) fisToplam *= 1.20;
+      return sum + fisToplam;
+    }, 0);
+    siparisTutarHtml = `<div class="cv2-siparis-tutar" style="color:${siparisRenk};">Sipariş: ${fmtWhole(siparisToplam)}</div>`;
+  }
   // CH1'deki (Cari Hesaplar) swipeActionsHtml ile birebir aynı mantık: tedarikçide
   // Alış/Ödeme, müşteride Tahsilat/Satış — sadece Düzenle CV2'ye özgü ek bir buton.
   // NOT: kullanıcı sağdan sola kaydırmayı daha sık kullandığı için bu butonlar
@@ -4902,7 +4934,10 @@ function CariCardV2(c, tur){
         <div class="cv2-name">${c.name}</div>
         <div class="cv2-date cv2-relzaman">${altYazi}</div>
       </div>
-      <div class="cv2-bal ${cls}">${fmtWhole(bal)}</div>
+      <div class="cv2-bal-wrap">
+        <div class="cv2-bal ${cls}">${fmtWhole(bal)}</div>
+        ${siparisTutarHtml}
+      </div>
     </div>
   </div>`;
 }
