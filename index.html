@@ -5799,11 +5799,16 @@ function cv2DahaFazla(id, tur){
   // 14 Ağu 2026, kullanıcı isteği: alttaki "Sil" solda / "Tamam" sağda; ayrı
   // "Ödeme Tarihini Kaydet" butonu kaldırıldı — "Tamam" artık tarihi de kaydedip kapatıyor.
   const hasPending = state.siparisFisleri.some(f=>f.cariId===id && !f.tamamlandi);
+  // "Geri Al" satırı (14 Ağu 2026): Tamamlandı'nın YANINA, tek adımda görünür olsun
+  // diye eklendi — tıklanınca doğrudan Sipariş Gör'e gider, orada her tamamlanmış
+  // sipariş kendi "Geri Al" butonuyla (siparisGeriAl) tek tek geri alınabilir.
+  const hasCompleted = state.siparisFisleri.some(f=>f.cariId===id && f.tamamlandi);
   const formHtml =
     '<div class="cv2-field"><label>ÖDEME TARİHİ</label><input id="cv2OdemeTarihiInput" type="datetime-local" value="' + (c.odemeTarihi ? (c.odemeTarihi.includes('T') ? c.odemeTarihi : c.odemeTarihi + 'T11:00') : (new Date().toISOString().slice(0,10) + 'T11:00')) + '"></div>' +
     '<button class="cv2-more-row" data-act="siparis">Sipariş</button>' +
     '<button class="cv2-more-row" data-act="siparisgor">Sipariş Gör</button>' +
-    '<button class="cv2-more-row"' + (hasPending ? '' : ' disabled') + ' data-act="tamamla">Tamamlandı</button>';
+    '<button class="cv2-more-row"' + (hasPending ? '' : ' disabled') + ' data-act="tamamla">Tamamlandı</button>' +
+    '<button class="cv2-more-row"' + (hasCompleted ? '' : ' disabled') + ' data-act="geriAl" style="color:#e5484d;">Tamamlandı\'yı Geri Al</button>';
   cv2ModalAc('Daha Fazla', c.name + '<br>Bu cariyi listeden silmek istiyor musun?', formHtml, 'Sil', 'danger',
     function(){
       // 08 Ağu 2026, kullanıcı isteği: cari hesap kartı, üzerinde hâlâ hareket
@@ -5836,6 +5841,7 @@ function cv2DahaFazla(id, tur){
       if(act === 'siparis') openSiparis(id, tur);
       else if(act === 'siparisgor') openSiparisGorPopup(id, tur);
       else if(act === 'tamamla') openTamamlaPopup(id, tur);
+      else if(act === 'geriAl') openSiparisGorPopup(id, tur);
     });
   });
 }
