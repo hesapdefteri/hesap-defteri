@@ -1054,6 +1054,9 @@
   .irsaliye-items .fis-kalem-row{cursor:default;box-shadow:none;background:#f7f9fa;}
   .irsaliye-toplam{display:flex;justify-content:space-between;align-items:center;padding:10px 4px 0 4px;border-top:1px solid var(--line);margin-top:2px;font-size:13px;font-weight:700;color:var(--muted);}
   .irsaliye-toplam span:last-child{font-size:16px;font-weight:800;color:var(--ink);}
+  .irsaliye-geri-al-btn{margin-top:10px;width:100%;padding:9px;border-radius:10px;border:1px solid #e5484d;background:#fff;
+    color:#e5484d;font-size:12.5px;font-weight:800;cursor:pointer;}
+  .irsaliye-geri-al-btn:disabled{border-color:#c7ced1;color:#c7ced1;cursor:not-allowed;}
   .fis-toplam-row{display:flex;justify-content:space-between;font-size:15.5px;font-weight:800;color:var(--red);}
 
   .fatura-table{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 6px rgba(20,40,50,.05);margin-bottom:14px;}
@@ -3030,6 +3033,44 @@ function openSiparis(id, ledgerKey){
   nudge();
 }
 
+// Bir siparişi "Tamamlandı"dan geri almak güvenli mi? (14 Ağu 2026 eklendi)
+// Tamamlanınca oluşan hareketlerden (siparisRef ile etiketli) SONRA hesaba bir
+// TAHSİLAT/ÖDEME girilmiş VE hesap şu an kapalıysa (bakiye ~0), geri alma
+// engellenir — yanlışlıkla zaten tahsil edilmiş bir siparişin hareketleri
+// silinip hesap tutarsız/borçlu görünmesin diye.
+function canSiparisGeriAl(f, c){
+  if(!f || !c || !f.tamamlandi) return { ok:false, reason:'Bu sipariş zaten tamamlanmamış.' };
+  const tamTarih = f.tamamlanmaTarihi ? new Date(f.tamamlanmaTarihi) : null;
+  const sonrakiTahsilat = tamTarih && (c.transactions||[]).some(t =>
+    (t.type === 'TAHSİLAT' || t.type === 'ÖDEME') && new Date(t.date) > tamTarih);
+  const hesapKapali = Math.abs(cariBalance(c)) <= 0.005;
+  if(sonrakiTahsilat && hesapKapali){
+    return { ok:false, reason:'Bu siparişten sonra tahsilat/ödeme alınmış ve hesap kapanmış. Bu yüzden geri alınamıyor.' };
+  }
+  return { ok:true };
+}
+function siparisGeriAl(fisId){
+  const f = state.siparisFisleri.find(x=>x.id===fisId);
+  if(!f) return;
+  const c = state[f.ledgerKey].find(x=>x.id===f.cariId);
+  const check = canSiparisGeriAl(f, c);
+  if(!check.ok){ alertBox(check.reason); return; }
+  openConfirm('Siparişi Geri Al', 'Bu sipariş "Tamamlandı" durumundan geri alınacak, oluşan cari hareketler silinecek. Emin misin?', () => {
+    c.transactions = (c.transactions||[]).filter(t => t.siparisRef !== f.id);
+    f.tamamlandi = false;
+    delete f.tamamlanmaTarihi;
+    save();
+    render();
+    // Hangi ekrandan çağrıldıysa o ekranı tazele — Sipariş Gör popup açıksa onu,
+    // Siparişler ana listesi görünürdeyse onu güncelle.
+    if(document.getElementById('siparisGorOverlay').classList.contains('show')){
+      openSiparisGorPopup(f.cariId, f.ledgerKey);
+    }
+    if(document.getElementById('siparisListScreen').classList.contains('show')){
+      renderSiparisList();
+    }
+  }, 'Evet, Geri Al');
+}
 function openSiparisGorPopup(id, ledgerKey){
   const c = state[ledgerKey].find(x=>x.id===id);
   document.getElementById('siparisGorTitle').textContent = 'Sipariş İrsaliyeleri' + (c ? ' — ' + c.name : '');
@@ -3052,6 +3093,7 @@ function openSiparisGorPopup(id, ledgerKey){
           </div>`).join('')}
       </div>
       <div class="irsaliye-toplam"><span>TOPLAM</span><span>${fmt(d.toplam||0)}</span></div>
+      ${d.tamamlandi ? `<button class="irsaliye-geri-al-btn" data-geri-al="${d.id}">Tamamlandı'yı Geri Al</button>` : ''}
     </div>
   `).join('') : '<div class="sk-empty">Bu hesaba ait sipariş yok</div>';
   el.querySelectorAll('.irsaliye-card[data-id]').forEach(card=>{
@@ -3060,6 +3102,9 @@ function openSiparisGorPopup(id, ledgerKey){
       siparisDetayDonusEkran = 'cv2';
       openSiparisDetay(card.dataset.id);
     };
+  });
+  el.querySelectorAll('[data-geri-al]').forEach(btn=>{
+    btn.onclick = (e) => { e.stopPropagation(); siparisGeriAl(btn.dataset.geriAl); };
   });
   document.getElementById('siparisGorOverlay').classList.add('show');
 }
@@ -3106,16 +3151,20 @@ document.getElementById('tamamlaOnayla').onclick = () => {
   if(!c) return;
   const pending = state.siparisFisleri.filter(f=>f.cariId===tamamlaCariId && !f.tamamlandi);
   const txType = tamamlaLedger === 'cari' ? 'SATIŞ' : 'ALIŞ';
+  const tamamlanmaTs = new Date().toISOString();
   pending.forEach(f=>{
     let fisToplam = 0;
+    // siparisRef: 14 Ağu 2026'da eklendi — "Geri Al" fonksiyonu bu hareketleri
+    // bulup silebilsin diye her hareket hangi sipariş fişinden geldiğini taşıyor.
     f.kalemler.forEach(k=>{
-      c.transactions.push({ type: txType, desc: k.ad, amount: k.tutar, date: new Date().toISOString() });
+      c.transactions.push({ type: txType, desc: k.ad, amount: k.tutar, date: tamamlanmaTs, siparisRef: f.id });
       fisToplam += toNum(k.tutar);
     });
     if(f.kdvDahil){
-      c.transactions.push({ type: txType, desc: 'KDV (%20)', amount: fisToplam * 0.20, date: new Date().toISOString() });
+      c.transactions.push({ type: txType, desc: 'KDV (%20)', amount: fisToplam * 0.20, date: tamamlanmaTs, siparisRef: f.id });
     }
     f.tamamlandi = true;
+    f.tamamlanmaTarihi = tamamlanmaTs;
   });
   save();
   document.getElementById('tamamlaOverlay').classList.remove('show');
@@ -3326,7 +3375,7 @@ function renderSiparisList(){
           <div class="sk-card-name">${d.cariAdi || ''}</div>
           <div class="k-tutar">${fmt(d.toplam||0)}</div>
         </div>
-        <div class="k-sub">${d.belgeNo||''} · ${trDate(d.tarih)} · ${d.kalemler.length} kalem ${d.tamamlandi ? '· <span style="color:var(--green);font-weight:700;">TAMAMLANDI</span>' : ''}</div>
+        <div class="k-sub">${d.belgeNo||''} · ${trDate(d.tarih)} · ${d.kalemler.length} kalem ${d.tamamlandi ? `· <span style="color:var(--green);font-weight:700;">TAMAMLANDI</span> · <a href="#" class="sip-list-geri-al" data-id="${d.id}" style="color:#e5484d;font-weight:700;text-decoration:none;">Geri Al</a>` : ''}</div>
       </div>
     </div>
   `).join('') : '<div class="sk-empty">Henüz sipariş fişi yok</div>';
@@ -3340,6 +3389,9 @@ function renderSiparisList(){
   });
   list.querySelectorAll('.sip-list-duzenle').forEach(btn=>{
     btn.onclick = (e) => { e.stopPropagation(); siparisDetayDonusEkran = 'siparisler'; openSiparisDetay(btn.dataset.id); };
+  });
+  list.querySelectorAll('.sip-list-geri-al').forEach(a=>{
+    a.onclick = (e) => { e.stopPropagation(); e.preventDefault(); siparisGeriAl(a.dataset.id); };
   });
   list.querySelectorAll('.sip-list-sil').forEach(btn=>{
     btn.onclick = (e) => {
