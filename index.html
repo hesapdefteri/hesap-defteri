@@ -286,6 +286,8 @@
   .cv2-ek-table td:first-child{font-size:14.5px;font-weight:700;}
   .cv2-ek-table tr.cv2-ek-alis td, .cv2-ek-table tr.cv2-ek-alis td.num{color:var(--red);}
   .cv2-ek-table td.cv2-ek-tur{font-weight:800;font-size:12.5px;}
+  .cv2-ek-aciklama-metin{color:var(--muted);font-weight:600;font-size:11.5px;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.35;}
   .cv2-ek-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;
     vertical-align:middle;flex-shrink:0;}
   .cv2-ek-dot.pos{background:var(--green);}
@@ -5599,7 +5601,7 @@ function cv2Ekstre(id, tur){
       const negCls = amt < 0 ? ' cv2-ek-alis' : '';
       satirlarHtml.push(`<tr class="${negCls.trim()}">
         <td>${isNaN(d) ? '—' : cv2EkTarih(d)}</td>
-        <td><span class="cv2-ek-dot ${amt >= 0 ? 'pos' : 'neg'}"></span><span class="cv2-ek-tur">${cv2TxLabel(t.type)}</span>${t.desc ? '<br><span style="color:var(--muted);font-weight:600;font-size:16.5px;">' + t.desc + '</span>' : ''}</td>
+        <td><span class="cv2-ek-dot ${amt >= 0 ? 'pos' : 'neg'}"></span><span class="cv2-ek-tur">${cv2TxLabel(t.type)}</span>${t.desc ? '<br><span class="cv2-ek-aciklama-metin">' + t.desc + '</span>' : ''}</td>
         <td class="num">${fmtEkstreNum(amt)}</td>
         <td class="num">${fmtEkstreNum(running)}</td>
       </tr>`);
