@@ -166,6 +166,11 @@
   .cv2-sh-x{position:absolute;top:2px;right:16px;width:30px;height:30px;border-radius:50%;border:none;
     background:#eef1f3;color:var(--muted);font-size:14px;font-weight:800;cursor:pointer;line-height:1;
     display:flex;align-items:center;justify-content:center;}
+  .cv2-sh-countdown{position:absolute;top:2px;right:54px;background:#fff;border-radius:14px;
+    padding:5px 10px 5px 8px;display:flex;align-items:center;gap:5px;
+    box-shadow:0 2px 8px rgba(16,24,32,.10),inset 0 0 0 1px rgba(16,24,32,.06);}
+  .cv2-sh-countdown .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+  .cv2-sh-countdown .txt{font-size:11.5px;font-weight:800;white-space:nowrap;}
   .cv2-sh-name{font-size:18px;font-weight:800;color:var(--ink);letter-spacing:-.3px;padding-right:36px;}
   .cv2-sh-bal-row{display:flex;align-items:baseline;gap:7px;margin-top:6px;}
   .cv2-sh-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;position:relative;top:-1px;}
@@ -2371,6 +2376,10 @@
     <div class="cv2-grab"></div>
     <div class="cv2-sh-head">
       <button class="cv2-sh-x" id="cv2ShClose" aria-label="Kapat">✕</button>
+      <div class="cv2-sh-countdown" id="cv2ShCountdown" style="display:none;">
+        <span class="dot" id="cv2ShCountdownDot"></span>
+        <span class="txt" id="cv2ShCountdownTxt"></span>
+      </div>
       <div class="cv2-sh-name" id="cv2ShTitle">—</div>
       <div class="cv2-sh-bal-row">
         <span class="cv2-sh-dot" id="cv2ShDot"></span>
@@ -5237,6 +5246,32 @@ function cv2Hareketler(id, tur){
 
   const sh = sonHareketTarihi(c);
   document.getElementById('cv2ShLast').textContent = 'Son işlem: ' + (sh ? cv2TR(sh) : '—');
+
+  // Ödeme tarihi girilmişse (14 Ağu 2026, kullanıcı isteği) sağ üstte X'in yanına
+  // kalan süreyi gösteren küçük bir geri sayım rozeti.
+  const cdEl = document.getElementById('cv2ShCountdown');
+  if(c.odemeTarihi){
+    const odemeStr = c.odemeTarihi.includes('T') ? c.odemeTarihi : (c.odemeTarihi + 'T11:00');
+    const odeme = new Date(odemeStr);
+    const now = new Date();
+    const farkMs = odeme - now;
+    const gecikti = farkMs < 0;
+    const mutlakMs = Math.abs(farkMs);
+    const gun = Math.floor(mutlakMs / 86400000);
+    const saat = Math.floor((mutlakMs % 86400000) / 3600000);
+    let metin;
+    if(gun > 0) metin = gun + 'g ' + saat + 's';
+    else metin = saat + 's ' + Math.floor((mutlakMs % 3600000) / 60000) + 'dk';
+    const renk = gecikti ? '#ea4335' : (gun < 1 ? '#dd7a2c' : '#1c2b30');
+    document.getElementById('cv2ShCountdownDot').style.background = renk;
+    document.getElementById('cv2ShCountdownTxt').textContent = (gecikti ? 'Gecikti ' : 'Kaldı ') + metin;
+    document.getElementById('cv2ShCountdownTxt').style.color = renk;
+    cdEl.style.display = 'flex';
+    document.getElementById('cv2ShTitle').style.paddingRight = '132px';
+  } else {
+    cdEl.style.display = 'none';
+    document.getElementById('cv2ShTitle').style.paddingRight = '';
+  }
 
   const withIdx = (c.transactions || []).map((t,i)=>({t,i}));
   withIdx.sort((a,b)=> new Date(b.t.date) - new Date(a.t.date));
