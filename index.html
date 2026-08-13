@@ -269,8 +269,13 @@
     flex-direction:column;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
   #cv2EkstreScreen.show{display:flex;}
   .cv2-ek-head{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;
-    padding:14px 16px;border-bottom:1px solid var(--line);}
-  .cv2-ek-vazgec,.cv2-ek-gonder{border:none;background:none;color:var(--accent);font-family:inherit;
+    padding:calc(env(safe-area-inset-top) + 14px) 16px 14px 16px;border-bottom:1px solid var(--line);position:relative;}
+  .cv2-ek-vazgec{border:none;background:rgba(255,255,255,.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    color:var(--ink);width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-family:inherit;font-size:17px;font-weight:700;cursor:pointer;padding:0;
+    box-shadow:0 2px 8px rgba(16,24,32,.10),inset 0 0 0 1px rgba(255,255,255,.6);}
+  .cv2-ek-vazgec:active{transform:scale(.92);}
+  .cv2-ek-gonder{border:none;background:none;color:var(--accent);font-family:inherit;
     font-size:18px;font-weight:600;cursor:pointer;padding:4px;}
   .cv2-ek-baslik{font-size:21px;font-weight:800;color:var(--ink);}
   .cv2-ek-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
@@ -583,7 +588,7 @@
   .am-badge.b-sablon{background:linear-gradient(135deg,#c9973f,#8a6d1f);}
   .am-badge-balance{position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);background:#1c2b30;color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.25);border:2px solid #fff;}
 
-  .urun-search-bar{display:flex;align-items:center;gap:10px;background:#fff;padding:22px 16px 14px 16px;flex-shrink:0;border-bottom:1px solid var(--line);}
+  .urun-search-bar{display:flex;align-items:center;gap:10px;background:#fff;padding:calc(env(safe-area-inset-top) + 14px) 16px 14px 16px;flex-shrink:0;border-bottom:1px solid var(--line);}
   .urun-back{background:none;border:none;color:var(--accent);font-size:22px;cursor:pointer;padding:0 2px;}
   .urun-search-icon{color:var(--muted);font-size:15px;}
   .urun-search-bar input{flex:1;background:#f0f1f3;border:none;border-radius:10px;color:var(--ink);font-size:16px;padding:9px 12px;}
@@ -781,7 +786,7 @@
 
   .detail-screen{position:fixed;inset:0;background:#fff;z-index:20;display:none;flex-direction:column;}
   .detail-screen.show{display:flex;}
-  .d-header{display:flex;align-items:center;justify-content:space-between;padding:16px 14px 12px 14px;border-bottom:1px solid var(--line);flex-shrink:0;}
+  .d-header{display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top) + 16px) 14px 12px 14px;border-bottom:1px solid var(--line);flex-shrink:0;}
   .d-back{background:none;border:none;font-size:24px;color:var(--ink);cursor:pointer;padding:4px 8px;}
   .d-title{font-size:19px;font-weight:700;flex:1;text-align:center;}
   .d-share{background:none;border:none;font-size:19px;color:var(--accent);cursor:pointer;padding:0 10px;}
@@ -851,7 +856,7 @@
   .report-screen.show{display:flex;}
   .report-header{
     display:flex;align-items:center;justify-content:space-between;
-    padding:14px 16px;border-bottom:1px solid var(--line);flex-shrink:0;
+    padding:calc(env(safe-area-inset-top) + 14px) 16px 14px 16px;border-bottom:1px solid var(--line);flex-shrink:0;
   }
   .report-header .rvazgec{background:none;border:none;color:var(--accent);font-size:15px;cursor:pointer;}
   .report-header .rtitle{font-size:20px;font-weight:800;}
@@ -946,7 +951,7 @@
 
   .sk-detail{position:fixed;inset:0;background:#f4f7f8;z-index:30;display:none;flex-direction:column;}
   .sk-detail.show{display:flex;}
-  .sk-dhead{background:#0f3d44;padding:14px 14px 0 14px;flex-shrink:0;}
+  .sk-dhead{background:#0f3d44;padding:calc(env(safe-area-inset-top) + 14px) 14px 0 14px;flex-shrink:0;}
   .sk-dhead-top{display:flex;align-items:center;justify-content:space-between;color:#fff;padding-bottom:10px;}
   .sk-dhead-top .d-back{color:#fff;font-size:24px;background:none;border:none;cursor:pointer;padding:4px 8px;}
   .sk-dhead-top .d-title{font-size:16.5px;font-weight:700;flex:1;text-align:center;}
@@ -2395,7 +2400,7 @@
 
 <div id="cv2EkstreScreen">
   <div class="cv2-ek-head">
-    <button class="cv2-ek-vazgec" id="cv2EkVazgec">Vazgeç</button>
+    <button class="cv2-ek-vazgec" id="cv2EkVazgec" aria-label="Kapat">✕</button>
     <div class="cv2-ek-baslik">Ekstre</div>
     <button class="cv2-ek-gonder" id="cv2EkGonder">Gönder</button>
   </div>
