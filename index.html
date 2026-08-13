@@ -283,7 +283,10 @@
   .cv2-ek-table td:first-child{padding-left:0;}
   .cv2-ek-table td:last-child{padding-right:0;}
   .cv2-ek-table td.num{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14.5px;font-weight:700;}
-  .cv2-ek-table td:first-child{font-size:14.5px;font-weight:700;}
+  .cv2-ek-table td.num:last-child{border-left:1px solid #eef0f1;padding-left:8px;}
+  .cv2-ek-table th.num:last-child{border-left:1px solid var(--line);padding-left:8px;}
+  .cv2-ek-tarih-gun{display:block;font-size:14px;font-weight:700;color:inherit;}
+  .cv2-ek-tarih-saat{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-top:1px;}
   .cv2-ek-table tr.cv2-ek-alis td, .cv2-ek-table tr.cv2-ek-alis td.num{color:var(--red);}
   .cv2-ek-table td.cv2-ek-tur{font-weight:800;font-size:12.5px;}
   .cv2-ek-aciklama-metin{color:var(--muted);font-weight:600;font-size:11.5px;
@@ -5564,13 +5567,16 @@ function cv2Duzenle(id, tur){
     document.getElementById('cv2TurMusteri').classList.remove('active');
   });
 }
-function cv2EkTarih(d){
+function cv2EkTarihGun(d){
   const gg = String(d.getDate()).padStart(2,'0');
   const aa = String(d.getMonth()+1).padStart(2,'0');
   const yy = d.getFullYear();
+  return `${gg}.${aa}.${yy}`;
+}
+function cv2EkTarihSaat(d){
   const ss = String(d.getHours()).padStart(2,'0');
   const dd = String(d.getMinutes()).padStart(2,'0');
-  return `${gg}.${aa}.${yy} ${ss}:${dd}`;
+  return `${ss}:${dd}`;
 }
 function cv2EkstreKapat(){
   document.getElementById('cv2EkstreScreen').classList.remove('show');
@@ -5600,7 +5606,7 @@ function cv2Ekstre(id, tur){
       running += amt;
       const negCls = amt < 0 ? ' cv2-ek-alis' : '';
       satirlarHtml.push(`<tr class="${negCls.trim()}">
-        <td>${isNaN(d) ? '—' : cv2EkTarih(d)}</td>
+        <td>${isNaN(d) ? '—' : '<span class="cv2-ek-tarih-gun">' + cv2EkTarihGun(d) + '</span><span class="cv2-ek-tarih-saat">' + cv2EkTarihSaat(d) + '</span>'}</td>
         <td><span class="cv2-ek-dot ${amt >= 0 ? 'pos' : 'neg'}"></span><span class="cv2-ek-tur">${cv2TxLabel(t.type)}</span>${t.desc ? '<br><span class="cv2-ek-aciklama-metin">' + t.desc + '</span>' : ''}</td>
         <td class="num">${fmtEkstreNum(amt)}</td>
         <td class="num">${fmtEkstreNum(running)}</td>
