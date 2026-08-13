@@ -31,16 +31,16 @@
 <style>
   @keyframes cv2spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
   :root{
-    --bg-top:#0b1a3d;
-    --bg-mid:#122a52;
-    --card:#17335f;
-    --ink:#eef3f8;
-    --muted:#9db0c9;
-    --line:rgba(255,255,255,.10);
-    --red:#ff6b6a;
-    --green:#3ddc84;
-    --accent:#5aa3ea;
-    --accent-soft:rgba(90,163,234,.16);
+    --bg-top:#c7d6dd;
+    --bg-mid:#dbe6ea;
+    --card:#ffffff;
+    --ink:#1c2b30;
+    --muted:#7c8b90;
+    --line:#e7edf0;
+    --red:#c0392b;
+    --green:#1f7a4d;
+    --accent:#2f6690;
+    --accent-soft:#e7f0f5;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{overflow-x:hidden;max-width:100vw;}
@@ -53,7 +53,7 @@
   #cv2Screen, #cv2Sheet, #cv2Modal{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
-  #cv2Screen{background:linear-gradient(180deg,var(--bg-mid) 0%,var(--bg-mid) 220px);}
+  #cv2Screen{background:linear-gradient(180deg,#eef2f4 0%,#f4f7f8 220px);}
   #cv2Screen .cv2-head{flex-shrink:0;padding:calc(env(safe-area-inset-top) + 14px) 18px 10px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
   #cv2Screen .cv2-head h1{margin:0;font-size:23px;font-weight:800;letter-spacing:-.6px;color:var(--ink);}
   .cv2-addbtn{border:none;border-radius:14px;padding:10px 17px;font-size:13.5px;font-weight:800;color:#fff;
@@ -61,27 +61,27 @@
     font-family:inherit;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;white-space:nowrap;flex-shrink:0;}
   .cv2-addbtn:active{transform:scale(.94);box-shadow:0 3px 10px rgba(28,53,102,.28);}
   .cv2-filterbtn{border:1.5px solid var(--line);border-radius:14px;padding:9px 14px;font-size:12.5px;
-    font-weight:800;color:var(--muted);background:var(--card);font-family:inherit;cursor:pointer;
+    font-weight:800;color:var(--muted);background:#fff;font-family:inherit;cursor:pointer;
     transition:transform .15s ease,background .15s ease,color .15s ease;white-space:nowrap;flex-shrink:0;}
   .cv2-filterbtn:active{transform:scale(.94);}
   .cv2-filterbtn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
 
   .cv2-searchicon{border:none;border-radius:13px;width:38px;height:38px;position:relative;
-    font-size:15.5px;background:var(--card);font-family:inherit;cursor:pointer;flex-shrink:0;
+    font-size:15.5px;background:#fff;font-family:inherit;cursor:pointer;flex-shrink:0;
     display:flex;align-items:center;justify-content:center;color:var(--muted);
     box-shadow:0 3px 10px rgba(16,24,32,.1);transition:transform .15s ease,background .15s ease,color .15s ease;}
   .cv2-searchicon:active{transform:scale(.9);}
   .cv2-searchicon.active{background:var(--accent);color:#fff;box-shadow:0 4px 12px rgba(28,53,102,.3);}
   .cv2-searchicon.filtreli::after{content:'';position:absolute;top:-2px;right:-2px;width:11px;height:11px;
-    border-radius:50%;background:#e0392b;border:2px solid var(--bg-mid);}
+    border-radius:50%;background:#e0392b;border:2px solid #f4f7f8;}
   .cv2-searchicon.active.filtreli::after{border-color:#1c3566;}
 
   .cv2-filterpanel{display:none;position:absolute;top:46px;right:0;z-index:30;width:250px;
-    background:var(--card);border-radius:18px;padding:16px;box-shadow:0 14px 38px rgba(16,24,32,.18);
+    background:#fff;border-radius:18px;padding:16px;box-shadow:0 14px 38px rgba(16,24,32,.18);
     border:1px solid rgba(16,24,32,.06);}
   .cv2-filterpanel.show{display:block;animation:cv2FilterIn .16s ease;}
   @keyframes cv2FilterIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
-  .cv2-filterpanel-arrow{position:absolute;top:-6px;right:52px;width:12px;height:12px;background:var(--card);
+  .cv2-filterpanel-arrow{position:absolute;top:-6px;right:52px;width:12px;height:12px;background:#fff;
     transform:rotate(45deg);border-radius:2px;box-shadow:-2px -2px 4px rgba(16,24,32,.03);}
   .cv2-filterpanel-grp{margin-bottom:14px;}
   .cv2-filterpanel-grp:last-child{margin-bottom:0;}
@@ -89,7 +89,7 @@
     text-transform:uppercase;margin-bottom:7px;}
 
   .cv2-segrow{flex-shrink:0;padding:0 16px 10px 16px;display:flex;gap:8px;flex-wrap:wrap;}
-  .cv2-seg{display:flex;background:rgba(255,255,255,.10);border-radius:12px;padding:3px;gap:2px;flex:1 1 auto;min-width:150px;}
+  .cv2-seg{display:flex;background:#eef1f3;border-radius:12px;padding:3px;gap:2px;flex:1 1 auto;min-width:150px;}
   .cv2-seg button{flex:1;border:none;background:transparent;border-radius:9px;padding:7px 8px;
     font-size:11.5px;font-weight:800;color:var(--muted);font-family:inherit;cursor:pointer;
     white-space:nowrap;transition:background .15s ease,color .15s ease;}
@@ -113,7 +113,7 @@
   .cv2-searchwrap{flex-shrink:0;padding:0 16px 10px 16px;}
   .cv2-search{width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:14px;
     padding:11px 14px;font-size:14px;font-weight:600;color:var(--ink);font-family:inherit;
-    background:var(--card);outline:none;transition:border-color .2s ease;}
+    background:#fff;outline:none;transition:border-color .2s ease;}
   .cv2-search:focus{border-color:var(--accent);}
   .cv2-search::placeholder{color:var(--muted);font-weight:600;}
   .cv2-list{display:flex;flex-direction:column;gap:10px;}
@@ -136,7 +136,7 @@
   .cv2-abtn.ekstre{background:#3d5a80;}
   .cv2-abtn.daha{background:#8a94a0;}
 
-  .cv2-card{position:relative;z-index:2;background:var(--card);border-radius:18px;padding:14px 16px;
+  .cv2-card{position:relative;z-index:2;background:#fff;border-radius:18px;padding:14px 16px;
     display:flex;align-items:center;gap:12px;cursor:pointer;touch-action:pan-y;will-change:transform;
     border:1px solid rgba(16,24,32,.04);-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
   .cv2-card[data-tur="cari"]{border-color:#4285f4;}
@@ -159,16 +159,16 @@
   #cv2SheetBg{position:absolute;inset:0;background:rgba(18,22,26,.4);
     -webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px);opacity:0;transition:opacity .3s ease;}
   #cv2Sheet.in #cv2SheetBg{opacity:1;}
-  #cv2SheetPanel{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:24px 24px 0 0;max-height:80vh;
+  #cv2SheetPanel{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:24px 24px 0 0;max-height:80vh;
     display:flex;flex-direction:column;transform:translateY(101%);transition:transform .4s cubic-bezier(.32,.72,0,1);
     box-shadow:0 -10px 40px rgba(0,0,0,.18);}
   #cv2Sheet.in #cv2SheetPanel{transform:translateY(0);}
-  .cv2-grab{width:36px;height:5px;border-radius:3px;background:rgba(255,255,255,.28);margin:9px auto 2px auto;flex-shrink:0;}
+  .cv2-grab{width:36px;height:5px;border-radius:3px;background:#dfe4e7;margin:9px auto 2px auto;flex-shrink:0;}
   .cv2-sh-head{flex-shrink:0;position:relative;padding:6px 20px 14px 20px;border-bottom:1px solid var(--line);}
   .cv2-sh-x{position:absolute;top:2px;right:16px;width:30px;height:30px;border-radius:50%;border:none;
-    background:rgba(255,255,255,.10);color:var(--muted);font-size:14px;font-weight:800;cursor:pointer;line-height:1;
+    background:#eef1f3;color:var(--muted);font-size:14px;font-weight:800;cursor:pointer;line-height:1;
     display:flex;align-items:center;justify-content:center;}
-  .cv2-sh-countdown{position:absolute;top:2px;right:54px;background:var(--card);border-radius:14px;
+  .cv2-sh-countdown{position:absolute;top:2px;right:54px;background:#fff;border-radius:14px;
     padding:5px 10px 5px 8px;display:flex;align-items:center;gap:5px;
     box-shadow:0 2px 8px rgba(16,24,32,.10),inset 0 0 0 1px rgba(16,24,32,.06);}
   .cv2-sh-countdown .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
@@ -205,7 +205,7 @@
   .cv2-txtype{font-size:13.5px;font-weight:800;color:var(--ink);}
   .cv2-txdesc{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px;overflow:hidden;text-overflow:ellipsis;
     white-space:nowrap;}
-  .cv2-txdate{font-size:11px;color:var(--ink);font-weight:600;margin-top:2px;}
+  .cv2-txdate{font-size:11px;color:#333;font-weight:600;margin-top:2px;}
   .cv2-txright{text-align:right;flex-shrink:0;}
   .cv2-txamt{font-size:15px;font-weight:800;letter-spacing:-.3px;white-space:nowrap;}
   .cv2-txamt.debt{color:var(--red);} .cv2-txamt.credit{color:var(--green);} .cv2-txamt.zero{color:var(--ink);}
@@ -236,7 +236,7 @@
   #cv2ModalBg{position:absolute;inset:0;background:rgba(18,22,26,.4);
     -webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px);opacity:0;transition:opacity .24s ease;}
   #cv2Modal.in #cv2ModalBg{opacity:1;}
-  #cv2ModalCard{position:relative;width:100%;max-width:340px;background:var(--card);border-radius:22px;padding:20px;
+  #cv2ModalCard{position:relative;width:100%;max-width:340px;background:#fff;border-radius:22px;padding:20px;
     box-shadow:0 18px 50px rgba(0,0,0,.24);opacity:0;transform:scale(.94) translateY(10px);
     transition:opacity .24s ease,transform .24s ease;}
   #cv2Modal.in #cv2ModalCard{opacity:1;transform:none;}
@@ -251,30 +251,30 @@
     color:var(--accent);font-family:inherit;font-size:14px;font-weight:700;border-radius:13px;
     padding:12px 14px;margin-top:10px;cursor:pointer;transition:transform .15s ease,opacity .15s ease;}
   .cv2-more-row:active{transform:scale(.98);}
-  .cv2-more-row:disabled{background:rgba(255,255,255,.10);color:var(--muted);opacity:.6;cursor:default;}
+  .cv2-more-row:disabled{background:#eef1f3;color:var(--muted);opacity:.6;cursor:default;}
   .cv2-more-row:disabled:active{transform:none;}
   #cv2ModalForm .cv2-more-row:nth-of-type(1){background:#4285f4;color:#fff;}
   #cv2ModalForm .cv2-more-row:nth-of-type(2){background:#fbbc05;color:#3a2e00;}
   #cv2ModalForm .cv2-more-row:nth-of-type(3){background:#34a853;color:#fff;}
   #cv2ModalForm .cv2-more-row:nth-of-type(4):not(:disabled){background:#1c2b30;color:#fff;}
   .cv2-field input{width:100%;margin-top:6px;border:1.5px solid var(--line);border-radius:13px;padding:11px 13px;
-    font-size:15px;font-weight:700;color:var(--ink);font-family:inherit;background:var(--card);outline:none;
+    font-size:15px;font-weight:700;color:var(--ink);font-family:inherit;background:#fff;outline:none;
     transition:border-color .2s ease;}
   .cv2-field input:focus{border-color:var(--accent);}
   .cv2-tur-btn{flex:1;border:1.5px solid var(--line);border-radius:12px;padding:10px 0;font-size:13px;
-    font-weight:800;color:var(--muted);background:var(--card);font-family:inherit;cursor:pointer;
+    font-weight:800;color:var(--muted);background:#fff;font-family:inherit;cursor:pointer;
     transition:background .15s ease,color .15s ease,border-color .15s ease;}
   .cv2-tur-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
   .cv2-btn{border:none;border-radius:14px;padding:13px 10px;font-size:13.5px;font-weight:800;cursor:pointer;
     font-family:inherit;transition:transform .15s ease,opacity .15s ease;}
   .cv2-btn:active{transform:scale(.97);opacity:.85;}
   .cv2-btn.primary{background:var(--accent);color:#fff;box-shadow:0 5px 14px rgba(47,102,144,.28);}
-  .cv2-btn.ghost{background:rgba(255,255,255,.10);color:var(--ink);}
+  .cv2-btn.ghost{background:#eef1f3;color:var(--ink);}
   .cv2-btn.danger{background:#ea4335;color:#fff;}
-  .cv2-btn.wide{width:100%;background:rgba(255,255,255,.10);color:var(--muted);}
+  .cv2-btn.wide{width:100%;background:#eef1f3;color:var(--muted);}
 
   /* ---- Ekstre (rapor tarzı, tablo + koşan bakiye) ---- */
-  #cv2EkstreScreen{position:fixed;inset:0;z-index:860;background:var(--card);display:none;
+  #cv2EkstreScreen{position:fixed;inset:0;z-index:860;background:#fff;display:none;
     flex-direction:column;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
   #cv2EkstreScreen.show{display:flex;}
   .cv2-ek-head{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;
@@ -297,7 +297,7 @@
   .cv2-ek-table col.c-aciklama{width:41%;}
   .cv2-ek-table col.c-miktar{width:20%;}
   .cv2-ek-table col.c-toplam{width:20%;}
-  .cv2-ek-table thead th{position:sticky;top:0;background:var(--card);text-align:left;font-size:10.5px;
+  .cv2-ek-table thead th{position:sticky;top:0;background:#fff;text-align:left;font-size:10.5px;
     font-weight:800;color:var(--muted);letter-spacing:.1px;padding:8px 6px;border-bottom:1px solid var(--line);
     z-index:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .cv2-ek-table thead th:first-child{padding-left:0;}
@@ -334,16 +334,16 @@
 
   /* ================= KREDİ KARTI HESABIM ================= */
   #kkScreen, #kkSheet, #kkModal{
-    --kkGreen:#3ddc84; --kkGreenS:rgba(61,220,132,.15);
-    --kkRed:#ff6b6a;   --kkRedS:rgba(255,107,106,.15);
-    --kkOrange:#ffb84d;--kkOrangeS:rgba(255,184,77,.15);
-    --kkInk:#eef3f8; --kkGray:#9db0c9; --kkGray2:#7d92ac; --kkLine:rgba(255,255,255,.10); --kkBg:#122a52;
+    --kkGreen:#15a05c; --kkGreenS:#e8f6ee;
+    --kkRed:#e03131;   --kkRedS:#fdecec;
+    --kkOrange:#ef8f0d;--kkOrangeS:#fff4e2;
+    --kkInk:#171a1c; --kkGray:#868d93; --kkGray2:#aab1b6; --kkLine:#ebeef0; --kkBg:#f6f8f9;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
   #kkScreen{background:var(--kkBg);}
   #kkScreen .kk-head{padding:16px 18px 6px 18px;flex-shrink:0;}
   #kkScreen .kk-head h1{margin:0;font-size:23px;font-weight:800;letter-spacing:-.6px;color:var(--kkInk);}
-  .kk-card{background:var(--card);border-radius:20px;box-shadow:0 2px 14px rgba(16,24,32,.055);}
+  .kk-card{background:#fff;border-radius:20px;box-shadow:0 2px 14px rgba(16,24,32,.055);}
 
   /* ---- üst özet (katlanabilir) ---- */
   .kk-summary{margin:8px 12px 10px 12px;flex-shrink:0;overflow:hidden;}
@@ -403,7 +403,7 @@
   .kk-split{flex:1;min-height:0;display:grid;grid-template-columns:clamp(94px,26vw,112px) 1fr;
     gap:10px;padding:0 12px 8px 12px;}
   .kk-rail{height:100%;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
-    scroll-behavior:smooth;background:var(--card);border-radius:20px;padding:9px 5px;
+    scroll-behavior:smooth;background:#fff;border-radius:20px;padding:9px 5px;
     box-shadow:0 2px 14px rgba(16,24,32,.055);display:flex;flex-direction:column;gap:6px;
     scrollbar-width:none;touch-action:pan-y;}
   .kk-rail::-webkit-scrollbar{display:none;}
@@ -418,7 +418,7 @@
   @media(hover:hover){ .kk-m:hover{background:#f2f6f8;} }
   .kk-m:active{transform:scale(.94);}
   .kk-m-c{width:clamp(58px,15.5vw,66px);height:clamp(58px,15.5vw,66px);aspect-ratio:1;border-radius:50%;flex-shrink:0;
-    border:2px solid #E4E7EC;background:var(--card);box-shadow:0 2px 6px rgba(16,24,32,.07);
+    border:2px solid #E4E7EC;background:#fff;box-shadow:0 2px 6px rgba(16,24,32,.07);
     display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.1;
     font-size:clamp(9px,2.5vw,11px);font-weight:700;letter-spacing:0;color:var(--kkGray);
     transition:transform .2s ease-in-out,background .2s ease-in-out,color .2s ease-in-out,
@@ -458,7 +458,7 @@
   .kk-tx-date{font-size:clamp(9.5px,2.7vw,11px);color:var(--kkGray2);margin-top:3px;font-weight:700;white-space:nowrap;}
   .kk-empty{padding:34px 18px;text-align:center;color:var(--kkGray2);font-size:13px;font-weight:700;}
 
-  .kk-foot{flex-shrink:0;background:var(--card);border-top:1px solid var(--kkLine);
+  .kk-foot{flex-shrink:0;background:#fff;border-top:1px solid var(--kkLine);
     padding:9px 12px calc(9px + env(safe-area-inset-bottom));
     display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
   .kk-foot .i{text-align:center;min-width:0;}
@@ -473,11 +473,11 @@
   #kkSheetBg{position:absolute;inset:0;background:rgba(18,22,26,.4);
     -webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px);opacity:0;transition:opacity .34s ease;}
   #kkSheet.in #kkSheetBg{opacity:1;}
-  #kkSheetPanel{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:26px 26px 0 0;
+  #kkSheetPanel{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:26px 26px 0 0;
     max-height:88vh;display:flex;flex-direction:column;transform:translateY(101%);
     transition:transform .44s cubic-bezier(.32,.72,0,1);box-shadow:0 -10px 44px rgba(0,0,0,.2);will-change:transform;}
   #kkSheet.in #kkSheetPanel{transform:translateY(0);}
-  .kk-grab{width:38px;height:5px;border-radius:3px;background:rgba(255,255,255,.28);margin:9px auto 2px auto;flex-shrink:0;}
+  .kk-grab{width:38px;height:5px;border-radius:3px;background:#dfe4e7;margin:9px auto 2px auto;flex-shrink:0;}
   .kk-sheet-head{flex-shrink:0;padding:6px 20px 12px 20px;border-bottom:1px solid var(--kkLine);}
   .kk-sheet-head .t{font-size:19px;font-weight:800;color:var(--kkInk);letter-spacing:-.5px;line-height:1.25;}
   .kk-sheet-head .r{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:8px;}
@@ -504,14 +504,14 @@
   .kk-plan-r .d{color:var(--kkGray);font-weight:700;}
   .kk-plan-r .s.ok{color:var(--kkGreen);} .kk-plan-r .s.no{color:var(--kkGray2);}
   .kk-acts{flex-shrink:0;border-top:1px solid var(--kkLine);padding:12px 20px calc(14px + env(safe-area-inset-bottom));
-    display:grid;grid-template-columns:1fr 1fr;gap:9px;background:var(--card);}
+    display:grid;grid-template-columns:1fr 1fr;gap:9px;background:#fff;}
   .kk-btn{border:none;border-radius:14px;padding:13px 10px;font-size:13.5px;font-weight:800;cursor:pointer;
     font-family:inherit;letter-spacing:-.2px;transition:transform .15s ease,opacity .15s ease;}
   .kk-btn:active{transform:scale(.97);opacity:.85;}
   .kk-btn.primary{background:var(--kkGreen);color:#fff;box-shadow:0 5px 14px rgba(21,160,92,.28);}
   .kk-btn.ghost{background:var(--kkBg);color:var(--kkInk);}
   .kk-btn.danger{background:var(--kkRedS);color:var(--kkRed);}
-  .kk-btn.wide{grid-column:1 / -1;background:rgba(255,255,255,.10);color:var(--kkGray);}
+  .kk-btn.wide{grid-column:1 / -1;background:#eef1f3;color:var(--kkGray);}
 
   /* ---- küçük onay / düzenleme penceresi ---- */
   #kkModal{position:fixed;inset:0;z-index:900;display:none;align-items:center;justify-content:center;padding:22px;}
@@ -519,7 +519,7 @@
   #kkModalBg{position:absolute;inset:0;background:rgba(18,22,26,.4);
     -webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px);opacity:0;transition:opacity .24s ease-in-out;}
   #kkModal.in #kkModalBg{opacity:1;}
-  #kkModalCard{position:relative;width:100%;max-width:340px;background:var(--card);border-radius:22px;padding:20px;
+  #kkModalCard{position:relative;width:100%;max-width:340px;background:#fff;border-radius:22px;padding:20px;
     box-shadow:0 18px 50px rgba(0,0,0,.24);opacity:0;transform:scale(.94) translateY(10px);
     transition:opacity .24s ease-in-out,transform .24s ease-in-out;}
   #kkModal.in #kkModalCard{opacity:1;transform:none;}
@@ -529,7 +529,7 @@
   .kk-field{margin-top:14px;}
   .kk-field label{display:block;font-size:11px;font-weight:800;color:var(--kkGray);letter-spacing:.2px;}
   .kk-field input{width:100%;margin-top:6px;border:1.5px solid var(--kkLine);border-radius:13px;
-    padding:11px 13px;font-size:15px;font-weight:700;color:var(--kkInk);font-family:inherit;background:var(--card);
+    padding:11px 13px;font-size:15px;font-weight:700;color:var(--kkInk);font-family:inherit;background:#fff;
     outline:none;transition:border-color .2s ease-in-out;}
   .kk-field input:focus{border-color:var(--kkGreen);}
 
@@ -578,7 +578,7 @@
   .cv2-toggle{position:relative;width:46px;height:27px;border-radius:20px;background:#d8cdb8;flex-shrink:0;
     cursor:pointer;transition:background .2s;align-self:center;}
   .cv2-toggle.on{background:#6b5f4f;}
-  .cv2-toggle .knob{position:absolute;top:2.5px;left:2.5px;width:22px;height:22px;border-radius:50%;background:var(--card);
+  .cv2-toggle .knob{position:absolute;top:2.5px;left:2.5px;width:22px;height:22px;border-radius:50%;background:#fff;
     box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s;}
   .cv2-toggle.on .knob{transform:translateX(19px);}
   .ayar-badge svg{width:24px;height:24px;}
@@ -597,19 +597,19 @@
   .am-badge.b-sablon{background:linear-gradient(135deg,#c9973f,#8a6d1f);}
   .am-badge-balance{position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);background:#1c2b30;color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.25);border:2px solid #fff;}
 
-  .urun-search-bar{display:flex;align-items:center;gap:10px;background:var(--card);padding:calc(env(safe-area-inset-top) + 14px) 16px 14px 16px;flex-shrink:0;border-bottom:1px solid var(--line);}
+  .urun-search-bar{display:flex;align-items:center;gap:10px;background:#fff;padding:calc(env(safe-area-inset-top) + 14px) 16px 14px 16px;flex-shrink:0;border-bottom:1px solid var(--line);}
   .urun-back{background:none;border:none;color:var(--accent);font-size:22px;cursor:pointer;padding:0 2px;}
   .urun-search-icon{color:var(--muted);font-size:15px;}
   .urun-search-bar input{flex:1;background:#f0f1f3;border:none;border-radius:10px;color:var(--ink);font-size:16px;padding:9px 12px;}
   .urun-search-bar input::placeholder{color:var(--muted);}
-  .urun-list{flex:1;overflow-y:auto;padding:16px;background:var(--bg-mid);}
+  .urun-list{flex:1;overflow-y:auto;padding:16px;background:#f4f7f8;}
   .urun-list .swipe-wrap{border-bottom:1px solid var(--line);}
   .urun-list .swipe-wrap:last-child{border-bottom:none;}
-  .urun-list.sk-list{background:var(--card);border-radius:14px;box-shadow:0 2px 8px rgba(20,40,50,.05);}
+  .urun-list.sk-list{background:#fff;border-radius:14px;box-shadow:0 2px 8px rgba(20,40,50,.05);}
   body{
     margin:0;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    background:linear-gradient(180deg,var(--bg-top) 0%, var(--bg-mid) 230px, var(--bg-mid) 230px);
+    background:linear-gradient(180deg,var(--bg-top) 0%, var(--bg-mid) 230px, #f4f7f8 230px);
     color:var(--ink);
     min-height:100vh;
     padding-bottom:40px;
@@ -637,10 +637,10 @@
   .gg-entry .meta{color:var(--muted);font-size:11.5px;}
   .toggle-list{text-align:center;font-size:12.5px;color:var(--accent);padding:6px 0 0 0;cursor:pointer;font-weight:600;}
 
-  .sheet{background:var(--bg-mid);border-radius:22px 22px 0 0;margin-top:12px;flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;}
+  .sheet{background:#f4f7f8;border-radius:22px 22px 0 0;margin-top:12px;flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;}
   .cari-list-scroll{flex:1;overflow-y:auto;min-height:0;}
   .grabber{width:40px;height:5px;background:#d3dcdf;border-radius:3px;margin:10px auto 4px auto;}
-  .sheet-title{font-size:13px;font-weight:800;color:var(--muted);letter-spacing:.5px;padding:14px 4px 6px 4px;}
+  .sheet-title{font-size:13px;font-weight:800;color:#4a5a60;letter-spacing:.5px;padding:14px 4px 6px 4px;}
   .acct-card{background:var(--card);border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(20,40,50,.05);}
   .acct-row{display:flex;justify-content:space-between;align-items:center;padding:16px 16px;border-bottom:1px solid var(--line);cursor:pointer;position:relative;}
   .acct-row:last-child{border-bottom:none;}
@@ -656,7 +656,7 @@
   .taksit-badge.tamam{background:linear-gradient(135deg,#4ec98a,#1f8a54);}
   .taksit-detay-card .gg-row .lbl{font-size:15px;}
   .taksit-detay-card .gg-row .val{font-size:17px;}
-    .cari-card{background:var(--card);border-radius:16px;padding:14px;color:var(--ink);position:relative;overflow:hidden;flex-shrink:0;box-shadow:0 2px 8px rgba(20,40,50,.06);}
+    .cari-card{background:#fff;border-radius:16px;padding:14px;color:var(--ink);position:relative;overflow:hidden;flex-shrink:0;box-shadow:0 2px 8px rgba(20,40,50,.06);}
   #cariSummaryCard{box-shadow:0 8px 16px rgba(20,40,50,.12);flex-shrink:0;}
   .acct-card.cari-sub{box-shadow:0 8px 16px rgba(20,40,50,.12);}
   .cari-card-top{display:flex;align-items:center;justify-content:space-between;}
@@ -683,7 +683,7 @@
   .cari-card-swipe-wrap .cari-card{position:relative;z-index:1;}
   .cari-card-mini{padding:12px 14px;display:flex;align-items:center;font-size:16px;font-weight:700;color:var(--ink);}
   .ci-input{width:100%;box-sizing:border-box;margin-bottom:10px;padding:13px 12px;font-size:15px;border:1px solid var(--line);border-radius:12px;color:var(--ink);}
-  .ci-tur-btn{flex:1;padding:12px 0;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--muted);font-weight:700;font-size:14px;cursor:pointer;}
+  .ci-tur-btn{flex:1;padding:12px 0;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--muted);font-weight:700;font-size:14px;cursor:pointer;}
   .ci-tur-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
       .siparis-teslimat-row{display:flex;align-items:center;gap:7px;font-size:10.5pt;color:var(--muted);margin-top:5px;}
   .siparis-date-circle{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#f0a94e,#dd7a2c);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;line-height:1.1;font-weight:700;flex-shrink:0;letter-spacing:.3px;box-shadow:0 3px 8px rgba(221,122,44,.35);}
@@ -721,7 +721,7 @@
   .swipe-btn.fis-list-duzenle{background:#2f5c8a;}
   .swipe-btn.fis-list-sil{background:#c0392b;}
   .sk-list .swipe-wrap{border-radius:0;}
-  .swipe-content{position:relative;background:var(--card);transition:transform .2s ease;touch-action:pan-y;border-bottom:none !important;}
+  .swipe-content{position:relative;background:#fff;transition:transform .2s ease;touch-action:pan-y;border-bottom:none !important;}
   .acct-row.bar{border-left:4px solid var(--accent);}
   .cari-sub{padding:4px 0 0 0;}
   .cari-sub .acct-row{padding-left:16px;}
@@ -747,7 +747,7 @@
   #dEkstreOverlay{align-items:flex-start;padding-top:calc(env(safe-area-inset-top) + 14px);}
       .dcek-page{flex:0 0 100%;min-width:100%;scroll-snap-align:start;box-sizing:border-box;padding:0 1px;}
   .dcek-page-head{display:flex;justify-content:space-between;align-items:center;padding:2px 2px 8px 2px;}
-  .dcek-page-title{font-size:11.5px;font-weight:800;letter-spacing:.3px;color:var(--muted);}
+  .dcek-page-title{font-size:11.5px;font-weight:800;letter-spacing:.3px;color:#7a8590;}
     .dcek-dots{display:flex;justify-content:center;gap:6px;margin-top:8px;}
   .dcek-dot{width:6px;height:6px;border-radius:50%;background:#d5dade;transition:background .2s,width .2s;}
   .dcard-pager{overflow:hidden;position:relative;}
@@ -755,9 +755,9 @@
   .dcard-page{flex:0 0 50%;min-width:50%;box-sizing:border-box;}
   .dcek-dot.active{background:var(--accent);width:16px;border-radius:3px;}
   .overlay.show{display:flex;}
-  .modal{background:var(--card);width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:20px 20px 26px 20px;}
+  .modal{background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:20px 20px 26px 20px;}
   .modal h3{margin:0 0 14px 0;font-size:17px;}
-  .seg{display:flex;background:rgba(255,255,255,.10);border-radius:12px;padding:4px;margin-bottom:14px;}
+  .seg{display:flex;background:#eef1f2;border-radius:12px;padding:4px;margin-bottom:14px;}
   .seg button{flex:1;border:none;background:transparent;padding:10px 0;border-radius:9px;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;}
   .seg button.active.income{background:var(--green);color:#fff;}
   .seg button.active.expense{background:var(--red);color:#fff;}
@@ -765,8 +765,8 @@
   /* iOS "Ayarlar" tarzı gruplu liste görünümü — sadece çek/tahsilat düzenleme
      formunda kullanılıyor (.field genel sınıfı diğer tüm formlarda değişmeden
      kalıyor, burada onun yerine .field-ios kullanılıyor). */
-  #quickTxModal, #cekWizModal{background:var(--card);}
-  .ios-card{background:var(--card);border-radius:14px;overflow:hidden;margin-bottom:14px;}
+  #quickTxModal, #cekWizModal{background:#f2f2f7;}
+  .ios-card{background:#fff;border-radius:14px;overflow:hidden;margin-bottom:14px;}
   .field-ios{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;border-bottom:1px solid var(--line);margin:0;}
   .field-ios:last-child{border-bottom:none;}
   .field-ios label{font-size:14.5px;font-weight:500;color:var(--ink);flex-shrink:0;margin:0;}
@@ -777,12 +777,12 @@
   .field-ios-block{padding:12px 14px;border-bottom:1px solid var(--line);}
   .field-ios-block:last-child{border-bottom:none;}
   .field-ios-block > label{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;}
-  #overlay .modal, #urunOverlay .modal, #skAlisOverlay .modal, #skSatisOverlay .modal, #kalemEkleOverlay .modal, #cariInfoOverlay .modal, #yeniCariOverlay .modal{background:var(--card);}
+  #overlay .modal, #urunOverlay .modal, #skAlisOverlay .modal, #skSatisOverlay .modal, #kalemEkleOverlay .modal, #cariInfoOverlay .modal, #yeniCariOverlay .modal{background:#f2f2f7;}
   .cari-input-row{display:flex;gap:8px;align-items:stretch;}
   .cari-input-row input{flex:1;min-width:0;}
-  .cari-sec-btn{flex-shrink:0;width:46px;border:1px solid rgba(255,255,255,.20);border-radius:10px;background:#fbfcfc;color:var(--accent);font-size:18px;cursor:pointer;}
+  .cari-sec-btn{flex-shrink:0;width:46px;border:1px solid #dfe5e7;border-radius:10px;background:#fbfcfc;color:var(--accent);font-size:18px;cursor:pointer;}
   .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600;}
-  .field input, .field select{width:100%;padding:12px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.20);font-size:15px;background:#fbfcfc;}
+  .field input, .field select{width:100%;padding:12px 12px;border-radius:10px;border:1px solid #dfe5e7;font-size:15px;background:#fbfcfc;}
   .modal-actions{display:flex;gap:10px;margin-top:8px;}
   .kat-row{display:flex;gap:8px;align-items:center;}
   .kat-row select{flex:1;}
@@ -792,20 +792,20 @@
   .kat-new-row input{flex:1;border:1px solid #d5dade;border-radius:10px;padding:9px 12px;font-size:15px;}
   .kat-new-save{flex-shrink:0;border:none;background:#2e56c9;color:#fff;border-radius:10px;padding:0 16px;font-weight:700;}
   .modal-actions button{flex:1;padding:13px 0;border-radius:12px;border:none;font-size:15px;font-weight:700;cursor:pointer;}
-  .btn-cancel{background:rgba(255,255,255,.10);color:var(--ink);}
+  .btn-cancel{background:#eef1f2;color:var(--ink);}
   .btn-save{background:var(--accent);color:#fff;}
 
-  .detail-screen{position:fixed;inset:0;background:var(--card);z-index:20;display:none;flex-direction:column;}
+  .detail-screen{position:fixed;inset:0;background:#fff;z-index:20;display:none;flex-direction:column;}
   .detail-screen.show{display:flex;}
   .d-header{display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top) + 16px) 14px 12px 14px;border-bottom:1px solid var(--line);flex-shrink:0;}
   .d-back{background:none;border:none;font-size:24px;color:var(--ink);cursor:pointer;padding:4px 8px;}
   .d-title{font-size:19px;font-weight:700;flex:1;text-align:center;}
   .d-share{background:none;border:none;font-size:19px;color:var(--accent);cursor:pointer;padding:0 10px;}
-  .d-menu{background:rgba(255,255,255,.10);border:none;border-radius:16px;padding:8px 16px;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;}
+  .d-menu{background:#eef1f2;border:none;border-radius:16px;padding:8px 16px;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;}
 
   .d-list{flex:1;overflow-y:auto;padding:6px 16px 100px 16px;}
   .tx-row{padding:14px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;cursor:pointer;}
-  .rapor-section-title{margin:18px 0 4px 0;font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;}
+  .rapor-section-title{margin:18px 0 4px 0;font-size:13px;font-weight:800;color:#7a8590;text-transform:uppercase;letter-spacing:.03em;}
   #raporList, #kasaList{margin-bottom:90px;}
   .kasa-ay-group{border-bottom:1px solid var(--line);}
   .kasa-ay-header{display:flex;justify-content:space-between;align-items:center;padding:14px 0;cursor:pointer;}
@@ -829,7 +829,7 @@
   .tx-type.neg{color:var(--red);}
   .tx-date{font-weight:400;color:var(--muted);text-transform:none;font-size:14px;}
   .tx-transfer{color:var(--accent);font-size:14px;margin-top:2px;}
-  .tx-desc{color:var(--ink);font-size:14px;margin-top:2px;}
+  .tx-desc{color:#3d4b50;font-size:14px;margin-top:2px;}
   .tx-date-circle{width:46px;height:46px;border-radius:50%;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10.5px;line-height:1.05;font-weight:800;flex-shrink:0;letter-spacing:.2px;box-shadow:0 3px 8px rgba(0,0,0,.18);}
   .tx-date-circle b{font-size:17px;line-height:1.05;font-weight:800;}
   .tx-date-circle.islendi{background:linear-gradient(135deg,#4ec98a,#1f8a54);}
@@ -838,19 +838,19 @@
   .tx-amount.neg{color:var(--red);}
   .tx-amount .cents{font-size:14px;}
 
-  .d-toplam{display:flex;justify-content:space-between;align-items:center;padding:16px;background:var(--bg-mid);border-top:1px solid var(--line);flex-shrink:0;}
+  .d-toplam{display:flex;justify-content:space-between;align-items:center;padding:16px;background:#f4f7f8;border-top:1px solid var(--line);flex-shrink:0;}
   .d-toplam .lbl{font-size:14px;color:var(--muted);font-weight:600;}
   .d-toplam .val{font-size:22px;font-weight:700;}
           
   .entry-bar{background:#1f7a4d;flex-shrink:0;}
   .entry-row{display:flex;align-items:center;padding:10px 12px;gap:6px;}
-  .entry-desc{flex:1;min-width:0;background:rgba(255,255,255,.08);border:none;border-radius:10px;padding:12px 10px;font-size:14px;color:var(--ink);}
+  .entry-desc{flex:1;min-width:0;background:#eef7f1;border:none;border-radius:10px;padding:12px 10px;font-size:14px;color:var(--ink);}
   .entry-desc.hidden{display:none;}
   .entry-amt{width:64px;flex-shrink:0;background:transparent;border:none;border-bottom:2px solid rgba(255,255,255,.6);color:#fff;font-size:16px;text-align:right;padding:8px 2px;}
   .entry-amt::placeholder{color:rgba(255,255,255,.7);}
   .keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 12px 14px 12px;background:#e2e5e6;}
   .keypad.hidden{display:none;}
-  .keypad button{background:var(--card);border:none;border-radius:12px;padding:16px 0;font-size:22px;font-weight:600;color:var(--ink);box-shadow:0 1px 1px rgba(0,0,0,.06);}
+  .keypad button{background:#fff;border:none;border-radius:12px;padding:16px 0;font-size:22px;font-weight:600;color:#111;box-shadow:0 1px 1px rgba(0,0,0,.06);}
   .keypad button:active{background:#d8dbdc;}
   .keypad button.kback{background:transparent;box-shadow:none;font-size:20px;}
   .entry-save{flex-shrink:0;white-space:nowrap;background:rgba(255,255,255,.15);border:none;border-radius:10px;color:#fff;font-weight:700;font-size:13px;padding:12px 12px;cursor:pointer;}
@@ -863,7 +863,7 @@
   .empty-tx.hidden{display:none;}
 
   /* ===== Rapor / Ekstre ekranı ===== */
-  .report-screen{position:fixed;inset:0;background:var(--card);z-index:25;display:none;flex-direction:column;}
+  .report-screen{position:fixed;inset:0;background:#fff;z-index:25;display:none;flex-direction:column;}
   .report-screen.show{display:flex;}
   .report-header{
     display:flex;align-items:center;justify-content:space-between;
@@ -886,26 +886,26 @@
   .rtable th:nth-child(4), .rtable td:nth-child(4){width:22%;}
   .rtable td, .rtable th{word-wrap:break-word;overflow-wrap:break-word;}
   .rtable th{
-    text-align:left;font-size:10px;color:var(--muted);font-weight:800;
+    text-align:left;font-size:10px;color:#4a5a60;font-weight:800;
     padding:7px 4px;border-bottom:1px solid var(--line);white-space:nowrap;
   }
   .rtable th.num, .rtable td.num{text-align:right;}
   .rtable td{padding:9px 4px;border-bottom:1px solid #f0f2f3;vertical-align:top;}
   .rtable tbody tr[data-idx]{cursor:pointer;}
-  .rtable tbody tr[data-idx]:active{background:var(--bg-mid);}
-  .rtable td.tarih{white-space:nowrap;color:var(--ink);}
+  .rtable tbody tr[data-idx]:active{background:#f4f7f8;}
+  .rtable td.tarih{white-space:nowrap;color:#3d4b50;}
   .rtable td.tur{font-weight:800;white-space:nowrap;}
   .rtable td.tur.neg{color:var(--red);}
-  .rtable td.aciklama{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink);}
+  .rtable td.aciklama{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#3d4b50;}
   .rtable td.neg{color:var(--red);font-weight:600;}
   .rtable tr.month-row td{
     background:#f2f3f1;font-weight:800;font-size:12px;padding:8px 4px;
   }
-  .rtable tr.month-row td.msum{font-weight:600;font-size:10px;color:var(--ink);text-align:right;}
+  .rtable tr.month-row td.msum{font-weight:600;font-size:10px;color:#3d4b50;text-align:right;}
   .rtable tr.grand-row td{
-    background:rgba(255,255,255,.10);font-weight:800;font-size:12.5px;padding:12px 4px;border-top:2px solid var(--ink);
+    background:#eef1f2;font-weight:800;font-size:12.5px;padding:12px 4px;border-top:2px solid var(--ink);
   }
-  .rtable tr.grand-row td.gsum{font-size:10px;font-weight:500;color:var(--ink);text-align:right;}
+  .rtable tr.grand-row td.gsum{font-size:10px;font-weight:500;color:#3d4b50;text-align:right;}
   .rtable tr.grand-row td.gtotal{text-align:right;font-size:15px;color:var(--red);}
 
   .report-footer{padding:16px;text-align:left;font-size:12px;color:var(--muted);border-top:1px solid var(--line);}
@@ -914,7 +914,7 @@
   /* ===== Fiş / hareket detay popup ===== */
   .receipt-overlay{position:fixed;inset:0;background:rgba(20,30,35,.5);display:none;align-items:center;justify-content:center;z-index:80;padding:20px;}
   .receipt-overlay.show{display:flex;}
-  .receipt-card{background:var(--card);width:100%;max-width:340px;border-radius:16px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.25);}
+  .receipt-card{background:#fff;width:100%;max-width:340px;border-radius:16px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.25);}
   .receipt-head{background:#fbf9df;text-align:center;padding:16px 14px;border-bottom:1px dashed #d8d3a0;}
   .receipt-head .r-type{font-size:17px;font-weight:800;letter-spacing:.5px;}
   .receipt-head .r-type.neg{color:var(--red);}
@@ -925,20 +925,20 @@
   .receipt-line .rl-lbl{color:var(--muted);flex-shrink:0;}
   .receipt-line .rl-val{font-weight:700;text-align:right;}
   .receipt-line .rl-val.neg{color:var(--red);}
-  .receipt-total{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:var(--bg-mid);border-top:1px solid var(--line);}
+  .receipt-total{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:#f4f7f8;border-top:1px solid var(--line);}
   .receipt-total .rt-lbl{font-size:13px;font-weight:700;color:var(--ink);}
   .receipt-total .rt-val{font-size:20px;font-weight:800;}
   .receipt-total .rt-val.neg{color:var(--red);}
-  .receipt-close{display:block;width:100%;padding:14px 0;border:none;background:rgba(255,255,255,.10);color:var(--ink);font-size:15px;font-weight:700;cursor:pointer;}
+  .receipt-close{display:block;width:100%;padding:14px 0;border:none;background:#eef1f2;color:var(--ink);font-size:15px;font-weight:700;cursor:pointer;}
 
   /* ===== Stok Kartı Modülü ===== */
-    .sk-list{flex:1;overflow-y:auto;padding:14px 16px;background:var(--bg-mid);}
-  .sk-card{background:var(--card);border-radius:12px;box-shadow:0 2px 10px rgba(20,40,50,.08);padding:20px 20px;cursor:pointer;}
+    .sk-list{flex:1;overflow-y:auto;padding:14px 16px;background:#f4f7f8;}
+  .sk-card{background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(20,40,50,.08);padding:20px 20px;cursor:pointer;}
   .sk-list .sk-card{border-radius:0;box-shadow:none;}
   .sk-list > .sk-card:not(:last-child){border-bottom:1px solid var(--line);}
   .sk-card.pasif{opacity:.5;}
   .sk-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
-  .sk-card-name{font-size:19px;font-weight:800;color:var(--ink);}
+  .sk-card-name{font-size:19px;font-weight:800;color:#3d4b50;}
   .sk-card-code{font-size:13.5px;font-weight:600;color:var(--muted);margin-top:3px;}
   .sk-card-qty{font-size:19px;font-weight:900;text-align:right;white-space:nowrap;}
   .sk-card-qty.neg{color:var(--red);}
@@ -949,7 +949,7 @@
   #urunList .sk-card{display:flex;align-items:flex-start;gap:12px;padding:16px 4px;}
   #urunList .sk-card-icon{flex:0 0 auto;width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:#e8f3ec;}
   #urunList .sk-card-icon svg{width:20px;height:20px;stroke:#2f8557;}
-  #urunList .sk-card-icon.warn{background:rgba(255,107,106,.15);}
+  #urunList .sk-card-icon.warn{background:#fdeceb;}
   #urunList .sk-card-icon.warn svg{stroke:#d1453b;}
   #urunList .sk-card-main{flex:1;min-width:0;}
   #urunList .sk-card-top{align-items:center;}
@@ -957,10 +957,10 @@
   #urunList .sk-card-code{font-size:12.5px;font-weight:600;color:var(--muted);margin-top:2px;}
   #urunList .sk-card-qty-wrap{flex:0 0 auto;display:flex;align-items:center;gap:6px;}
   #urunList .sk-card-qty-pill{font-size:13px;font-weight:800;white-space:nowrap;padding:5px 12px;border-radius:999px;background:#e5f5ea;color:#1c8a4f;}
-  #urunList .sk-card-qty-pill.neg{background:rgba(255,107,106,.15);color:#d1453b;}
+  #urunList .sk-card-qty-pill.neg{background:#fdeceb;color:#d1453b;}
   #urunList .sk-card-chevron{color:#c6ccce;font-size:18px;font-weight:700;}
 
-  .sk-detail{position:fixed;inset:0;background:var(--bg-mid);z-index:30;display:none;flex-direction:column;}
+  .sk-detail{position:fixed;inset:0;background:#f4f7f8;z-index:30;display:none;flex-direction:column;}
   .sk-detail.show{display:flex;}
   .sk-dhead{background:#0f3d44;padding:calc(env(safe-area-inset-top) + 14px) 14px 0 14px;flex-shrink:0;}
   .sk-dhead-top{display:flex;align-items:center;justify-content:space-between;color:#fff;padding-bottom:10px;}
@@ -974,78 +974,78 @@
   .sk-sum-card .val{font-size:15px;font-weight:800;color:#fff;margin-top:2px;}
   .sk-sum-card .val.neg{color:#ff8a80;}
 
-  .sk-tabs{display:flex;background:var(--card);border-bottom:1px solid var(--line);flex-shrink:0;overflow-x:auto;}
+  .sk-tabs{display:flex;background:#fff;border-bottom:1px solid var(--line);flex-shrink:0;overflow-x:auto;}
   .sk-tabs button{flex:1;min-width:78px;background:none;border:none;color:var(--muted);font-weight:700;font-size:12.5px;padding:12px 4px;cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;}
   .sk-tabs button.active{color:var(--accent);border-bottom-color:var(--accent);}
 
   .sk-body{flex:1;overflow-y:auto;padding:16px;}
 
-  .sk-form-card{background:var(--card);border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(20,40,50,.05);margin-bottom:14px;}
+  .sk-form-card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(20,40,50,.05);margin-bottom:14px;}
   .sk-form-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .sk-toggle{display:flex;align-items:center;gap:10px;padding:6px 0;}
   .sk-toggle.hidden{display:none;}
-  .sk-toggle-switch{width:44px;height:26px;border-radius:14px;background:rgba(255,255,255,.20);position:relative;cursor:pointer;flex-shrink:0;transition:background .2s;}
+  .sk-toggle-switch{width:44px;height:26px;border-radius:14px;background:#dfe5e7;position:relative;cursor:pointer;flex-shrink:0;transition:background .2s;}
   .sk-toggle-switch.on{background:var(--green);}
-  .sk-toggle-switch .knob{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--card);transition:left .2s;}
+  .sk-toggle-switch .knob{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;}
   .sk-toggle-switch.on .knob{left:21px;}
   .sk-save-btn{width:100%;padding:14px 0;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px;}
 
   .sk-price-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);}
   .sk-price-row:last-of-type{border-bottom:none;}
   .sk-price-row label{font-size:13.5px;color:var(--ink);font-weight:600;}
-  .sk-price-row input{width:120px;text-align:right;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.20);font-size:14px;background:#fbfcfc;}
+  .sk-price-row input{width:120px;text-align:right;padding:8px 10px;border-radius:8px;border:1px solid #dfe5e7;font-size:14px;background:#fbfcfc;}
 
   .sk-mini-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;}
   .sk-mini-toolbar .sk-add-mini{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;}
   .sk-mini-filters{display:flex;gap:6px;overflow-x:auto;flex:1;}
-  .sk-mini-filters input, .sk-mini-filters select{border:1px solid rgba(255,255,255,.20);border-radius:8px;padding:8px 8px;font-size:12px;background:var(--card);flex-shrink:0;}
+  .sk-mini-filters input, .sk-mini-filters select{border:1px solid #dfe5e7;border-radius:8px;padding:8px 8px;font-size:12px;background:#fff;flex-shrink:0;}
 
-  .sk-table{width:100%;border-collapse:collapse;font-size:12px;background:var(--card);border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(20,40,50,.05);}
-  .sk-table th{text-align:left;font-size:10.5px;color:var(--muted);font-weight:800;padding:9px 8px;background:rgba(255,255,255,.10);white-space:nowrap;}
+  .sk-table{width:100%;border-collapse:collapse;font-size:12px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(20,40,50,.05);}
+  .sk-table th{text-align:left;font-size:10.5px;color:#4a5a60;font-weight:800;padding:9px 8px;background:#eef1f2;white-space:nowrap;}
   .sk-table td{padding:10px 8px;border-bottom:1px solid #f0f2f3;white-space:nowrap;}
   .sk-table th.num, .sk-table td.num{text-align:right;}
   .sk-table tr[data-idx]{cursor:pointer;}
-  .sk-table tr[data-idx]:active{background:var(--bg-mid);}
+  .sk-table tr[data-idx]:active{background:#f4f7f8;}
   .sk-table td.neg{color:var(--red);font-weight:700;}
   .sk-table-wrap{overflow-x:auto;}
 
   .sk-rapor-list{display:flex;flex-direction:column;gap:10px;}
-  .sk-rapor-btn{background:var(--card);border-radius:12px;padding:14px 16px;box-shadow:0 2px 8px rgba(20,40,50,.05);display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:14.5px;font-weight:600;color:var(--ink);}
+  .sk-rapor-btn{background:#fff;border-radius:12px;padding:14px 16px;box-shadow:0 2px 8px rgba(20,40,50,.05);display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:14.5px;font-weight:600;color:var(--ink);}
   .sk-rapor-btn .arrow{color:var(--muted);}
 
   .sk-empty{color:var(--muted);font-size:13px;text-align:center;padding:30px 0;}
   .sk-modal-wide .modal{max-height:88vh;overflow-y:auto;}
 
   /* ===== Fiş (Alış/Satış) Sistemi ===== */
-  .fis-tur-tabs{display:flex;gap:8px;padding:12px 16px;background:rgba(255,255,255,.08);overflow-x:auto;flex-shrink:0;}
-  .fis-tur-tabs button{flex-shrink:0;border:none;border-radius:20px;padding:9px 14px;font-size:12.5px;font-weight:700;color:var(--muted);background:var(--card);cursor:pointer;}
+  .fis-tur-tabs{display:flex;gap:8px;padding:12px 16px;background:#eef7f1;overflow-x:auto;flex-shrink:0;}
+  .fis-tur-tabs button{flex-shrink:0;border:none;border-radius:20px;padding:9px 14px;font-size:12.5px;font-weight:700;color:var(--muted);background:#fff;cursor:pointer;}
   .fis-tur-tabs button.active{background:var(--green);color:#fff;}
-  .fis-daterange{padding:0 16px 12px 16px;background:rgba(255,255,255,.08);flex-shrink:0;}
-  .fis-daterange select{width:100%;border:1px solid rgba(255,255,255,.20);border-radius:10px;padding:9px 10px;font-size:13px;background:var(--card);color:var(--ink);font-weight:600;}
+  .fis-daterange{padding:0 16px 12px 16px;background:#eef7f1;flex-shrink:0;}
+  .fis-daterange select{width:100%;border:1px solid #dfe5e7;border-radius:10px;padding:9px 10px;font-size:13px;background:#fff;color:var(--ink);font-weight:600;}
   .fis-card-durum{display:inline-block;margin-top:8px;padding:5px 12px;border-radius:20px;background:#f2f2f2;color:#8a6d1f;font-size:11.5px;font-weight:700;}
-  .fis-card-durum.taslak{background:rgba(255,107,106,.15);color:var(--red);}
+  .fis-card-durum.taslak{background:#fdeceb;color:var(--red);}
   .fis-card-belgeno{font-size:12px;font-weight:600;color:var(--muted);}
   #fisList .swipe-wrap{border-bottom:1.5px solid #e5ddcf;}
   #fisList .swipe-wrap:last-child{border-bottom:none;}
   #fisList .sk-card{padding:18px 20px;}
 
-  .picker-screen{position:fixed;inset:0;background:var(--card);z-index:35;display:none;flex-direction:column;}
+  .picker-screen{position:fixed;inset:0;background:#fff;z-index:35;display:none;flex-direction:column;}
   .picker-screen.show{display:flex;}
 
-  .fis-detail{position:fixed;inset:0;background:var(--bg-mid);z-index:30;display:none;flex-direction:column;}
+  .fis-detail{position:fixed;inset:0;background:#f4f7f8;z-index:30;display:none;flex-direction:column;}
   .fis-detail.show{display:flex;}
   .fis-dbody{flex:1;overflow-y:auto;padding:16px 16px 100px 16px;}
-  .fis-footer{position:fixed;bottom:0;left:0;right:0;background:var(--card);padding:12px 16px;display:flex;gap:10px;box-shadow:0 -2px 10px rgba(20,40,50,.1);z-index:2;}
+  .fis-footer{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:12px 16px;display:flex;gap:10px;box-shadow:0 -2px 10px rgba(20,40,50,.1);z-index:2;}
   .fis-footer button{flex:1;padding:14px 0;border:none;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;}
 
-  .fis-kalem-row{background:var(--card);border-radius:12px;padding:12px 14px;margin-bottom:8px;box-shadow:0 2px 6px rgba(20,40,50,.05);display:flex;justify-content:space-between;align-items:center;cursor:pointer;}
+  .fis-kalem-row{background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:8px;box-shadow:0 2px 6px rgba(20,40,50,.05);display:flex;justify-content:space-between;align-items:center;cursor:pointer;}
   .fis-kalem-row .k-name{font-size:14px;font-weight:700;color:var(--ink);}
   .fis-kalem-row .k-sub{font-size:12px;color:var(--muted);margin-top:2px;}
   .fis-kalem-row .k-tutar{font-size:14.5px;font-weight:800;color:var(--ink);white-space:nowrap;}
   .fis-ekle-btn{width:100%;padding:14px 0;border-radius:12px;border:2px dashed #b9c4c7;background:none;color:var(--accent);font-weight:700;font-size:14px;cursor:pointer;margin-bottom:14px;}
 
-  .fis-toplam-card{background:var(--card);border-radius:14px;padding:16px;margin-top:6px;box-shadow:0 2px 8px rgba(20,40,50,.05);}
-  .irsaliye-card{background:var(--card);border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(20,40,50,.06);cursor:pointer;}
+  .fis-toplam-card{background:#fff;border-radius:14px;padding:16px;margin-top:6px;box-shadow:0 2px 8px rgba(20,40,50,.05);}
+  .irsaliye-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(20,40,50,.06);cursor:pointer;}
   .irsaliye-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px dashed var(--line);padding-bottom:10px;margin-bottom:10px;}
   .irsaliye-label{font-size:10.5px;font-weight:800;letter-spacing:.4px;color:var(--muted);}
   .irsaliye-tamamlandi{color:var(--green);font-weight:800;margin-left:6px;}
@@ -1054,13 +1054,13 @@
   .irsaliye-items .fis-kalem-row{cursor:default;box-shadow:none;background:#f7f9fa;}
   .irsaliye-toplam{display:flex;justify-content:space-between;align-items:center;padding:10px 4px 0 4px;border-top:1px solid var(--line);margin-top:2px;font-size:13px;font-weight:700;color:var(--muted);}
   .irsaliye-toplam span:last-child{font-size:16px;font-weight:800;color:var(--ink);}
-  .irsaliye-geri-al-btn{margin-top:10px;width:100%;padding:9px;border-radius:10px;border:1px solid #e5484d;background:var(--card);
+  .irsaliye-geri-al-btn{margin-top:10px;width:100%;padding:9px;border-radius:10px;border:1px solid #e5484d;background:#fff;
     color:#e5484d;font-size:12.5px;font-weight:800;cursor:pointer;}
   .irsaliye-geri-al-btn:disabled{border-color:#c7ced1;color:#c7ced1;cursor:not-allowed;}
   .fis-toplam-row{display:flex;justify-content:space-between;font-size:15.5px;font-weight:800;color:var(--red);}
 
-  .fatura-table{background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 2px 6px rgba(20,40,50,.05);margin-bottom:14px;}
-  .fatura-header-row{display:flex;background:rgba(255,255,255,.10);padding:8px 10px;font-size:10.5px;font-weight:800;letter-spacing:.3px;color:var(--muted);}
+  .fatura-table{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 6px rgba(20,40,50,.05);margin-bottom:14px;}
+  .fatura-header-row{display:flex;background:#eef1f2;padding:8px 10px;font-size:10.5px;font-weight:800;letter-spacing:.3px;color:var(--muted);}
   .fatura-row{display:flex;padding:10px;border-top:1px solid var(--line);align-items:center;cursor:pointer;}
   .fatura-row:hover{background:#fafcfc;}
   .f-kodu{flex:0 0 15%;font-size:11.5px;color:var(--muted);word-break:break-word;}
@@ -1082,7 +1082,7 @@
 
 .g-overlay{position:fixed;inset:0;background:rgba(20,16,10,.5);display:none;align-items:flex-end;justify-content:center;z-index:9998;}
 .g-overlay.show{display:flex;}
-.g-sheet{background:var(--card);width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:18px 18px 22px;
+.g-sheet{background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:18px 18px 22px;
   max-height:78vh;overflow-y:auto;}
 .g-sheet-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
 .g-sheet-title{font-size:15.5px;font-weight:800;color:#3a3229;}
@@ -1109,7 +1109,7 @@
 #cv2LpButtons .cv2-lp-btn:nth-child(3){background:#34a853;color:#fff;}
 #cv2LpButtons .cv2-lp-btn:nth-child(4){background:#4285f4;color:#fff;}
 #cv2LpButtons .cv2-lp-btn:nth-child(5){background:#1c2b30;color:#fff;}
-#cv2LpButtons .cv2-lp-btn:nth-child(6){background:var(--card);color:var(--ink);border:1.5px solid #e2e5e6;}
+#cv2LpButtons .cv2-lp-btn:nth-child(6){background:#fff;color:#1c2b30;border:1.5px solid #e2e5e6;}
 #cv2LpOverlay{align-items:center;padding:24px;}
 #cv2LpOverlay .g-sheet{border-radius:20px;max-height:70vh;}
 .g-musteri-list-item{display:flex;align-items:center;gap:10px;padding:12px 4px;border-bottom:1px solid #f0ece3;cursor:pointer;}
@@ -1153,10 +1153,10 @@
 </div>
 
 <div id="cv2BigDropWarn" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(11,26,61,.65);align-items:center;justify-content:center;">
-  <div style="background:var(--card);border-radius:20px;padding:24px 22px;width:280px;text-align:center;box-shadow:0 14px 34px rgba(0,0,0,.35);">
+  <div style="background:#fff;border-radius:20px;padding:24px 22px;width:280px;text-align:center;box-shadow:0 14px 34px rgba(0,0,0,.35);">
     <div style="font-size:15px;font-weight:800;color:#c0392b;margin-bottom:10px;">⚠️ Beklenmedik azalma</div>
-    <div id="cv2BigDropMsg" style="font-size:13px;color:var(--ink);font-weight:600;line-height:1.5;margin-bottom:20px;"></div>
-    <button id="cv2BigDropCancel" style="width:100%;padding:13px;border:none;border-radius:12px;background:rgba(255,255,255,.10);color:var(--ink);font-weight:800;font-size:14px;font-family:inherit;margin-bottom:10px;cursor:pointer;">Vazgeç (buluta yazma)</button>
+    <div id="cv2BigDropMsg" style="font-size:13px;color:#333;font-weight:600;line-height:1.5;margin-bottom:20px;"></div>
+    <button id="cv2BigDropCancel" style="width:100%;padding:13px;border:none;border-radius:12px;background:#eef1f3;color:#1c2b30;font-weight:800;font-size:14px;font-family:inherit;margin-bottom:10px;cursor:pointer;">Vazgeç (buluta yazma)</button>
     <button id="cv2BigDropConfirm" style="width:100%;padding:13px;border:none;border-radius:12px;background:#c0392b;color:#fff;font-weight:800;font-size:14px;font-family:inherit;cursor:pointer;">Yine de Kaydet</button>
   </div>
 </div>
@@ -1329,7 +1329,7 @@
       <span style="font-size:13px;font-weight:700;color:var(--muted);">TOPLAM ₺</span>
       <span id="dEkstreToplam" style="font-size:18px;font-weight:800;color:var(--ink);">0,00</span>
     </div>
-    <button id="dEkstreKapat" style="margin-top:6px;width:100%;padding:14px 0;border:none;border-radius:12px;background:rgba(255,255,255,.10);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Kapat</button>
+    <button id="dEkstreKapat" style="margin-top:6px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Kapat</button>
   </div>
 </div>
 
@@ -1349,7 +1349,7 @@
       <div class="field-ios"><label>İlgili Kişi</label><input id="ciContact" placeholder="—"></div>
     </div>
     <button id="ciSave" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;cursor:pointer;margin-top:6px;">Kaydet</button>
-    <button id="ciCancel" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:rgba(255,255,255,.10);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
+    <button id="ciCancel" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
   </div>
 </div>
 
@@ -1378,7 +1378,7 @@
     </div>
     <div style="font-size:11.5px;color:var(--muted);margin-bottom:12px;">Alacak: hesap kaporo/ön ödeme gönderdiyse seç</div>
     <button id="ncSave" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;cursor:pointer;margin-top:6px;">Kaydet</button>
-    <button id="ncCancel" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:rgba(255,255,255,.10);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
+    <button id="ncCancel" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
   </div>
 </div>
 
@@ -1394,7 +1394,7 @@
       <input id="siparisFiyat" type="text" inputmode="decimal" placeholder="Birim Fiyat" class="ci-input">
       <button id="siparisKalemEkle" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;cursor:pointer;">Fişe Ekle</button>
     </div>
-    <button id="siparisKapat" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:rgba(255,255,255,.10);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Kapat</button>
+    <button id="siparisKapat" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Kapat</button>
   </div>
 </div>
 
@@ -1402,7 +1402,7 @@
   <div class="modal" style="height:85vh;display:flex;flex-direction:column;padding-bottom:14px;">
     <h3 id="siparisGorTitle" style="margin-bottom:10px;">Siparişler</h3>
     <div id="siparisGorList" style="flex:1;overflow-y:auto;min-height:0;"></div>
-    <button id="siparisGorKapat" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:rgba(255,255,255,.10);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Kapat</button>
+    <button id="siparisGorKapat" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Kapat</button>
   </div>
 </div>
 
@@ -1417,7 +1417,7 @@
     </div>
     <p style="color:var(--muted);font-size:11.5px;margin:6px 4px 0 4px;">Onaylayınca hesap bakiyesi hemen güncellenir, bu ekrandan geri alınamaz.</p>
     <button id="tamamlaOnayla" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--green);color:#fff;font-weight:700;font-size:15px;cursor:pointer;">Onayla ve İşle</button>
-    <button id="tamamlaVazgec" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:rgba(255,255,255,.10);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Vazgeç</button>
+    <button id="tamamlaVazgec" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Vazgeç</button>
   </div>
 </div>
 
@@ -1442,7 +1442,7 @@
   </div>
   <div class="fis-dbody" id="siparisDetayBody"></div>
   <div class="fis-footer">
-    <button id="siparisVazgec" style="background:rgba(255,255,255,.10);color:var(--ink);">Vazgeç</button>
+    <button id="siparisVazgec" style="background:#eef1f2;color:var(--ink);">Vazgeç</button>
     <button id="siparisFisKaydet" style="background:var(--green);color:#fff;">Kaydet</button>
   </div>
 </div>
@@ -1552,7 +1552,7 @@
   <div class="modal" style="padding-bottom:16px;max-height:80vh;overflow-y:auto;">
     <h3 id="cv2BulutYedekBaslik" style="margin-bottom:10px;">Bulut Yedeği Seç</h3>
     <div id="cv2BulutYedekIcerik" style="text-align:left;"></div>
-    <button id="cv2BulutYedekKapat" style="margin-top:14px;width:100%;padding:14px 0;border:none;border-radius:12px;background:rgba(255,255,255,.10);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Kapat</button>
+    <button id="cv2BulutYedekKapat" style="margin-top:14px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Kapat</button>
   </div>
 </div>
 
@@ -1561,7 +1561,7 @@
     <h3 style="margin-bottom:6px;">Tüm Veriler Silinsin mi?</h3>
     <p style="color:var(--muted);font-size:14px;margin:0 0 16px 0;">Cari hesaplar, stok kartları, fişler ve siparişler dahil her şey silinir. Bu işlem geri alınamaz — önce yedek almanı öneririm.</p>
     <button id="sifirlaEvet" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--red);color:#fff;font-weight:700;font-size:15px;cursor:pointer;">Evet, Hepsini Sil</button>
-    <button id="sifirlaVazgec" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:rgba(255,255,255,.10);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Vazgeç</button>
+    <button id="sifirlaVazgec" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Vazgeç</button>
   </div>
 </div>
 
@@ -1573,7 +1573,7 @@
     <h3 style="margin-bottom:6px;">Erdin Kaya</h3>
     <p style="color:var(--muted);font-size:14px;margin:0 0 4px 0;">📞 [telefon numarası]</p>
     <p style="color:var(--muted);font-size:14px;margin:0 0 16px 0;">✉️ erdinkaya@gmail.com</p>
-    <button id="iletisimKapat" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:rgba(255,255,255,.10);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Kapat</button>
+    <button id="iletisimKapat" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Kapat</button>
   </div>
 </div>
 
@@ -1662,7 +1662,7 @@
     </div>
 
     <button id="quickTxSave" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;cursor:pointer;margin-top:6px;">Kaydet</button>
-    <button id="quickTxCancel" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:rgba(255,255,255,.10);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
+    <button id="quickTxCancel" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
   </div>
 </div>
 
@@ -1672,7 +1672,7 @@
     <div id="cekWizFieldHost"></div>
     <div id="cekWizDone" class="hidden" style="text-align:center;color:#1f9d64;font-weight:700;font-size:13.5px;margin:2px 0 14px 0;">✓ Bitti — son soru bu</div>
     <div style="display:flex;gap:8px;margin-top:6px;">
-      <button type="button" id="cekWizBack" class="hidden" style="flex:0 0 76px;padding:13px 0;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font-weight:700;font-size:14px;cursor:pointer;">‹ Geri</button>
+      <button type="button" id="cekWizBack" class="hidden" style="flex:0 0 76px;padding:13px 0;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font-weight:700;font-size:14px;cursor:pointer;">‹ Geri</button>
       <button type="button" id="cekWizNext" style="flex:1;border:none;border-radius:10px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;padding:13px 0;cursor:pointer;">İleri</button>
     </div>
     <button type="button" id="cekWizSaveNow" style="position:absolute;right:16px;bottom:12px;width:auto;border:none;background:none;color:#d9362b;font-weight:800;font-size:13.5px;padding:6px 4px;cursor:pointer;">Bitti</button>
@@ -1680,7 +1680,7 @@
 </div>
 
 <div class="overlay" id="cekOnizlemeOverlay" style="z-index:96;">
-  <div class="modal" style="max-height:88vh;overflow-y:auto;padding-bottom:14px;background:var(--card);">
+  <div class="modal" style="max-height:88vh;overflow-y:auto;padding-bottom:14px;background:#f2f2f7;">
     <h3 id="cekOnBaslik" style="margin-bottom:12px;">Çek Detayı</h3>
     <div class="ios-card">
       <div class="field-ios"><label>Cari Hesap</label><span id="cekOnCari" style="font-weight:600;"></span></div>
@@ -1706,17 +1706,17 @@
       <div class="field-ios"><label>Lehtar</label><span id="cekOnLehtar"></span></div>
     </div>
     <button type="button" id="cekOnizlemeDuzenleBtn" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;cursor:pointer;margin-top:6px;">Düzenle</button>
-    <button type="button" id="cekOnizlemeKapatBtn" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:rgba(255,255,255,.10);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Kapat</button>
+    <button type="button" id="cekOnizlemeKapatBtn" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Kapat</button>
   </div>
 </div>
 
 <div class="overlay" id="tahYontemOverlay" style="z-index:95;">
   <div class="modal" style="padding-bottom:14px;text-align:center;">
     <h3 style="margin-bottom:14px;">Ödeme Yöntemi</h3>
-    <button type="button" id="tahYontemNakitSecBtn" style="width:100%;padding:16px 0;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;margin-bottom:10px;">Nakit Ödemesi</button>
-    <button type="button" id="tahYontemCekSecBtn" style="width:100%;padding:16px 0;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;margin-bottom:10px;">Çek Ödemesi</button>
-    <button type="button" id="borcAlacakBorcBtn" style="width:100%;padding:16px 0;border:1px solid var(--line);border-radius:12px;background:var(--card);color:#c0392b;font-weight:700;font-size:15px;cursor:pointer;margin-bottom:10px;">Borç Ekle</button>
-    <button type="button" id="borcAlacakAlacakBtn" style="width:100%;padding:16px 0;border:1px solid var(--line);border-radius:12px;background:var(--card);color:#1f9d64;font-weight:700;font-size:15px;cursor:pointer;">Alacak Ekle</button>
+    <button type="button" id="tahYontemNakitSecBtn" style="width:100%;padding:16px 0;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;margin-bottom:10px;">Nakit Ödemesi</button>
+    <button type="button" id="tahYontemCekSecBtn" style="width:100%;padding:16px 0;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;margin-bottom:10px;">Çek Ödemesi</button>
+    <button type="button" id="borcAlacakBorcBtn" style="width:100%;padding:16px 0;border:1px solid var(--line);border-radius:12px;background:#fff;color:#c0392b;font-weight:700;font-size:15px;cursor:pointer;margin-bottom:10px;">Borç Ekle</button>
+    <button type="button" id="borcAlacakAlacakBtn" style="width:100%;padding:16px 0;border:1px solid var(--line);border-radius:12px;background:#fff;color:#1f9d64;font-weight:700;font-size:15px;cursor:pointer;">Alacak Ekle</button>
   </div>
 </div>
 
@@ -1725,7 +1725,7 @@
     <h3 id="confirmDeleteTitle" style="margin-bottom:6px;">Bu hareketi sil</h3>
     <p id="confirmDeleteText" style="color:var(--muted);font-size:14px;margin:0 0 16px 0;">Bu işlem geri alınamaz. Emin misin?</p>
     <button id="confirmDeleteYes" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--red);color:#fff;font-weight:700;font-size:15px;cursor:pointer;">Evet, Sil</button>
-    <button id="confirmDeleteNo" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:rgba(255,255,255,.10);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Vazgeç</button>
+    <button id="confirmDeleteNo" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Vazgeç</button>
   </div>
 </div>
 
@@ -1815,7 +1815,7 @@
       <span id="skAktifLabel" style="font-size:14px;font-weight:600;">Aktif</span>
     </div>
     <div class="modal-actions">
-      <button id="urunCancel" style="background:rgba(255,255,255,.10);color:var(--ink);">Vazgeç</button>
+      <button id="urunCancel" style="background:#eef1f2;color:var(--ink);">Vazgeç</button>
       <button id="urunSaveBtn" style="background:var(--green);color:#fff;">Kaydet</button>
     </div>
   </div>
@@ -1871,7 +1871,7 @@
       <span style="font-size:14px;font-weight:600;">Alış İadesi mi?</span>
     </div>
     <div class="modal-actions">
-      <button id="skAlisCancel" style="background:rgba(255,255,255,.10);color:var(--ink);">Vazgeç</button>
+      <button id="skAlisCancel" style="background:#eef1f2;color:var(--ink);">Vazgeç</button>
       <button id="skAlisSave" style="background:var(--green);color:#fff;">Kaydet</button>
     </div>
   </div>
@@ -1907,7 +1907,7 @@
       <span style="font-size:14px;font-weight:600;">Satış İadesi mi?</span>
     </div>
     <div class="modal-actions">
-      <button id="skSatisCancel" style="background:rgba(255,255,255,.10);color:var(--ink);">Vazgeç</button>
+      <button id="skSatisCancel" style="background:#eef1f2;color:var(--ink);">Vazgeç</button>
       <button id="skSatisSave" style="background:var(--green);color:#fff;">Kaydet</button>
     </div>
   </div>
@@ -1945,7 +1945,7 @@
     </div>
     <div id="skRankList" style="max-height:50vh;overflow-y:auto;"></div>
     <div class="modal-actions">
-      <button id="skRankClose" style="background:rgba(255,255,255,.10);color:var(--ink);width:100%;">Kapat</button>
+      <button id="skRankClose" style="background:#eef1f2;color:var(--ink);width:100%;">Kapat</button>
     </div>
   </div>
 </div>
@@ -1956,7 +1956,7 @@
     <button type="button" id="skTarihceEkleBtn" class="fis-ekle-btn" style="margin-bottom:10px;">＋ Yeni Ekle</button>
     <div id="skTarihceList" style="max-height:50vh;overflow-y:auto;"></div>
     <div class="modal-actions">
-      <button id="skTarihceKapat" style="background:rgba(255,255,255,.10);color:var(--ink);width:100%;">Kapat</button>
+      <button id="skTarihceKapat" style="background:#eef1f2;color:var(--ink);width:100%;">Kapat</button>
     </div>
   </div>
 </div>
@@ -1966,7 +1966,7 @@
     <h3 id="skFiyatGecmisiTitle">Fiyat Geçmişi</h3>
     <div id="skFiyatGecmisiList" style="max-height:55vh;overflow-y:auto;"></div>
     <div class="modal-actions">
-      <button id="skFiyatGecmisiClose" style="background:rgba(255,255,255,.10);color:var(--ink);width:100%;">Kapat</button>
+      <button id="skFiyatGecmisiClose" style="background:#eef1f2;color:var(--ink);width:100%;">Kapat</button>
     </div>
   </div>
 </div>
@@ -2005,7 +2005,7 @@
   </div>
   <div class="fis-dbody" id="fisDetayBody"></div>
   <div class="fis-footer">
-    <button id="fisVazgec" style="background:rgba(255,255,255,.10);color:var(--ink);">Vazgeç</button>
+    <button id="fisVazgec" style="background:#eef1f2;color:var(--ink);">Vazgeç</button>
     <button id="fisKaydet" style="background:var(--green);color:#fff;">Kaydet</button>
   </div>
 </div>
@@ -2062,8 +2062,8 @@
       <div class="field-ios"><label>Tutar</label><input type="text" id="kalemTutar" readonly style="font-weight:800;color:var(--ink);"></div>
     </div>
     <div class="modal-actions">
-      <button id="kalemSil" style="background:rgba(255,107,106,.15);color:var(--red);display:none;">Sil</button>
-      <button id="kalemVazgec" style="background:rgba(255,255,255,.10);color:var(--ink);">Vazgeç</button>
+      <button id="kalemSil" style="background:#fdeceb;color:var(--red);display:none;">Sil</button>
+      <button id="kalemVazgec" style="background:#eef1f2;color:var(--ink);">Vazgeç</button>
       <button id="kalemEkleBtn" style="background:var(--green);color:#fff;">Ekle</button>
     </div>
   </div>
@@ -2089,7 +2089,7 @@
   </div>
   <div class="fis-dbody" id="sablonDetayBody"></div>
   <div class="fis-footer">
-    <button id="sablonVazgec" style="background:rgba(255,255,255,.10);color:var(--ink);">Vazgeç</button>
+    <button id="sablonVazgec" style="background:#eef1f2;color:var(--ink);">Vazgeç</button>
     <button id="sablonKaydet" style="background:var(--green);color:#fff;">Kaydet</button>
   </div>
 </div>
@@ -2105,8 +2105,8 @@
       <div class="field-ios"><label>Satış Fiyatı</label><input type="number" id="sablonKalemSatisFiyat" placeholder="0,00" inputmode="decimal"></div>
     </div>
     <div class="modal-actions">
-      <button id="sablonKalemSil" style="background:rgba(255,107,106,.15);color:var(--red);display:none;">Sil</button>
-      <button id="sablonKalemVazgec" style="background:rgba(255,255,255,.10);color:var(--ink);">Vazgeç</button>
+      <button id="sablonKalemSil" style="background:#fdeceb;color:var(--red);display:none;">Sil</button>
+      <button id="sablonKalemVazgec" style="background:#eef1f2;color:var(--ink);">Vazgeç</button>
       <button id="sablonKalemKaydetBtn" style="background:var(--green);color:#fff;">Ekle</button>
     </div>
   </div>
@@ -2152,7 +2152,7 @@
     <h3 style="margin-bottom:12px;">Yeni Masraf Kalemi</h3>
     <input id="mkAd" placeholder="Kalem Adı (örn. İnternet Gideri)" class="ci-input">
     <button id="mkSave" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;cursor:pointer;margin-top:6px;">Kaydet</button>
-    <button id="mkCancel" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:rgba(255,255,255,.10);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
+    <button id="mkCancel" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
   </div>
 </div>
 
@@ -2169,7 +2169,7 @@
       <button data-k=",">,</button><button data-k="0">0</button><button data-k="back" class="kback">⌫</button>
     </div>
     <button id="masrafEkleSave" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;cursor:pointer;margin-top:10px;">Kaydet</button>
-    <button id="masrafEkleCancel" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:rgba(255,255,255,.10);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
+    <button id="masrafEkleCancel" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
   </div>
 </div>
 
@@ -2455,7 +2455,7 @@
     <p style="color:var(--muted);font-size:13px;margin:0 0 14px 0;" id="cekCikisAciklama"></p>
     <div id="cekCikisTedarikciList" style="max-height:48vh;overflow-y:auto;"></div>
     <button type="button" id="cekCikisYeniTedarikciBtn" style="width:100%;text-align:center;padding:13px 12px;border:1.5px dashed var(--accent);border-radius:12px;background:none;font-weight:700;font-size:14px;color:var(--accent);cursor:pointer;margin-top:4px;">＋ Yeni Tedarikçi Ekle</button>
-    <button id="cekCikisIptal" style="margin-top:12px;width:100%;padding:14px 0;border:none;border-radius:12px;background:rgba(255,255,255,.10);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
+    <button id="cekCikisIptal" style="margin-top:12px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">İptal</button>
   </div>
 </div>
 
@@ -2471,7 +2471,7 @@
       <span class="rt-val" id="rcBakiye">0,00₺</span>
     </div>
     <div class="receipt-actions" style="display:flex;gap:10px;padding:0 18px 16px 18px;">
-      <button class="receipt-close" id="rcDelete" style="background:rgba(255,107,106,.15);color:var(--red);flex:1;">Sil</button>
+      <button class="receipt-close" id="rcDelete" style="background:#fdeceb;color:var(--red);flex:1;">Sil</button>
       <button class="receipt-close" id="rcEdit" style="background:var(--accent-soft);color:var(--accent);flex:1;">Düzenle</button>
     </div>
     <button class="receipt-close" id="rcClose">Kapat</button>
@@ -6492,7 +6492,7 @@ function cekRowHtml(r, i){
   return `
     <div class="swipe-wrap" style="border-radius:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(20,30,40,.06);">
       ${swipeActions}
-      <div class="swipe-content" data-idx="${i}" style="background:var(--card);border-radius:14px;padding:13px 14px;display:flex;align-items:center;gap:12px;">
+      <div class="swipe-content" data-idx="${i}" style="background:#fff;border-radius:14px;padding:13px 14px;display:flex;align-items:center;gap:12px;">
         <div style="width:38px;height:38px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;background:linear-gradient(135deg,#1e2a4a,#0d1526);">${harf}</div>
         <div style="flex:1;min-width:0;">
           <div style="font-weight:700;font-size:14.5px;color:var(--ink);">${r.cari.name}</div>
@@ -6680,7 +6680,7 @@ function openCekCikis(idx){
   } else {
     listEl.innerHTML = state.tedarikci.map(td=>{
       const harf = (td.name || '?').trim().charAt(0).toUpperCase();
-      return `<button type="button" class="cek-cikis-tedarikci-btn" data-id="${td.id}" style="width:100%;display:flex;align-items:center;gap:10px;text-align:left;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-weight:600;font-size:14px;color:var(--ink);cursor:pointer;margin-bottom:8px;">
+      return `<button type="button" class="cek-cikis-tedarikci-btn" data-id="${td.id}" style="width:100%;display:flex;align-items:center;gap:10px;text-align:left;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;font-weight:600;font-size:14px;color:var(--ink);cursor:pointer;margin-bottom:8px;">
         <span style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;background:linear-gradient(135deg,#5b6b73,#38454b);">${harf}</span>
         <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${td.name}</span>
       </button>`;
@@ -9005,8 +9005,8 @@ function showYedekMetinKutusu(dataStr){
     overlay.id = 'yedekMetinOverlay';
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(10,20,30,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px;';
     overlay.innerHTML = `
-      <div style="background:var(--card);border-radius:16px;padding:18px;max-width:480px;width:100%;max-height:85vh;display:flex;flex-direction:column;gap:10px;">
-        <div style="font-weight:800;font-size:15px;color:var(--ink);">Yedek Verisi (JSON)</div>
+      <div style="background:#fff;border-radius:16px;padding:18px;max-width:480px;width:100%;max-height:85vh;display:flex;flex-direction:column;gap:10px;">
+        <div style="font-weight:800;font-size:15px;color:#1c2b30;">Yedek Verisi (JSON)</div>
         <div style="font-size:12.5px;color:#7c8b90;line-height:1.4;">Aşağıdaki metnin tamamına dokunup basılı tut → "Tümünü Seç" → "Kopyala" yap. İstersen önce butonla otomatik kopyalamayı dene.</div>
         <textarea id="yedekMetinAlani" readonly style="flex:1;min-height:220px;font-family:monospace;font-size:11.5px;border:1px solid #e7edf0;border-radius:10px;padding:10px;resize:none;-webkit-user-select:text;user-select:text;"></textarea>
         <div style="display:flex;gap:10px;">
@@ -9014,7 +9014,7 @@ function showYedekMetinKutusu(dataStr){
           <button id="yedekKopyalaBtn" style="flex:1;padding:12px 0;border:none;border-radius:12px;background:#2f6690;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">Panoya Kopyala</button>
         </div>
         <div style="display:flex;gap:10px;">
-          <button id="yedekKapatBtn" style="flex:1;padding:12px 16px;border:1px solid #e7edf0;border-radius:12px;background:var(--card);color:var(--ink);font-weight:700;font-size:14px;cursor:pointer;">Kapat</button>
+          <button id="yedekKapatBtn" style="flex:1;padding:12px 16px;border:1px solid #e7edf0;border-radius:12px;background:#fff;color:#1c2b30;font-weight:700;font-size:14px;cursor:pointer;">Kapat</button>
         </div>
         <div id="yedekKopyaDurum" style="font-size:12.5px;font-weight:700;color:#1f7a4d;text-align:center;height:14px;"></div>
       </div>`;
