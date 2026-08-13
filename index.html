@@ -18,7 +18,12 @@
   })();
 </script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Hesap Defteri">
+<meta name="theme-color" content="#0b1a3d">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -40,7 +45,7 @@
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{overflow-x:hidden;max-width:100vw;}
   
-  #anaMenu{min-height:100vh;background:linear-gradient(160deg,#0b1a3d 0%, #1c3566 45%, #0f2350 100%);padding:64px 18px 40px 18px;display:flex;flex-direction:column;justify-content:flex-start;}
+  #anaMenu{min-height:100vh;background:linear-gradient(160deg,#0b1a3d 0%, #1c3566 45%, #0f2350 100%);padding:calc(env(safe-area-inset-top) + 24px) 18px 40px 18px;display:flex;flex-direction:column;justify-content:flex-start;}
   .am-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px 6px;}
 
 
