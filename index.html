@@ -295,9 +295,9 @@
     vertical-align:middle;flex-shrink:0;}
   .cv2-ek-dot.pos{background:var(--green);}
   .cv2-ek-dot.neg{background:var(--red);}
-  .cv2-ek-table tr.cv2-ek-ay td{background:#f6f8f9;font-weight:800;font-size:11.5px;color:var(--ink);
-    padding:8px 4px;}
-  .cv2-ek-table tr.cv2-ek-ay td.num{color:var(--ink);font-weight:800;font-size:12px;white-space:normal;overflow:visible;text-overflow:clip;}
+  .cv2-ek-table tr.cv2-ek-ay td{background:var(--accent);font-weight:800;font-size:11.5px;color:#fff;
+    padding:9px 6px;letter-spacing:.3px;}
+  .cv2-ek-table tr.cv2-ek-ay td.num{color:#fff;font-weight:800;font-size:12.5px;white-space:normal;overflow:visible;text-overflow:clip;}
 
   @media(min-width:700px){
     #cv2Screen .cv2-head{padding:20px 24px 10px 24px;}
@@ -5570,7 +5570,7 @@ function cv2Duzenle(id, tur){
 function cv2EkTarihGun(d){
   const gg = String(d.getDate()).padStart(2,'0');
   const aa = String(d.getMonth()+1).padStart(2,'0');
-  const yy = d.getFullYear();
+  const yy = String(d.getFullYear()).slice(-2);
   return `${gg}.${aa}.${yy}`;
 }
 function cv2EkTarihSaat(d){
@@ -5582,9 +5582,9 @@ function cv2EkstreKapat(){
   document.getElementById('cv2EkstreScreen').classList.remove('show');
 }
 function cv2Ekstre(id, tur){
-  // Tablo tarzı resmi bir ekstre raporu — ay gruplama/özet satırı YOK (kafa karıştırıyordu,
-  // kullanıcı isteğiyle 13 Ağu 2026'da kaldırıldı), sadece kronolojik koşan bakiyeli liste,
-  // EN YENİ hareket EN ÜSTTE.
+  // Tablo tarzı resmi bir ekstre raporu — kronolojik koşan bakiyeli liste, EN YENİ
+  // hareket EN ÜSTTE. Aylar arasına (13 Ağu 2026, ikinci tur) o ayın net cirosunu
+  // gösteren sade bir kuşak satırı konuldu (eski karışık pos/neg/running üçlüsü değil).
   const c = cv2Find(id, tur); if(!c) return;
   document.getElementById('cv2EkAd').textContent = c.name;
   document.getElementById('cv2EkTur').textContent = tur === 'tedarikci' ? 'Tedarikçi' : 'Müşteri';
@@ -5595,17 +5595,24 @@ function cv2Ekstre(id, tur){
     body.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:24px 8px;">Hareket yok</td></tr>';
   } else {
     // Koşan bakiye ESKİDEN YENİYE doğru hesaplanır (doğruluğu bunu gerektirir),
-    // ama ekranda EN YENİ hareket EN ÜSTTE görünsün diye satırlar sona kadar
-    // toplanıp en son ters çevrilir.
+    // ama ekranda EN YENİ hareket EN ÜSTTE görünsün diye ay blokları ve blok
+    // içindeki satırlar sona kadar toplanıp en son ters çevrilir.
     let running = 0;
-    const satirlarHtml = [];
+    const bloklar = []; // { etiket, satirlarHtml:[], ciro }
+    let mevcut = null;
 
     rows.forEach(t=>{
       const d = new Date(t.date);
+      const etiket = isNaN(d) ? 'Tarihsiz' : (KK_AY_ADLARI[d.getMonth()].toUpperCase() + ' ' + d.getFullYear());
+      if(!mevcut || etiket !== mevcut.etiket){
+        mevcut = { etiket, satirlarHtml: [], ciro: 0 };
+        bloklar.push(mevcut);
+      }
       const amt = signedAmount(t);
       running += amt;
+      mevcut.ciro += amt;
       const negCls = amt < 0 ? ' cv2-ek-alis' : '';
-      satirlarHtml.push(`<tr class="${negCls.trim()}">
+      mevcut.satirlarHtml.push(`<tr class="${negCls.trim()}">
         <td>${isNaN(d) ? '—' : '<span class="cv2-ek-tarih-gun">' + cv2EkTarihGun(d) + '</span><span class="cv2-ek-tarih-saat">' + cv2EkTarihSaat(d) + '</span>'}</td>
         <td><span class="cv2-ek-dot ${amt >= 0 ? 'pos' : 'neg'}"></span><span class="cv2-ek-tur">${cv2TxLabel(t.type)}</span>${t.desc ? '<br><span class="cv2-ek-aciklama-metin">' + t.desc + '</span>' : ''}</td>
         <td class="num">${fmtEkstreNum(amt)}</td>
@@ -5613,7 +5620,12 @@ function cv2Ekstre(id, tur){
       </tr>`);
     });
 
-    body.innerHTML = satirlarHtml.slice().reverse().join('');
+    let html = '';
+    bloklar.slice().reverse().forEach(b=>{
+      html += b.satirlarHtml.slice().reverse().join('');
+      html += `<tr class="cv2-ek-ay"><td colspan="2">${b.etiket}</td><td class="num" colspan="2">Ciro: ${fmtEkstreNum(b.ciro)}</td></tr>`;
+    });
+    body.innerHTML = html;
   }
 
   document.getElementById('cv2EkstreScreen').classList.add('show');
