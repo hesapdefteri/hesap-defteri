@@ -236,6 +236,8 @@
   #cv2ModalCard .t{font-size:17px;font-weight:800;color:var(--ink);letter-spacing:-.4px;}
   #cv2ModalCard .m{font-size:13px;color:var(--muted);font-weight:600;margin-top:7px;line-height:1.5;}
   #cv2ModalCard .b{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px;}
+  #cv2Modal.cv2-modal-swap #cv2ModalNo{order:2;}
+  #cv2Modal.cv2-modal-swap #cv2ModalYes{order:1;}
   .cv2-field{margin-top:14px;}
   .cv2-field label{display:block;font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.2px;}
   .cv2-more-row{display:block;width:100%;text-align:left;border:none;background:var(--accent-soft);
@@ -5331,6 +5333,8 @@ function cv2ModalAc(baslik, mesaj, formHtml, onayMetni, onaySinif, aksiyon, ikin
   document.getElementById('cv2ModalTitle').textContent = baslik;
   document.getElementById('cv2ModalMsg').innerHTML = mesaj || '';
   document.getElementById('cv2ModalForm').innerHTML = formHtml || '';
+  const m0 = document.getElementById('cv2Modal');
+  m0.classList.toggle('cv2-modal-swap', !!(ikinciBtn && ikinciBtn.solaAl));
   const yes = document.getElementById('cv2ModalYes');
   yes.textContent = onayMetni || 'Onayla';
   yes.className = 'cv2-btn ' + (onaySinif || 'primary');
@@ -5652,13 +5656,14 @@ function cv2Ekstre(id, tur){
 
   document.getElementById('cv2EkstreScreen').classList.add('show');
 }
-function cv2OdemeTarihiKaydet(id, tur){
+function cv2OdemeTarihiKaydet(id, tur, sessiz){
   const c = cv2Find(id, tur); if(!c) return;
   const inp = document.getElementById('cv2OdemeTarihiInput');
   if(!inp) return;
   c.odemeTarihi = inp.value || null;
   save();
   renderCariV2();
+  if(sessiz) return;
   const btn = document.getElementById('cv2OdemeTarihiKaydetBtn');
   if(btn){ const eski = btn.textContent; btn.textContent = 'Kaydedildi ✓'; setTimeout(()=>{ btn.textContent = eski; }, 1200); }
 }
@@ -5666,10 +5671,11 @@ function cv2DahaFazla(id, tur){
   const c = cv2Find(id, tur); if(!c) return;
   // CH1'deki (bindOrderButtons) Sipariş/Sipariş Gör/Tamamlandı de aynı fonksiyonlarla
   // buraya eklendi — sadece CV2'nin ayrı bir swipe alanı yerine "Daha Fazla" içinde.
+  // 14 Ağu 2026, kullanıcı isteği: alttaki "Sil" solda / "Tamam" sağda; ayrı
+  // "Ödeme Tarihini Kaydet" butonu kaldırıldı — "Tamam" artık tarihi de kaydedip kapatıyor.
   const hasPending = state.siparisFisleri.some(f=>f.cariId===id && !f.tamamlandi);
   const formHtml =
     '<div class="cv2-field"><label>ÖDEME TARİHİ</label><input id="cv2OdemeTarihiInput" type="date" value="' + (c.odemeTarihi || '') + '"></div>' +
-    '<button class="cv2-more-row" id="cv2OdemeTarihiKaydetBtn" data-act="odemetarihikaydet" data-id="' + id + '" data-tur="' + tur + '">Ödeme Tarihini Kaydet</button>' +
     '<button class="cv2-more-row" data-act="siparis">Sipariş</button>' +
     '<button class="cv2-more-row" data-act="siparisgor">Sipariş Gör</button>' +
     '<button class="cv2-more-row"' + (hasPending ? '' : ' disabled') + ' data-act="tamamla">Tamamlandı</button>';
@@ -5694,13 +5700,13 @@ function cv2DahaFazla(id, tur){
           renderCariV2();
         }, 2000);
       }
-    }
+    },
+    { label: 'Tamam', cls: 'ghost', solaAl: true, aksiyon: function(){ cv2OdemeTarihiKaydet(id, tur, true); } }
   );
   document.querySelectorAll('#cv2ModalForm .cv2-more-row').forEach(btn=>{
     btn.addEventListener('click', () => {
       if(btn.disabled) return;
       const act = btn.dataset.act;
-      if(act === 'odemetarihikaydet'){ cv2OdemeTarihiKaydet(id, tur); return; }
       cv2ModalKapat();
       if(act === 'siparis') openSiparis(id, tur);
       else if(act === 'siparisgor') openSiparisGorPopup(id, tur);
