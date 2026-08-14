@@ -1114,6 +1114,11 @@
 #cv2LpOverlay .g-sheet{border-radius:20px;max-height:70vh;}
 .g-musteri-list-item{display:flex;align-items:center;gap:10px;padding:12px 4px;border-bottom:1px solid #f0ece3;cursor:pointer;}
 .g-musteri-list-item:last-child{border-bottom:none;}
+/* 14 Ağu 2026: Sipariş ürün seçici — seçili satırda belirgin tik + mavi vurgu */
+.siparis-stok-row{display:flex;align-items:center;gap:8px;}
+.siparis-stok-row .siparis-stok-tik{width:18px;flex-shrink:0;color:#1a56c4;font-weight:700;visibility:hidden;}
+.siparis-stok-row.siparis-stok-secili{background:#eef5ff;}
+.siparis-stok-row.siparis-stok-secili .siparis-stok-tik{visibility:visible;}
 </style>
 <!-- Firebase (telefon numarasıyla giriş + bulut senkronizasyonu) -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -1390,6 +1395,7 @@
     </div>
     <div id="siparisStokList" style="flex:1;overflow-y:auto;min-height:0;"></div>
     <div id="siparisMiktarWrap" style="display:none;margin-top:10px;">
+      <div id="siparisSeciliUrunEtiket" style="font-weight:600;color:#1a56c4;margin-bottom:8px;font-size:14px;"></div>
       <input id="siparisMiktar" type="text" inputmode="decimal" placeholder="Miktar" class="ci-input">
       <input id="siparisFiyat" type="text" inputmode="decimal" placeholder="Birim Fiyat" class="ci-input">
       <button id="siparisKalemEkle" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;cursor:pointer;">Fişe Ekle</button>
@@ -3335,6 +3341,7 @@ function openSiparisPicker(){
   document.getElementById('siparisMiktar').value = '';
   document.getElementById('siparisFiyat').value = '';
   document.getElementById('siparisMiktarWrap').style.display = 'none';
+  document.getElementById('siparisSeciliUrunEtiket').textContent = '';
   renderSiparisStokList();
   document.getElementById('siparisOverlay').classList.add('show');
 }
@@ -3342,18 +3349,20 @@ function renderSiparisStokList(){
   const list = document.getElementById('siparisStokList');
   list.innerHTML = state.stokKartlari.length ? state.stokKartlari.map(s => `
     <div class="acct-row siparis-stok-row" data-id="${s.id}">
+      <span class="siparis-stok-tik">✓</span>
       <span class="name">${s.ad}</span>
       <span class="amount">${s.fiyatlar && s.fiyatlar.satis1 ? fmt(s.fiyatlar.satis1) : ''}</span>
     </div>
   `).join('') : '<div class="sk-empty">Henüz stok kartı yok</div>';
   list.querySelectorAll('.siparis-stok-row').forEach(row=>{
     row.onclick = () => {
-      list.querySelectorAll('.siparis-stok-row').forEach(r=>r.style.background='');
-      row.style.background = '#eef5ff';
+      list.querySelectorAll('.siparis-stok-row').forEach(r=>r.classList.remove('siparis-stok-secili'));
+      row.classList.add('siparis-stok-secili');
       siparisPickerStokId = row.dataset.id;
       const stok = state.stokKartlari.find(s=>s.id===siparisPickerStokId);
       document.getElementById('siparisFiyat').value = stok && stok.fiyatlar ? (toNum(stok.fiyatlar.satis1)||'') : '';
       document.getElementById('siparisMiktarWrap').style.display = 'block';
+      document.getElementById('siparisSeciliUrunEtiket').textContent = 'Seçili ürün: ' + (stok ? stok.ad : '');
       setTimeout(()=>document.getElementById('siparisMiktar').focus(), 50);
     };
   });
