@@ -3392,12 +3392,33 @@ function siparisDetayGeriDon(){
 }
 document.getElementById('siparisDetayBack').onclick = () => { siparisDetayGeriDon(); };
 document.getElementById('siparisVazgec').onclick = () => { siparisDetayGeriDon(); };
+// 14 Ağu 2026: Yeni bir sipariş fişi kaydedildiğinde ilgili kişiye otomatik
+// Telegram bildirimi gönderiyor. Bot: @SafPlastSiparis_bot. Şimdilik test
+// chat_id'si (Erdin'in eşi) sabit tanımlı — gerçek iş arkadaşının chat_id'si
+// belirlenince burada değiştirilecek. Mesaj gönderimi başarısız olsa da
+// sipariş kaydını ASLA engellemesin diye try/catch ile sarmalandı (sessiz hata).
+const SIPARIS_TELEGRAM_BOT_TOKEN = '8797741692:AAEXadW9Nkxu9iwl9iowQdYDarNfa-g94LM';
+const SIPARIS_TELEGRAM_CHAT_ID = '5209583691'; // TODO: iş arkadaşının chat_id'si belirlenince değiştir
+function siparisTelegramBildir(siparis){
+  try{
+    const kalemOzet = (siparis.kalemler||[]).map(k => `${k.miktar} ${k.ad}`).join(', ');
+    const toplam = (siparis.kalemler||[]).reduce((s,k)=>s+toNum(k.tutar),0);
+    const text = `📦 Yeni Sipariş\nCari: ${siparis.cariAdi}\nBelge No: ${siparis.belgeNo}\nTarih: ${siparis.tarih}\nKalemler: ${kalemOzet}\nToplam: ${toplam.toLocaleString('tr-TR')}₺\n\nSiparişler hazır mı? Ne zaman teslim alabiliriz?`;
+    fetch(`https://api.telegram.org/bot${SIPARIS_TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ chat_id: SIPARIS_TELEGRAM_CHAT_ID, text })
+    }).catch(()=>{}); // sessiz hata — sipariş kaydını etkilemesin
+  }catch(e){ /* sessiz hata */ }
+}
+
 document.getElementById('siparisFisKaydet').onclick = () => {
   const d = draftSiparis;
   if(!d.cariAdi || !d.cariAdi.trim()) return;
   if(!d.kalemler.length) return;
   const cari = bulYadaEkleCari(d.ledgerKey, d.cariAdi);
   save();
+  const yeniSiparisMi = !d.id;
   if(d.id){
     const idx = state.siparisFisleri.findIndex(x=>x.id===d.id);
     if(idx !== -1) state.siparisFisleri[idx] = { ...d, cariId: cari.id };
@@ -3408,6 +3429,7 @@ document.getElementById('siparisFisKaydet').onclick = () => {
     state.sayaclar.siparis = (state.sayaclar.siparis||0) + 1;
   }
   save();
+  if(yeniSiparisMi) siparisTelegramBildir(d);
   render();
   siparisDetayGeriDon();
 };
