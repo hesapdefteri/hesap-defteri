@@ -9836,6 +9836,44 @@ function ensureSafPlastGercekVeriDuzelt(){
 // tüm ALIŞ hareketleri için, henüz karşılığı olmayanlara Alışlar'da (alisFisleri)
 // birer fatura kaydı oluşturuldu — mükerrer olmasın diye her hareketin tutarı+
 // tarihi mevcut fişlerle (skRef veya tutar+tarih eşleşmesiyle) karşılaştırıldı.
+// 14 Ağu 2026: Saf Plast alış hareketlerinden 7 tanesinin açıklamasında GERÇEK
+// miktar/tür bilgisi var (ör. "1000 normal", "500 süngerli x4.8") — 11 Ağustos'ta
+// bu 7'si tek tek stok kartına bağlı fiş olarak işlenmişti, ama sonraki bir veri
+// kaybı/restore turunda bu detay kaybolup generic (miktar=1, tutar=toplam) fişe
+// dönüşmüş. Bu fonksiyon o 7 fişi GERÇEK ürün/miktar/birim fiyat ile yeniden
+// oluşturuyor (tarih+tutar eşleşmesiyle mevcut generic fişin ÜZERİNE yazıyor,
+// yeni belge no açmıyor). "Alinçe KDV" mahsuplaşma hareketleri GERÇEK
+// faturalardır (kullanıcı belirtti, o firmadan müşteriye kesilen fatura) —
+// dokunulmuyor, generic fiş olarak kalmaya devam ediyor.
+function ensureSafPlastUrunDetayiGeriGetir(){
+  if(state._safPlastUrunDetayi20260814) return false;
+  let changed = false;
+  const c = state.tedarikci.find(x => normAd(x.name) === normAd('Saf Plast'));
+  if(!c) return false;
+  const NORMAL_ID = 's_msjzf8qcrgmyy';
+  const SUNGERLI_ID = 's_msk7dyeoblq2y';
+  const EM38_ID = 's_em38mandalli1786223133749';
+  const bilinenler = [
+    {tarih:'2025-10-20', tutar:4400,  ad:'Kuru temizleme askısı',          birim:'Adet', birimFiyat:4.4, miktar:1000, stokId:NORMAL_ID,   aciklama:'1000 normal'},
+    {tarih:'2025-10-20', tutar:2400,  ad:'Kuru temizleme askısı Süngerli', birim:'Adet', birimFiyat:4.8, miktar:500,  stokId:SUNGERLI_ID, aciklama:'500 süngerli x4.8'},
+    {tarih:'2025-10-23', tutar:11000, ad:'Kuru temizleme askısı',          birim:'Adet', birimFiyat:4.4, miktar:2500, stokId:NORMAL_ID,   aciklama:'Drysan 2500 ad x 4.4'},
+    {tarih:'2026-03-13', tutar:8250,  ad:'Kuru temizleme askısı Süngerli', birim:'Adet', birimFiyat:5.5, miktar:1500, stokId:SUNGERLI_ID, aciklama:'Nişantaşı 1500 süngerli'},
+    {tarih:'2026-03-13', tutar:8250,  ad:'Kuru temizleme askısı Süngerli', birim:'Adet', birimFiyat:5.5, miktar:1500, stokId:SUNGERLI_ID, aciklama:'Şanal 1500 süngerli'},
+    {tarih:'2026-07-08', tutar:1950,  ad:'EM38 Mandallı Askı',             birim:'Adet', birimFiyat:6.5, miktar:300,  stokId:EM38_ID,      aciklama:'300 mandalı x 6.5 PERTEK'},
+    {tarih:'2026-07-29', tutar:12000, ad:'Kuru temizleme askısı Süngerli', birim:'Adet', birimFiyat:6.0, miktar:2000, stokId:SUNGERLI_ID,  aciklama:'İrsaliye No 2864 - 2000 adet süngerli askı (Şalal-8 kat) x6'}
+  ];
+  bilinenler.forEach(b => {
+    const fis = state.alisFisleri.find(f => normAd(f.cariAdi)===normAd('Saf Plast') && f.tarih===b.tarih && Math.abs(toNum(f.toplam)-b.tutar)<1);
+    if(fis){
+      fis.kalemler = [{ ad:b.ad, birim:b.birim, miktar:b.miktar, birimFiyat:b.birimFiyat, tutar:b.tutar, stokKartId:b.stokId }];
+      fis.aciklama = b.aciklama;
+      changed = true;
+    }
+  });
+  state._safPlastUrunDetayi20260814 = true;
+  return true; // her zaman true (bayrak korumalı, sadece bir kez çalışır)
+}
+
 function ensureSafPlastFaturalarTamamla(){
   let changed = false;
   // (1) Test fişlerini sil
@@ -9853,6 +9891,7 @@ function ensureSafPlastFaturalarTamamla(){
     const tTarih = t.date.slice(0,10);
     return mevcutFisler.some(f => f.tarih === tTarih && Math.abs(toNum(f.toplam) - Math.abs(t.amount)) < 1);
   };
+  // KDV mahsuplaşma hareketleri gerçek mal alımı değil, fiş oluşturulmasın (14 Ağu 2026)
   const alisHareketleri = c.transactions.filter(t => t.type === 'ALIŞ');
   let sayac = state.sayaclar.alis || 0;
   alisHareketleri.forEach(t => {
@@ -10268,6 +10307,7 @@ function cloudSyncAndBoot(user){
     if(ensureSafPlastPlastikBirlestir()) save();
     if(ensureSafPlastGercekVeriDuzelt()) save();
     if(ensureSafPlastFaturalarTamamla()) save();
+    if(ensureSafPlastUrunDetayiGeriGetir()) save();
     hideAuthScreen();
     render();
   }).catch(err => {
