@@ -9831,6 +9831,50 @@ function ensureSafPlastGercekVeriDuzelt(){
   return changed;
 }
 
+// 14 Ağu 2026: (1) "Saf Plast plastik" adına kayıtlı 7 adet 165₺'lik test/mükerrer
+// fiş (ALF-000006 - ALF-000012) kullanıcı onayıyla silindi. (2) Saf Plast'ın
+// tüm ALIŞ hareketleri için, henüz karşılığı olmayanlara Alışlar'da (alisFisleri)
+// birer fatura kaydı oluşturuldu — mükerrer olmasın diye her hareketin tutarı+
+// tarihi mevcut fişlerle (skRef veya tutar+tarih eşleşmesiyle) karşılaştırıldı.
+function ensureSafPlastFaturalarTamamla(){
+  let changed = false;
+  // (1) Test fişlerini sil
+  const silinecekBelgeler = ['ALF-000006','ALF-000007','ALF-000008','ALF-000009','ALF-000010','ALF-000011','ALF-000012'];
+  const oncekiUzunluk = state.alisFisleri.length;
+  state.alisFisleri = state.alisFisleri.filter(f => !(silinecekBelgeler.includes(f.belgeNo) && normAd(f.cariAdi) === normAd('Saf Plast plastik')));
+  if(state.alisFisleri.length !== oncekiUzunluk) changed = true;
+
+  // (2) Karşılığı olmayan ALIŞ hareketleri için fiş oluştur
+  const c = state.tedarikci.find(x => normAd(x.name) === normAd('Saf Plast'));
+  if(!c) return changed;
+  const mevcutFisler = state.alisFisleri.filter(f => normAd(f.cariAdi) === normAd('Saf Plast'));
+  const eslesenVarMi = (t) => {
+    if(t.skRef && mevcutFisler.some(f => f.id === t.skRef)) return true;
+    const tTarih = t.date.slice(0,10);
+    return mevcutFisler.some(f => f.tarih === tTarih && Math.abs(toNum(f.toplam) - Math.abs(t.amount)) < 1);
+  };
+  const alisHareketleri = c.transactions.filter(t => t.type === 'ALIŞ');
+  let sayac = state.sayaclar.alis || 0;
+  alisHareketleri.forEach(t => {
+    if(eslesenVarMi(t)) return;
+    sayac++;
+    const belgeNo = 'ALF-' + String(sayac).padStart(6,'0');
+    const fisId = genId();
+    const tutar = Math.abs(t.amount);
+    state.alisFisleri.push({
+      id: fisId, tur:'fatura', belgeNo, cariAdi: c.name,
+      tarih: t.date.slice(0,10), vadeTarihi: t.date.slice(0,10),
+      aciklama: t.desc || '', kdvDahil:false,
+      kalemler: [{ ad: t.desc || 'Alış', birim:'Adet', miktar:1, birimFiyat: tutar, tutar }],
+      toplam: tutar
+    });
+    t.skRef = fisId;
+    changed = true;
+  });
+  if(sayac !== (state.sayaclar.alis || 0)) state.sayaclar.alis = sayac;
+  return changed;
+}
+
 // 08 Ağu 2026: Kasa bakiyesi (state.cash) koddaki bozuk varsayılan değere
 // (706.888,34₺) yakın bir noktadan (729.288,34₺) birikmiş, gerçek değeri
 // değildi. Kullanıcı onayıyla kasa SIFIRLANDI — tek seferlik düzeltme, bir
@@ -10223,6 +10267,7 @@ function cloudSyncAndBoot(user){
     // kontrol ediliyor.
     if(ensureSafPlastPlastikBirlestir()) save();
     if(ensureSafPlastGercekVeriDuzelt()) save();
+    if(ensureSafPlastFaturalarTamamla()) save();
     hideAuthScreen();
     render();
   }).catch(err => {
