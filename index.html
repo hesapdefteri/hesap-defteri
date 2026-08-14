@@ -9874,6 +9874,78 @@ function ensureSafPlastUrunDetayiGeriGetir(){
   return true; // her zaman true (bayrak korumalı, sadece bir kez çalışır)
 }
 
+// 14 Ağu 2026 (2. tur): Kullanıcıyla tek tek konuşularak netleştirilen 10 hareket
+// (irsaliye fotoğraflarıyla teyit edildi) + 16.04.2026 tarihli, sistemde HİÇ
+// kaydı olmayan yeni bir ALIŞ hareketi (İrsaliye No 2723, 2500 adet Normal
+// @5.00₺=12.500₺, "Drysan") kullanıcı onayıyla eklendi.
+function ensureSafPlastUrunDetayi2GeriGetir(){
+  if(state._safPlastUrunDetayi2_20260814) return false;
+  const c = state.tedarikci.find(x => normAd(x.name) === normAd('Saf Plast'));
+  if(!c) return false;
+  const NORMAL_ID = 's_msjzf8qcrgmyy';
+  const SUNGERLI_ID = 's_msk7dyeoblq2y';
+
+  // (1) Tek kalemli düzeltmeler — mevcut generic fişin kalemlerini güncelle
+  const tekKalemliler = [
+    {tarih:'2026-01-24', tutar:6600,  kalemler:[{ad:'Kuru temizleme askısı', birim:'Adet', birimFiyat:4.4, miktar:1500, tutar:6600, stokKartId:NORMAL_ID}], aciklama:'Pertek 1500 normal x4.4'},
+    {tarih:'2026-01-24', tutar:11000, kalemler:[{ad:'Kuru temizleme askısı', birim:'Adet', birimFiyat:4.4, miktar:2500, tutar:11000, stokKartId:NORMAL_ID}], aciklama:'Drysan 2500 normal x4.4'},
+    {tarih:'2026-02-03', tutar:6600,  kalemler:[{ad:'Kuru temizleme askısı', birim:'Adet', birimFiyat:4.4, miktar:1500, tutar:6600, stokKartId:NORMAL_ID}], aciklama:'Ritz carlton 1500 normal x4.4'},
+    {tarih:'2026-08-06', tutar:13750, kalemler:[{ad:'Kuru temizleme askısı', birim:'Adet', birimFiyat:5.5, miktar:2500, tutar:13750, stokKartId:NORMAL_ID}], aciklama:'Ritz Carlton oteli 2500 normal x5.5'}
+  ];
+  // (2) Çok kalemli düzeltmeler
+  const cokKalemliler = [
+    {tarih:'2026-04-13', tutar:9125, kalemler:[
+      {ad:'Kuru temizleme askısı', birim:'Adet', birimFiyat:5.0, miktar:1000, tutar:5000, stokKartId:NORMAL_ID},
+      {ad:'Kuru temizleme askısı Süngerli', birim:'Adet', birimFiyat:5.5, miktar:750, tutar:4125, stokKartId:SUNGERLI_ID}
+    ], aciklama:'İrsaliye 2716 - 1000 normal + 750 süngerli'},
+    {tarih:'2026-05-14', tutar:41650, kalemler:[
+      {ad:'Kuru temizleme askısı', birim:'Adet', birimFiyat:4.4, miktar:2400, tutar:10560, stokKartId:NORMAL_ID},
+      {ad:'Kuru temizleme askısı', birim:'Adet', birimFiyat:5.0, miktar:6218, tutar:31090, stokKartId:NORMAL_ID}
+    ], aciklama:'Pertek 2400 + Ritz Carlton oteli 6218 (normal)'},
+    {tarih:'2026-06-04', tutar:12750, kalemler:[
+      {ad:'Kuru temizleme askısı', birim:'Adet', birimFiyat:5.5, miktar:1500, tutar:8250, stokKartId:NORMAL_ID},
+      {ad:'Kuru temizleme askısı Süngerli', birim:'Adet', birimFiyat:6.0, miktar:750, tutar:4500, stokKartId:SUNGERLI_ID}
+    ], aciklama:'İrsaliye 2786 (Cemal) - 1500 normal + 750 süngerli'},
+    {tarih:'2026-06-18', tutar:14375, kalemler:[
+      {ad:'Kuru temizleme askısı', birim:'Adet', birimFiyat:5.5, miktar:1250, tutar:6875, stokKartId:NORMAL_ID},
+      {ad:'Kuru temizleme askısı Süngerli', birim:'Adet', birimFiyat:6.0, miktar:1250, tutar:7500, stokKartId:SUNGERLI_ID}
+    ], aciklama:'İrsaliye 2802 (Best Tatvan) - 1250 normal + 1250 süngerli'},
+    {tarih:'2026-07-07', tutar:34000, kalemler:[
+      {ad:'Kuru temizleme askısı', birim:'Adet', birimFiyat:5.5, miktar:4000, tutar:22000, stokKartId:NORMAL_ID},
+      {ad:'Kuru temizleme askısı Süngerli', birim:'Adet', birimFiyat:6.0, miktar:2000, tutar:12000, stokKartId:SUNGERLI_ID}
+    ], aciklama:'İrsaliye 2824 (Cihan) - 4000 normal + 2000 süngerli'}
+  ];
+  [...tekKalemliler, ...cokKalemliler].forEach(b => {
+    const fis = state.alisFisleri.find(f => normAd(f.cariAdi)===normAd('Saf Plast') && f.tarih===b.tarih && Math.abs(toNum(f.toplam)-b.tutar)<1);
+    if(fis){ fis.kalemler = b.kalemler; fis.aciklama = b.aciklama; }
+  });
+
+  // (3) Sistemde hiç kaydı olmayan yeni hareket: 16.04.2026, İrsaliye 2723, Drysan
+  const yeniVar = c.transactions.some(t => t.date && t.date.slice(0,10)==='2026-04-16' && Math.abs(toNum(t.amount))===12500);
+  if(!yeniVar){
+    const txId = genId();
+    c.transactions.push({
+      id: txId, type:'ALIŞ', date:'2026-04-16T12:00:00.000Z', amount:12500,
+      desc:'İrsaliye 2723 - Drysan 2500 normal x5.00'
+    });
+    let sayac = (state.sayaclar.alis || 0) + 1;
+    const belgeNo = 'ALF-' + String(sayac).padStart(6,'0');
+    const fisId = genId();
+    state.alisFisleri.push({
+      id: fisId, tur:'fatura', belgeNo, cariAdi:'Saf Plast',
+      tarih:'2026-04-16', vadeTarihi:'2026-04-16',
+      aciklama:'İrsaliye 2723 - Drysan 2500 normal x5.00', kdvDahil:false,
+      kalemler:[{ad:'Kuru temizleme askısı', birim:'Adet', birimFiyat:5.0, miktar:2500, tutar:12500, stokKartId:NORMAL_ID}],
+      toplam:12500
+    });
+    c.transactions.find(t=>t.id===txId).skRef = fisId;
+    state.sayaclar.alis = sayac;
+  }
+
+  state._safPlastUrunDetayi2_20260814 = true;
+  return true;
+}
+
 function ensureSafPlastFaturalarTamamla(){
   let changed = false;
   // (1) Test fişlerini sil
@@ -10308,6 +10380,7 @@ function cloudSyncAndBoot(user){
     if(ensureSafPlastGercekVeriDuzelt()) save();
     if(ensureSafPlastFaturalarTamamla()) save();
     if(ensureSafPlastUrunDetayiGeriGetir()) save();
+    if(ensureSafPlastUrunDetayi2GeriGetir()) save();
     hideAuthScreen();
     render();
   }).catch(err => {
