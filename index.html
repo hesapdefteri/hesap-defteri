@@ -9777,7 +9777,7 @@ if(ensureSanalEksikTahsilat2500()) save();
 // (tedarikçi taraflarına dokunmuyor, oradaki veri zaten daha eksiksizdi).
 function ensureCariTedarikciCakismaTemizle(){
   let changed = false;
-  ['cagatayticaret', 'safplast'].forEach(id => {
+  ['cagatayticaret', 'safplast', 'goctuk'].forEach(id => {
     const idx = state.cari.findIndex(c => c.id === id);
     if(idx > -1){ state.cari.splice(idx, 1); changed = true; }
   });
