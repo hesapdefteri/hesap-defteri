@@ -9946,6 +9946,35 @@ function ensureSafPlastUrunDetayi2GeriGetir(){
   return true;
 }
 
+// 14 Ağu 2026 (3. tur): Son 3 hareket de irsaliye fotoğraflarıyla teyit edildi.
+function ensureSafPlastUrunDetayi3GeriGetir(){
+  if(state._safPlastUrunDetayi3_20260814) return false;
+  const NORMAL_ID = 's_msjzf8qcrgmyy';
+  const SUNGERLI_ID = 's_msk7dyeoblq2y';
+  const EM38_ID = 's_em38mandalli1786223133749';
+  const duzeltmeler = [
+    {tarih:'2026-03-30', tutar:5000, kalemler:[
+      {ad:'Kuru temizleme askısı', birim:'Adet', birimFiyat:5.0, miktar:1000, tutar:5000, stokKartId:NORMAL_ID}
+    ], aciklama:'İrsaliye 2684 (Uğur k tmz TATVAN) - 1000 normal x5.00'},
+    {tarih:'2026-06-09', tutar:13750, kalemler:[
+      {ad:'Kuru temizleme askısı', birim:'Adet', birimFiyat:5.5, miktar:2500, tutar:13750, stokKartId:NORMAL_ID}
+    ], aciklama:'İrsaliye 2790 (Drysan) - 2500 normal x5.50'},
+    {tarih:'2026-07-07', tutar:19900, kalemler:[
+      {ad:'EM38 Mandallı Askı', birim:'Adet', birimFiyat:6.5, miktar:300, tutar:1950, stokKartId:EM38_ID},
+      {ad:'Kuru temizleme askısı Süngerli', birim:'Adet', birimFiyat:6.0, miktar:1250, tutar:7500, stokKartId:SUNGERLI_ID},
+      {ad:'Kuru temizleme askısı Süngerli', birim:'Adet', birimFiyat:6.0, miktar:500, tutar:3000, stokKartId:SUNGERLI_ID},
+      {ad:'Kuru temizleme askısı', birim:'Adet', birimFiyat:5.5, miktar:1000, tutar:5500, stokKartId:NORMAL_ID},
+      {ad:'EM38 Mandallı Askı', birim:'Adet', birimFiyat:6.5, miktar:300, tutar:1950, stokKartId:EM38_ID}
+    ], aciklama:'İrsaliye 2833 (Nişantaşı+Greatdry) - detaylı 5 kalem'}
+  ];
+  duzeltmeler.forEach(b => {
+    const fis = state.alisFisleri.find(f => normAd(f.cariAdi)===normAd('Saf Plast') && f.tarih===b.tarih && Math.abs(toNum(f.toplam)-b.tutar)<1);
+    if(fis){ fis.kalemler = b.kalemler; fis.aciklama = b.aciklama; }
+  });
+  state._safPlastUrunDetayi3_20260814 = true;
+  return true;
+}
+
 function ensureSafPlastFaturalarTamamla(){
   let changed = false;
   // (1) Test fişlerini sil
@@ -10381,6 +10410,7 @@ function cloudSyncAndBoot(user){
     if(ensureSafPlastFaturalarTamamla()) save();
     if(ensureSafPlastUrunDetayiGeriGetir()) save();
     if(ensureSafPlastUrunDetayi2GeriGetir()) save();
+    if(ensureSafPlastUrunDetayi3GeriGetir()) save();
     hideAuthScreen();
     render();
   }).catch(err => {
