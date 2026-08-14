@@ -1114,11 +1114,22 @@
 #cv2LpOverlay .g-sheet{border-radius:20px;max-height:70vh;}
 .g-musteri-list-item{display:flex;align-items:center;gap:10px;padding:12px 4px;border-bottom:1px solid #f0ece3;cursor:pointer;}
 .g-musteri-list-item:last-child{border-bottom:none;}
-/* 14 Ağu 2026: Sipariş ürün seçici — seçili satırda belirgin tik + mavi vurgu */
-.siparis-stok-row{display:flex;align-items:center;gap:8px;}
-.siparis-stok-row .siparis-stok-tik{width:18px;flex-shrink:0;color:#1a56c4;font-weight:700;visibility:hidden;}
+/* 14 Ağu 2026: Sipariş ürün seçici — çoklu seçim (checkbox) + mavi vurgu */
+.siparis-stok-row{display:flex;align-items:center;gap:10px;}
+.siparis-stok-row .siparis-stok-chk{width:20px;height:20px;flex-shrink:0;border-radius:6px;border:2px solid #c7c2b8;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800;}
 .siparis-stok-row.siparis-stok-secili{background:#eef5ff;}
-.siparis-stok-row.siparis-stok-secili .siparis-stok-tik{visibility:visible;}
+.siparis-stok-row.siparis-stok-secili .siparis-stok-chk{background:#1a56c4;border-color:#1a56c4;}
+/* Miktar/fiyat girişi (ADIM 2) — her seçili ürün için kart */
+.siparis-miktar-card{background:#f7f5f0;border-radius:12px;padding:12px;margin-bottom:10px;}
+.siparis-miktar-ad{font-weight:700;color:var(--ink);margin-bottom:8px;font-size:14.5px;}
+.siparis-miktar-inputs{display:flex;gap:8px;}
+.siparis-miktar-inputs input{flex:1;}
+/* 14 Ağu 2026: genel "Kaydediliyor" toast — bkz. #genelKaydediliyorToast */
+.gk-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#1c2b30;color:#fff;padding:10px 18px;border-radius:30px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;z-index:999;box-shadow:0 6px 18px rgba(0,0,0,.25);}
+.gk-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.gk-spin{width:12px;height:12px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:gkspin .7s linear infinite;flex-shrink:0;}
+.gk-toast.ok .gk-spin{display:none;}
+@keyframes gkspin{to{transform:rotate(360deg);}}
 </style>
 <!-- Firebase (telefon numarasıyla giriş + bulut senkronizasyonu) -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -1390,15 +1401,19 @@
 <div class="overlay" id="siparisOverlay" style="z-index:90;">
   <div class="modal" style="height:85vh;display:flex;flex-direction:column;padding-bottom:14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-      <h3 style="margin:0;">Ürün Seç</h3>
+      <h3 id="siparisPickerTitle" style="margin:0;">Ürün Seç</h3>
       <button type="button" id="siparisYeniUrunBtn" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--ink);background:transparent;font-size:19px;font-weight:700;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">＋</button>
     </div>
-    <div id="siparisStokList" style="flex:1;overflow-y:auto;min-height:0;"></div>
-    <div id="siparisMiktarWrap" style="display:none;margin-top:10px;">
-      <div id="siparisSeciliUrunEtiket" style="font-weight:600;color:#1a56c4;margin-bottom:8px;font-size:14px;"></div>
-      <input id="siparisMiktar" type="text" inputmode="decimal" placeholder="Miktar" class="ci-input">
-      <input id="siparisFiyat" type="text" inputmode="decimal" placeholder="Birim Fiyat" class="ci-input">
-      <button id="siparisKalemEkle" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;cursor:pointer;">Fişe Ekle</button>
+    <!-- 14 Ağu 2026: çoklu ürün seçimi — ADIM 1: checkbox ile birden çok ürün işaretle -->
+    <div id="siparisStokStep" style="flex:1;display:flex;flex-direction:column;min-height:0;">
+      <div id="siparisStokList" style="flex:1;overflow-y:auto;min-height:0;"></div>
+      <button id="siparisPickerDevam" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;cursor:pointer;margin-top:10px;" disabled>Devam Et</button>
+    </div>
+    <!-- ADIM 2: seçilen her ürün için tek ekranda miktar/fiyat gir -->
+    <div id="siparisMiktarWrap" style="display:none;flex:1;flex-direction:column;min-height:0;">
+      <button type="button" id="siparisPickerGeri" style="align-self:flex-start;background:none;border:none;color:var(--accent);font-weight:600;font-size:13.5px;padding:0 0 8px 0;cursor:pointer;">‹ Ürünlere dön</button>
+      <div id="siparisMiktarList" style="flex:1;overflow-y:auto;min-height:0;"></div>
+      <button id="siparisKalemEkle" style="width:100%;padding:14px 0;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;cursor:pointer;margin-top:10px;">Fişe Ekle</button>
     </div>
     <button id="siparisKapat" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Kapat</button>
   </div>
@@ -2602,6 +2617,26 @@ function cv2GercekBulutaYaz(){
   });
 }
 
+// 14 Ağu 2026: genel "Kaydediliyor" toast — Alış/Satış fişi (kendi özet
+// akışı var) ve silme aksiyonları (openConfirm→showIslemYapiliyor akışından
+// geçiyor) DIŞINDAKİ kayıt ekleme noktalarında (Sipariş, Tahsilat/Ödeme,
+// Şablon) kısa bir görsel onay vermek için. Engelleyici değil, akışı durdurmaz.
+let _gkToastTimer = null;
+function kaydediliyorGoster(){
+  clearTimeout(_gkToastTimer);
+  const el = document.getElementById('genelKaydediliyorToast');
+  el.classList.remove('ok');
+  document.getElementById('genelKaydediliyorMetin').textContent = 'Kaydediliyor...';
+  el.classList.add('show');
+}
+function kaydediliyorTamam(){
+  const el = document.getElementById('genelKaydediliyorToast');
+  el.classList.add('ok');
+  document.getElementById('genelKaydediliyorMetin').textContent = 'Kaydedildi ✓';
+  clearTimeout(_gkToastTimer);
+  _gkToastTimer = setTimeout(()=> el.classList.remove('show'), 900);
+}
+
 function save(){
   // Yerel değişiklik her zaman "en yeni" damgayı taşısın diye — bu, uygulamayı
   // silme/düzenleme sonrası hemen yenileyince Firebase'in henüz tamamlanmamış
@@ -3056,7 +3091,6 @@ document.getElementById('ncSave').onclick = () => {
 
 // ===== Sipariş Fişi (çoklu kalem) =====
 let draftSiparis = null;
-let siparisPickerStokId = null;
 
 function yeniSiparisTaslak(){
   return {
@@ -3336,37 +3370,69 @@ function bindSiparisDetayEvents(){
   });
 }
 
+// 14 Ağu 2026: sipariş ürün seçimi artık TEK TEK değil — ADIM 1'de birden
+// çok ürün checkbox ile işaretlenir, ADIM 2'de hepsi için tek ekranda
+// miktar/fiyat girilir, "Fişe Ekle" hepsini birden fişe ekler.
+let siparisPickerSecilenIdler = new Set();
 function openSiparisPicker(){
-  siparisPickerStokId = null;
-  document.getElementById('siparisMiktar').value = '';
-  document.getElementById('siparisFiyat').value = '';
-  document.getElementById('siparisMiktarWrap').style.display = 'none';
-  document.getElementById('siparisSeciliUrunEtiket').textContent = '';
+  siparisPickerSecilenIdler = new Set();
+  siparisPickerAdim1Goster();
   renderSiparisStokList();
   document.getElementById('siparisOverlay').classList.add('show');
+}
+function siparisPickerAdim1Goster(){
+  document.getElementById('siparisPickerTitle').textContent = 'Ürün Seç';
+  document.getElementById('siparisStokStep').style.display = 'flex';
+  document.getElementById('siparisMiktarWrap').style.display = 'none';
+}
+function siparisPickerDevamButonuGuncelle(){
+  const n = siparisPickerSecilenIdler.size;
+  const btn = document.getElementById('siparisPickerDevam');
+  btn.disabled = n === 0;
+  btn.textContent = n === 0 ? 'Devam Et' : `Devam Et (${n} ürün)`;
 }
 function renderSiparisStokList(){
   const list = document.getElementById('siparisStokList');
   list.innerHTML = state.stokKartlari.length ? state.stokKartlari.map(s => `
-    <div class="acct-row siparis-stok-row" data-id="${s.id}">
-      <span class="siparis-stok-tik">✓</span>
+    <div class="acct-row siparis-stok-row${siparisPickerSecilenIdler.has(s.id)?' siparis-stok-secili':''}" data-id="${s.id}">
+      <span class="siparis-stok-chk">✓</span>
       <span class="name">${s.ad}</span>
       <span class="amount">${s.fiyatlar && s.fiyatlar.satis1 ? fmt(s.fiyatlar.satis1) : ''}</span>
     </div>
   `).join('') : '<div class="sk-empty">Henüz stok kartı yok</div>';
   list.querySelectorAll('.siparis-stok-row').forEach(row=>{
     row.onclick = () => {
-      list.querySelectorAll('.siparis-stok-row').forEach(r=>r.classList.remove('siparis-stok-secili'));
-      row.classList.add('siparis-stok-secili');
-      siparisPickerStokId = row.dataset.id;
-      const stok = state.stokKartlari.find(s=>s.id===siparisPickerStokId);
-      document.getElementById('siparisFiyat').value = stok && stok.fiyatlar ? (toNum(stok.fiyatlar.satis1)||'') : '';
-      document.getElementById('siparisMiktarWrap').style.display = 'block';
-      document.getElementById('siparisSeciliUrunEtiket').textContent = 'Seçili ürün: ' + (stok ? stok.ad : '');
-      setTimeout(()=>document.getElementById('siparisMiktar').focus(), 50);
+      const id = row.dataset.id;
+      if(siparisPickerSecilenIdler.has(id)) siparisPickerSecilenIdler.delete(id);
+      else siparisPickerSecilenIdler.add(id);
+      row.classList.toggle('siparis-stok-secili');
+      siparisPickerDevamButonuGuncelle();
     };
   });
+  siparisPickerDevamButonuGuncelle();
 }
+function siparisPickerAdim2Ac(){
+  const secilenler = [...siparisPickerSecilenIdler].map(id=>state.stokKartlari.find(s=>s.id===id)).filter(Boolean);
+  if(!secilenler.length) return;
+  document.getElementById('siparisPickerTitle').textContent = 'Miktar / Fiyat';
+  document.getElementById('siparisStokStep').style.display = 'none';
+  document.getElementById('siparisMiktarWrap').style.display = 'flex';
+  document.getElementById('siparisMiktarList').innerHTML = secilenler.map(s => `
+    <div class="siparis-miktar-card" data-id="${s.id}">
+      <div class="siparis-miktar-ad">${s.ad}</div>
+      <div class="siparis-miktar-inputs">
+        <input type="text" inputmode="decimal" placeholder="Miktar" class="ci-input siparis-mk-miktar" data-id="${s.id}">
+        <input type="text" inputmode="decimal" placeholder="Birim Fiyat" class="ci-input siparis-mk-fiyat" data-id="${s.id}" value="${s.fiyatlar && s.fiyatlar.satis1 ? toNum(s.fiyatlar.satis1) : ''}">
+      </div>
+    </div>
+  `).join('');
+  setTimeout(()=>{
+    const ilk = document.querySelector('.siparis-mk-miktar');
+    if(ilk) ilk.focus();
+  }, 50);
+}
+document.getElementById('siparisPickerDevam').onclick = () => siparisPickerAdim2Ac();
+document.getElementById('siparisPickerGeri').onclick = () => siparisPickerAdim1Goster();
 document.getElementById('siparisYeniUrunBtn').onclick = () => {
   siparisYeniUrunAktif = true;
   document.getElementById('urunAddBtn').click();
@@ -3376,13 +3442,19 @@ document.getElementById('siparisOverlay').onclick = (e) => {
   if(e.target === document.getElementById('siparisOverlay')) document.getElementById('siparisOverlay').classList.remove('show');
 };
 document.getElementById('siparisKalemEkle').onclick = () => {
-  if(!siparisPickerStokId) return;
-  const stok = state.stokKartlari.find(s=>s.id===siparisPickerStokId);
-  if(!stok) return;
-  const miktar = toNum(document.getElementById('siparisMiktar').value);
-  const fiyat = toNum(document.getElementById('siparisFiyat').value);
-  if(!miktar) return;
-  draftSiparis.kalemler.push({ stokId: stok.id, ad: stok.ad, miktar, birimFiyat: fiyat, tutar: miktar*fiyat });
+  const kartlar = document.querySelectorAll('#siparisMiktarList .siparis-miktar-card');
+  let eklenen = 0;
+  kartlar.forEach(card=>{
+    const id = card.dataset.id;
+    const stok = state.stokKartlari.find(s=>s.id===id);
+    if(!stok) return;
+    const miktar = toNum(card.querySelector('.siparis-mk-miktar').value);
+    const fiyat = toNum(card.querySelector('.siparis-mk-fiyat').value);
+    if(!miktar) return; // miktar girilmeyen ürün fişe eklenmez
+    draftSiparis.kalemler.push({ stokId: stok.id, ad: stok.ad, miktar, birimFiyat: fiyat, tutar: miktar*fiyat });
+    eklenen++;
+  });
+  if(!eklenen){ alertBox('En az bir üründe miktar girilmeli.'); return; }
   document.getElementById('siparisOverlay').classList.remove('show');
   renderSiparisDetayBody();
 };
@@ -3401,6 +3473,17 @@ function siparisDetayGeriDon(){
 }
 document.getElementById('siparisDetayBack').onclick = () => { siparisDetayGeriDon(); };
 document.getElementById('siparisVazgec').onclick = () => { siparisDetayGeriDon(); };
+// 14 Ağu 2026: sipariş KAYDEDİLİNCE artık Siparişler ana listesine ya da ana
+// menüye atmıyor — direkt ilgili Cari Hesap kartının Hareketler ekranına
+// (cv2 sheet) götürüyor, kullanıcı isteğiyle.
+function siparisKaydetSonrasiDon(cariId, ledgerKey){
+  hideAllScreens();
+  renderCariV2();
+  document.getElementById('cv2Screen').classList.add('show');
+  cv2Hareketler(cariId, ledgerKey);
+  siparisDetayDonusEkran = 'siparisler';
+  nudge();
+}
 // 14 Ağu 2026: Yeni bir sipariş fişi kaydedildiğinde ilgili kişiye otomatik
 // Telegram bildirimi gönderiyor. Bot: @SafPlastSiparis_bot. Şimdilik test
 // chat_id'si (Erdin'in eşi) sabit tanımlı — gerçek iş arkadaşının chat_id'si
@@ -3433,6 +3516,7 @@ document.getElementById('siparisFisKaydet').onclick = () => {
   const d = draftSiparis;
   if(!d.cariAdi || !d.cariAdi.trim()) return;
   if(!d.kalemler.length) return;
+  kaydediliyorGoster();
   const cari = bulYadaEkleCari(d.ledgerKey, d.cariAdi);
   save();
   const yeniSiparisMi = !d.id;
@@ -3446,9 +3530,10 @@ document.getElementById('siparisFisKaydet').onclick = () => {
     state.sayaclar.siparis = (state.sayaclar.siparis||0) + 1;
   }
   save();
+  kaydediliyorTamam();
   if(yeniSiparisMi) siparisTelegramBildir(d);
   render();
-  siparisDetayGeriDon();
+  siparisKaydetSonrasiDon(cari.id, d.ledgerKey);
 };
 document.getElementById('siparisDetaySil').onclick = () => {
   if(!draftSiparis.id) return;
@@ -4036,7 +4121,9 @@ document.getElementById('quickTxSave').onclick = () => {
   }
   editingTx = null;
 
+  kaydediliyorGoster();
   save();
+  kaydediliyorTamam();
   document.getElementById('quickTxOverlay').classList.remove('show');
   activeLedger = quickTxLedger;
   render();
@@ -7345,9 +7432,10 @@ document.getElementById('urunSaveBtn').onclick = () => {
   try{ renderUrunler(); }catch(err){ console.error('renderUrunler hata:', err); }
   if(editingSkId) { renderSkDetayUst(); renderSkTab(currentSkTab); }
   if(siparisYeniUrunAktif && yeniKart){
-    renderSiparisStokList();
-    const row = document.querySelector(`#siparisStokList .siparis-stok-row[data-id="${yeniKart.id}"]`);
-    if(row) row.click();
+    // Yeni ürün sipariş akışından eklendiyse: otomatik seçili işaretlenip
+    // doğrudan miktar/fiyat ekranına geçiliyor (eski tek-tek akıştaki gibi).
+    siparisPickerSecilenIdler.add(yeniKart.id);
+    siparisPickerAdim2Ac();
   }
   if(fisYeniUrunAktif && yeniKart){
     renderUrunSecList();
@@ -8893,7 +8981,9 @@ document.getElementById('sablonKaydet').onclick = () => {
   if(uyumsuz){ alertBox('Müşterilere dağıtılan adet, alış adetiyle eşit olmalı.'); return; }
   const idx = state.sablonlar.findIndex(x=>x.id===sablonDraft.id);
   if(idx !== -1) state.sablonlar[idx] = sablonDraft; else state.sablonlar.push(sablonDraft);
+  kaydediliyorGoster();
   save();
+  kaydediliyorTamam();
   document.getElementById('sablonDetayScreen').classList.remove('show');
   document.getElementById('sablonListScreen').classList.add('show');
   renderSablonList();
@@ -10516,5 +10606,14 @@ try {
 }
 
 </script>
+<!-- 14 Ağu 2026: genel "Kaydediliyor" göstergesi — Alış/Satış fişi dışındaki
+     kayıt ekleme aksiyonlarında (Sipariş, Tahsilat/Ödeme, Şablon) kısa bir
+     onay verir. Alış/Satış zaten kendi spinner+özet akışına sahip (fisKaydet),
+     silme aksiyonları zaten openConfirm→showIslemYapiliyor akışından geçiyor —
+     bu toast SADECE bu ikisinin dışında kalan ekleme noktalarına eklendi. -->
+<div id="genelKaydediliyorToast" class="gk-toast">
+  <span class="gk-spin"></span>
+  <span id="genelKaydediliyorMetin">Kaydediliyor...</span>
+</div>
 </body>
 </html>
