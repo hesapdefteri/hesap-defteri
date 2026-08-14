@@ -3401,9 +3401,17 @@ const SIPARIS_TELEGRAM_BOT_TOKEN = '8797741692:AAEXadW9Nkxu9iwl9iowQdYDarNfa-g94
 const SIPARIS_TELEGRAM_CHAT_ID = '5209583691'; // TODO: iş arkadaşının chat_id'si belirlenince değiştir
 function siparisTelegramBildir(siparis){
   try{
+    // 14 Ağu 2026 düzeltmesi: karşı tarafa SATIŞ fiyatı değil, kendi ALIŞ
+    // fiyatımız (stok kartındaki son alış fiyatı) üzerinden hesaplanan
+    // tutar gönderiliyor — satış marjı asla karşı tarafa görünmesin diye.
     const kalemOzet = (siparis.kalemler||[]).map(k => `${k.miktar} ${k.ad}`).join(', ');
-    const toplam = (siparis.kalemler||[]).reduce((s,k)=>s+toNum(k.tutar),0);
-    const text = `📦 Yeni Sipariş\nCari: ${siparis.cariAdi}\nBelge No: ${siparis.belgeNo}\nTarih: ${siparis.tarih}\nKalemler: ${kalemOzet}\nToplam: ${toplam.toLocaleString('tr-TR')}₺\n\nSiparişler hazır mı? Ne zaman teslim alabiliriz?`;
+    let toplam = 0;
+    (siparis.kalemler||[]).forEach(k => {
+      const card = state.stokKartlari.find(s => s.id === k.stokId);
+      const alisFiyati = card ? toNum(card.fiyatlar && card.fiyatlar.sonAlis) : 0;
+      toplam += toNum(k.miktar) * alisFiyati;
+    });
+    const text = `📦 Yeni Sipariş\nCari: ${siparis.cariAdi}\nBelge No: ${siparis.belgeNo}\nTarih: ${siparis.tarih}\nKalemler: ${kalemOzet}\nToplam (alış): ${toplam.toLocaleString('tr-TR')}₺\n\nSiparişler hazır mı? Ne zaman teslim alabiliriz?`;
     fetch(`https://api.telegram.org/bot${SIPARIS_TELEGRAM_BOT_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
