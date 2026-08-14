@@ -9804,7 +9804,32 @@ function ensureSafPlastPlastikBirlestir(){
   if(idx !== -1) state.tedarikci.splice(idx, 1);
   return true;
 }
-if(ensureSafPlastPlastikBirlestir()) save();
+
+// 14 Ağu 2026: Kullanıcı gerçek muhasebe kayıtlarını (dış rapor/ekstre) referans
+// göstererek Saf Plast hesabının Hesap Defteri'ndeki karşılığını birebir buna
+// eşitlememizi istedi. Karşılaştırmada 3 fark bulundu: 1 eksik hareket, 2
+// hareketin tarihi/açıklaması hatalı. Tek seferlik, idempotent düzeltme.
+function ensureSafPlastGercekVeriDuzelt(){
+  const c = state.tedarikci.find(x => normAd(x.name) === normAd('Saf Plast'));
+  if(!c) return false;
+  let changed = false;
+  // 1) Eksik hareket: 09.06.2026 Drysan alışı hiç yoktu, eklendi.
+  const eksikVarMi = c.transactions.some(t => t.date === '2026-06-09T10:36:00' && t.type === 'ALIŞ' && Math.abs(t.amount - 13750) < 1);
+  if(!eksikVarMi){
+    c.transactions.push({ type:'ALIŞ', desc:'Drysan', amount:13750, date:'2026-06-09T10:36:00' });
+    changed = true;
+  }
+  // 2) 27.07.2026 (saatsiz) kaydının gerçek tarihi 29.07.2026 11:29 imiş.
+  const t1 = c.transactions.find(t => t.date === '2026-07-27T00:00:00' && Math.abs(t.amount - 12000) < 1);
+  if(t1){ t1.date = '2026-07-29T11:29:00'; changed = true; }
+  // 3) 09.08.2026 kaydının gerçek tarihi 06.08.2026 12:01, açıklaması
+  // "Rizt 6 International dört koli Savaş bey" imiş (fiş sisteminden gelen
+  // genel "1 kalem · ALF-000013" açıklaması yanlıştı).
+  const t2 = c.transactions.find(t => t.date === '2026-08-09T00:00:00.000Z' && Math.abs(t.amount - 13750) < 1);
+  if(t2){ t2.date = '2026-08-06T12:01:00'; t2.desc = 'Rizt 6 International dört koli Savaş bey'; changed = true; }
+  if(changed) c.transactions.sort((a,b)=> new Date(a.date) - new Date(b.date));
+  return changed;
+}
 
 // 08 Ağu 2026: Kasa bakiyesi (state.cash) koddaki bozuk varsayılan değere
 // (706.888,34₺) yakın bir noktadan (729.288,34₺) birikmiş, gerçek değeri
@@ -10197,6 +10222,7 @@ function cloudSyncAndBoot(user){
     // kazanırsa kazansın, GERÇEK state burada (render'dan hemen önce) tekrar
     // kontrol ediliyor.
     if(ensureSafPlastPlastikBirlestir()) save();
+    if(ensureSafPlastGercekVeriDuzelt()) save();
     hideAuthScreen();
     render();
   }).catch(err => {
