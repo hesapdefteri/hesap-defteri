@@ -3013,6 +3013,12 @@ function openSiparis(id, ledgerKey){
   renderSiparisDetayBody();
   hideAllScreens();
   document.getElementById('siparisDetayScreen').classList.add('show');
+  // 14 Ağu 2026: Vazgeç'e basılırsa (kaydetmeden çıkış) bu cari kartın
+  // Hareketler sheet'ine dönsün — Siparişler ana listesine ya da boş
+  // Cari Hesap listesine ATLAMASIN.
+  siparisDetayDonusEkran = 'cv2';
+  siparisDetayDonusCariId = id;
+  siparisDetayDonusLedger = ledgerKey;
   nudge();
 }
 
@@ -3082,7 +3088,9 @@ function openSiparisGorPopup(id, ledgerKey){
   el.querySelectorAll('.irsaliye-card[data-id]').forEach(card=>{
     card.onclick = () => {
       document.getElementById('siparisGorOverlay').classList.remove('show');
-      siparisDetayDonusEkran = 'cv2';
+      siparisDetayDonusEkran = 'siparisgor';
+      siparisDetayDonusCariId = id;
+      siparisDetayDonusLedger = ledgerKey;
       openSiparisDetay(card.dataset.id);
     };
   });
@@ -3361,11 +3369,24 @@ document.getElementById('siparisKalemEkle').onclick = () => {
   renderSiparisDetayBody();
 };
 
+// siparisDetayDonusEkran: 'siparisler' (Siparişler ana listesi) | 'cv2' (Cari Hesap
+// kartının Hareketler sheet'i) | 'siparisgor' (Sipariş Gör popup'ından girildiyse
+// AYNI popup'a geri dönülür — 14 Ağu 2026, "her yerden girdiğim yere geri dönsün,
+// ana listeye/menüye atmasın" isteğiyle eklendi).
+let siparisDetayDonusCariId = null, siparisDetayDonusLedger = null;
 function siparisDetayGeriDon(){
   hideAllScreens();
-  if(siparisDetayDonusEkran === 'cv2'){
+  if(siparisDetayDonusEkran === 'siparisgor'){
     renderCariV2();
     document.getElementById('cv2Screen').classList.add('show');
+    openSiparisGorPopup(siparisDetayDonusCariId, siparisDetayDonusLedger);
+  } else if(siparisDetayDonusEkran === 'cv2'){
+    renderCariV2();
+    document.getElementById('cv2Screen').classList.add('show');
+    // Hangi cariden girildiği biliniyorsa (siparisDetayDonusCariId), düz
+    // Cari Hesap listesinde bırakmak yerine direkt o kartın Hareketler
+    // sheet'ini aç — "geri girdiğim yere dönsün" isteğiyle.
+    if(siparisDetayDonusCariId) cv2Hareketler(siparisDetayDonusCariId, siparisDetayDonusLedger);
   } else {
     document.getElementById('siparisListScreen').classList.add('show');
     renderSiparisList();
@@ -3443,11 +3464,11 @@ document.getElementById('siparisDetaySil').onclick = () => {
     const idx = state.siparisFisleri.findIndex(x=>x.id===draftSiparis.id);
     if(idx !== -1) state.siparisFisleri.splice(idx,1);
     save();
-    hideAllScreens();
-    document.getElementById('siparisListScreen').classList.add('show');
-    renderSiparisList();
     render();
-    nudge();
+    // 14 Ağu 2026: silme sonrası da GİRİLEN YERE geri dön (Sipariş Gör'den
+    // girildiyse Sipariş Gör'e, CH karttan girildiyse Hareketler'e) — daha
+    // önce burası her zaman Siparişler ana listesine atıyordu.
+    siparisDetayGeriDon();
   });
 };
 
