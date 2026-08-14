@@ -4592,7 +4592,7 @@ function removeCurrentReceiptTx(){
 
 let confirmDeleteAction = null;
 function showIslemYapiliyor(callback, duration){
-  duration = duration || 1500;
+  duration = duration || 900;
   const overlay = document.getElementById('islemYapiliyorOverlay');
   const fill = document.getElementById('islemProgressFill');
   document.getElementById('islemSpinnerBox').style.display = '';
@@ -4613,7 +4613,7 @@ function showIslemYapiliyor(callback, duration){
 // saveFn: spinner süresi bitince çalışır (asıl veri kaydı). navigateFn: Tamam'a
 // basınca çalışır (ekran geçişleri). 09 Ağu 2026, kullanıcı isteği.
 function showIslemYapiliyorFisOzeti(fisOzet, duration, saveFn, navigateFn){
-  duration = duration || 1500;
+  duration = duration || 900;
   const overlay = document.getElementById('islemYapiliyorOverlay');
   const fill = document.getElementById('islemProgressFill');
   document.getElementById('islemSpinnerBox').style.display = '';
@@ -5735,7 +5735,7 @@ function cv2TxSilOnayla(tur, id, idx){
         save();
         renderCariV2();
         cv2RefreshSheetIfOpen(id, tur);
-      }, 1500);
+      }, 900);
     }
   );
 }
@@ -5765,7 +5765,7 @@ function cv2TxDuzenle(tur, id, idx){
           save();
           renderCariV2();
           cv2RefreshSheetIfOpen(id, tur);
-        }, 1500);
+        }, 900);
       }
     }
   );
@@ -5822,7 +5822,7 @@ function cv2Duzenle(id, tur){
           }
           save();
           renderCariV2();
-        }, 1500);
+        }, 900);
       }
     }
   );
@@ -5946,7 +5946,7 @@ function cv2DahaFazla(id, tur){
           arr.splice(idx, 1);
           save();
           renderCariV2();
-        }, 1500);
+        }, 900);
       }
     },
     { label: 'Tamam', cls: 'ghost', solaAl: true, aksiyon: function(){ cv2OdemeTarihiKaydet(id, tur, true); } }
@@ -6550,7 +6550,7 @@ function renderKrediKarti(){
   if(mYes) mYes.addEventListener('click', ()=>{
     const aksiyon = kkModalAksiyon;
     kkModalKapat();
-    if(aksiyon) showIslemYapiliyor(aksiyon, 1500);
+    if(aksiyon) showIslemYapiliyor(aksiyon, 900);
   });
 
   // aşağı sürükleyerek kapatma
@@ -8324,7 +8324,7 @@ document.getElementById('fisKaydet').onclick = () => {
   };
   let wasLegacy = null;
 
-  showIslemYapiliyorFisOzeti(fisOzetVerisi, 1500, function(){
+  showIslemYapiliyorFisOzeti(fisOzetVerisi, 900, function(){
   // ---- asıl kaydetme (spinner süresi bitince çalışır) ----
   if(editingFisId) silFisKalemleri(editingFisId);
 
