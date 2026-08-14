@@ -3298,12 +3298,35 @@ function bindSiparisDetayEvents(){
   document.getElementById('siparisTurAlici').onclick = () => { draftSiparis.ledgerKey = 'cari'; renderSiparisDetayBody(); };
   document.getElementById('siparisTurTedarikci').onclick = () => { draftSiparis.ledgerKey = 'tedarikci'; renderSiparisDetayBody(); };
   document.getElementById('siparisKalemEkleBtn').onclick = () => openSiparisPicker();
-  document.querySelectorAll('.fatura-table .fatura-row').forEach(row=>{
-    row.onclick = () => {
-      const idx = +row.dataset.idx;
-      draftSiparis.kalemler.splice(idx,1);
-      renderSiparisDetayBody();
-    };
+  // 14 Ağu 2026: "satıra dokununca direkt silme" kullanıcı için tehlikeli
+  // bulunduğu için (yanlışlıkla kalem kaybı riski), Sipariş kalem satırları
+  // için SADECE SOLA KAYDIRMA ile silme eklendi — düz dokunma artık hiçbir
+  // şey yapmıyor. (Alış/Satış/Şablon fatura formlarına kasten dokunulmadı,
+  // sadece Sipariş için istendi.)
+  document.querySelectorAll('#siparisDetayBody .fatura-table .fatura-row').forEach(row=>{
+    let sx = 0, sy = 0, dx = 0, dragging = false;
+    row.style.transition = 'transform .18s ease';
+    row.addEventListener('touchstart', e=>{
+      sx = e.touches[0].clientX; sy = e.touches[0].clientY; dx = 0; dragging = true;
+    }, {passive:true});
+    row.addEventListener('touchmove', e=>{
+      if(!dragging) return;
+      const cx = e.touches[0].clientX, cy = e.touches[0].clientY;
+      dx = cx - sx;
+      if(Math.abs(dx) > Math.abs(cy - sy) && Math.abs(dx) > 8){
+        row.style.transform = 'translateX(' + Math.min(0, dx) + 'px)';
+      }
+    }, {passive:true});
+    row.addEventListener('touchend', ()=>{
+      dragging = false;
+      if(dx < -70){
+        const idx = +row.dataset.idx;
+        draftSiparis.kalemler.splice(idx,1);
+        renderSiparisDetayBody();
+      } else {
+        row.style.transform = 'translateX(0)';
+      }
+    });
   });
 }
 
@@ -10167,6 +10190,13 @@ function cloudSyncAndBoot(user){
     // boş varsayılan veri buluta basılır ve SONRASINDA giriş yapan TÜM gerçek
     // cihazları bu boş/varsayılan veriyle ezer (yaşanan olay tam olarak buydu).
     // İlk gerçek save() zaten normal akışta buluta doğru şekilde yazacak.
+    // 14 Ağu 2026 KRİTİK DÜZELTME: tek seferlik "ensureX" düzeltmeleri script
+    // parse anında (yani BULUT verisi inmeden, sadece cihazın eski yerel
+    // kopyasına bakarak) çalışıyordu — bu yüzden bulut senkronundan sonra
+    // gelen GERÇEK veriye hiç uygulanmıyordu. Artık bulut/yerel hangisi
+    // kazanırsa kazansın, GERÇEK state burada (render'dan hemen önce) tekrar
+    // kontrol ediliyor.
+    if(ensureSafPlastPlastikBirlestir()) save();
     hideAuthScreen();
     render();
   }).catch(err => {
