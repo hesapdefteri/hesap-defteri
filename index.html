@@ -2725,6 +2725,47 @@ function silLinkliCariHareket(skRef){
     });
   });
 }
+// Ödeme tarihi hatırlatıcısı (14 Ağu 2026 eklendi): iOS'ta web sayfası doğrudan
+// Hatırlatıcılar uygulamasına yazamıyor, ama .ics (takvim) dosyası indirilip
+// "Takvime/Hatırlatıcılara Ekle" ile eklenince aynı işi görüyor — telefonda
+// gerçek bir bildirim/alarm tetikler.
+function odemeHatirlaticiIndir(id, ledgerKey){
+  const c = state[ledgerKey].find(x=>x.id===id);
+  if(!c || !c.odemeTarihi) return;
+  const odemeStr = c.odemeTarihi.includes('T') ? c.odemeTarihi : (c.odemeTarihi + 'T11:00');
+  const d = new Date(odemeStr);
+  const pad = n => String(n).padStart(2,'0');
+  const stampOf = dt => dt.getUTCFullYear()+pad(dt.getUTCMonth()+1)+pad(dt.getUTCDate())+'T'+pad(dt.getUTCHours())+pad(dt.getUTCMinutes())+pad(dt.getUTCSeconds())+'Z';
+  const bal = cariBalance(c);
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//HesapDefteri//TR',
+    'CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT',
+    'UID:odeme-' + c.id + '-' + Date.now() + '@hesapdefteri',
+    'DTSTAMP:' + stampOf(new Date()),
+    'DTSTART:' + stampOf(d),
+    'SUMMARY:Ödeme Hatırlatma - ' + c.name,
+    'DESCRIPTION:' + c.name + ' hesabı için ödeme tarihi. Güncel bakiye: ' + fmtWhole(bal) + '₺',
+    'BEGIN:VALARM',
+    'ACTION:DISPLAY',
+    'DESCRIPTION:Ödeme zamanı geldi',
+    'TRIGGER:-PT0M',
+    'END:VALARM',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+  const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'odeme-hatirlatma-' + c.name.replace(/[^a-zA-Z0-9ığüşöçİĞÜŞÖÇ]/g,'_') + '.ics';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
 function cariBalance(c){
   return c.transactions.reduce((s,t)=> s + signedAmount(t), 0);
 }
@@ -5812,7 +5853,8 @@ function cv2DahaFazla(id, tur){
     '<button class="cv2-more-row" data-act="siparis">Sipariş</button>' +
     '<button class="cv2-more-row" data-act="siparisgor">Sipariş Gör</button>' +
     '<button class="cv2-more-row"' + (hasPending ? '' : ' disabled') + ' data-act="tamamla">Tamamlandı</button>' +
-    '<button class="cv2-more-row"' + (hasCompleted ? '' : ' disabled') + ' data-act="geriAl" style="color:#e5484d;">Tamamlandı\'yı Geri Al</button>';
+    '<button class="cv2-more-row"' + (hasCompleted ? '' : ' disabled') + ' data-act="geriAl" style="color:#e5484d;">Tamamlandı\'yı Geri Al</button>' +
+    '<button class="cv2-more-row"' + (c.odemeTarihi ? '' : ' disabled') + ' data-act="hatirlatici">🔔 Hatırlatıcı Ekle</button>';
   cv2ModalAc('Daha Fazla', c.name + '<br>Bu cariyi listeden silmek istiyor musun?', formHtml, 'Sil', 'danger',
     function(){
       // 08 Ağu 2026, kullanıcı isteği: cari hesap kartı, üzerinde hâlâ hareket
@@ -5846,6 +5888,7 @@ function cv2DahaFazla(id, tur){
       else if(act === 'siparisgor') openSiparisGorPopup(id, tur);
       else if(act === 'tamamla') openTamamlaPopup(id, tur);
       else if(act === 'geriAl') openSiparisGorPopup(id, tur);
+      else if(act === 'hatirlatici') odemeHatirlaticiIndir(id, tur);
     });
   });
 }
