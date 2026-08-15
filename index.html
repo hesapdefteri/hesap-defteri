@@ -5094,7 +5094,7 @@ function CariCardV2(c, tur){
     <div class="cv2-actions left" style="display:none;">
       <button class="cv2-abtn hareketler" data-act="hareketler" data-uid="${uid}">Hareketler</button>
       <button class="cv2-abtn ekstre" data-act="ekstre" data-uid="${uid}">Ekstre</button>
-      <button class="cv2-abtn daha" data-act="daha" data-uid="${uid}">Daha Fazla</button>
+      <button class="cv2-abtn daha" data-act="daha" data-uid="${uid}">Sipariş İşlemleri</button>
     </div>
     <div class="cv2-actions right" style="display:none;">
       ${paraBtns}
@@ -5262,8 +5262,8 @@ function cv2UzunBasMenuAc(id, tur){
   const c = state[tur].find(x=>x.id===id);
   document.getElementById('cv2LpTitle').textContent = c ? c.name : 'Hesap';
   const items = tur === 'tedarikci'
-    ? [['alis','Alış'],['odeme','Ödeme'],['duzenle','Düzenle'],['hareketler','Hareketler'],['ekstre','Ekstre'],['daha','Daha Fazla']]
-    : [['tahsilat','Tahsilat'],['satis','Satış'],['duzenle','Düzenle'],['hareketler','Hareketler'],['ekstre','Ekstre'],['daha','Daha Fazla']];
+    ? [['alis','Alış'],['odeme','Ödeme'],['duzenle','Düzenle'],['hareketler','Hareketler'],['ekstre','Ekstre'],['daha','Sipariş İşlemleri']]
+    : [['tahsilat','Tahsilat'],['satis','Satış'],['duzenle','Düzenle'],['hareketler','Hareketler'],['ekstre','Ekstre'],['daha','Sipariş İşlemleri']];
   document.getElementById('cv2LpButtons').innerHTML = items.map(([act,label])=>
     `<button type="button" class="cv2-lp-btn" data-act="${act}">${label}</button>`
   ).join('');
