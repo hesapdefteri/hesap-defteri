@@ -5265,7 +5265,7 @@ function cv2AksiyonUygula(id, tur, act){
 // EXCEL_WEBHOOK_URL kullanıcının kendi kuracağı Google Apps Script Web App adresidir —
 // boşken buton bilgilendirici bir uyarı gösterir, çalışmaz. Gönderilen her seferinde
 // hedef sayfadaki eski veri SİLİNİP yeni ekstre yazılır (kullanıcı özellikle istedi).
-const EXCEL_WEBHOOK_URL = '';
+const EXCEL_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbx-__xISVJpguylZCsvxXZk5Y_4gir_Io7awbOKi9hCMp3_PUqHNgLRUei9GZBYwSPR/exec';
 async function cv2ExcelGonder(id, tur){
   const c = cv2Find(id, tur); if(!c) return;
   document.getElementById('cv2LpOverlay').classList.remove('show');
@@ -5288,13 +5288,17 @@ async function cv2ExcelGonder(id, tur){
   });
   kaydediliyorGoster();
   try{
-    const res = await fetch(EXCEL_WEBHOOK_URL, {
+    // Apps Script Web App'ler tarayıcıya doğru CORS başlığı dönmeyebiliyor —
+    // bu durumda istek sunucuda BAŞARILI olsa bile fetch hata gibi görünebiliyor.
+    // 'no-cors' ile isteği gönderiyoruz; yanıt gövdesini okuyamayız ama istek
+    // network hatası vermeden (throw etmeden) gittiyse başarılı sayıyoruz.
+    await fetch(EXCEL_WEBHOOK_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Apps Script CORS için text/plain daha güvenilir
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ cariAdi: c.name, tur: tur === 'tedarikci' ? 'Tedarikçi' : 'Müşteri', rows: veri })
     });
     kaydediliyorTamam();
-    if(!res.ok) alertBox('Excel\'e gönderilirken bir sorun oluştu.');
   } catch(err){
     kaydediliyorTamam();
     alertBox('Excel\'e gönderilemedi: bağlantı hatası.');
