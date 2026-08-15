@@ -1047,6 +1047,7 @@
 #cv2LpButtons .cv2-lp-btn:nth-child(4){background:#4285f4;color:#fff;}
 #cv2LpButtons .cv2-lp-btn:nth-child(5){background:#1c2b30;color:#fff;}
 #cv2LpButtons .cv2-lp-btn:nth-child(6){background:#fff;color:#1c2b30;border:1.5px solid #e2e5e6;}
+#cv2LpButtons .cv2-lp-btn:nth-child(7){background:#fff;color:#1c2b30;border:1.5px solid #e2e5e6;}
 #cv2LpOverlay{align-items:center;padding:24px;}
 #cv2LpOverlay .g-sheet{border-radius:20px;max-height:70vh;}
 /* 14 Ağu 2026: Sipariş ürün seçici — çoklu seçim (checkbox) + mavi vurgu */
@@ -5256,7 +5257,48 @@ function cv2AksiyonUygula(id, tur, act){
   else if(act === 'duzenle') cv2Duzenle(id, tur);
   else if(act === 'hareketler') cv2Hareketler(id, tur);
   else if(act === 'ekstre') cv2Ekstre(id, tur);
+  else if(act === 'excelGonder') cv2ExcelGonder(id, tur);
   else if(act === 'daha') cv2DahaFazla(id, tur);
+}
+
+// Ekstreyi Google E-Tablolar'a gönderir (15 Ağu 2026, kullanıcı isteğiyle eklendi).
+// EXCEL_WEBHOOK_URL kullanıcının kendi kuracağı Google Apps Script Web App adresidir —
+// boşken buton bilgilendirici bir uyarı gösterir, çalışmaz. Gönderilen her seferinde
+// hedef sayfadaki eski veri SİLİNİP yeni ekstre yazılır (kullanıcı özellikle istedi).
+const EXCEL_WEBHOOK_URL = '';
+async function cv2ExcelGonder(id, tur){
+  const c = cv2Find(id, tur); if(!c) return;
+  document.getElementById('cv2LpOverlay').classList.remove('show');
+  if(!EXCEL_WEBHOOK_URL){
+    alertBox('Excel bağlantısı henüz kurulmadı. Kurulum tamamlanınca bu buton otomatik çalışacak.');
+    return;
+  }
+  const rows = (c.transactions || []).slice().sort((a,b)=> new Date(a.date) - new Date(b.date));
+  let running = 0;
+  const veri = rows.map(t=>{
+    const d = new Date(t.date);
+    const amt = signedAmount(t);
+    running += amt;
+    return {
+      tarih: isNaN(d) ? '' : cv2EkTarihGun(d) + ' ' + cv2EkTarihSaat(d),
+      aciklama: cv2TxLabel(t.type) + (t.desc ? ' - ' + t.desc : ''),
+      miktar: amt,
+      toplam: running
+    };
+  });
+  kaydediliyorGoster();
+  try{
+    const res = await fetch(EXCEL_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Apps Script CORS için text/plain daha güvenilir
+      body: JSON.stringify({ cariAdi: c.name, tur: tur === 'tedarikci' ? 'Tedarikçi' : 'Müşteri', rows: veri })
+    });
+    kaydediliyorTamam();
+    if(!res.ok) alertBox('Excel\'e gönderilirken bir sorun oluştu.');
+  } catch(err){
+    kaydediliyorTamam();
+    alertBox('Excel\'e gönderilemedi: bağlantı hatası.');
+  }
 }
 
 // Cari hesap satırını uzun basınca açılan hızlı işlem menüsü (titreşimle birlikte).
@@ -5264,8 +5306,8 @@ function cv2UzunBasMenuAc(id, tur){
   const c = state[tur].find(x=>x.id===id);
   document.getElementById('cv2LpTitle').textContent = c ? c.name : 'Hesap';
   const items = tur === 'tedarikci'
-    ? [['alis','Alış'],['odeme','Ödeme'],['duzenle','Düzenle'],['hareketler','Hareketler'],['ekstre','Ekstre'],['daha','Sipariş İşlemleri']]
-    : [['tahsilat','Tahsilat'],['satis','Satış'],['duzenle','Düzenle'],['hareketler','Hareketler'],['ekstre','Ekstre'],['daha','Sipariş İşlemleri']];
+    ? [['alis','Alış'],['odeme','Ödeme'],['duzenle','Düzenle'],['hareketler','Hareketler'],['ekstre','Ekstre'],['excelGonder',"Excel'le Gönder"],['daha','Sipariş İşlemleri']]
+    : [['tahsilat','Tahsilat'],['satis','Satış'],['duzenle','Düzenle'],['hareketler','Hareketler'],['ekstre','Ekstre'],['excelGonder',"Excel'le Gönder"],['daha','Sipariş İşlemleri']];
   document.getElementById('cv2LpButtons').innerHTML = items.map(([act,label])=>
     `<button type="button" class="cv2-lp-btn" data-act="${act}">${label}</button>`
   ).join('');
