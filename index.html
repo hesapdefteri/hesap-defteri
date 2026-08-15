@@ -3338,10 +3338,12 @@ function siparisPickerAdim2Ac(){
       </div>
     </div>
   `).join('');
-  setTimeout(()=>{
-    const ilk = document.querySelector('.siparis-mk-miktar');
-    if(ilk) ilk.focus();
-  }, 50);
+  // iOS'ta rakam tuş takımının otomatik açılması için focus() doğrudan
+  // kullanıcı dokunuşunun (Devam butonu click) senkron akışında çağrılmalı;
+  // setTimeout/requestAnimationFrame arayı bozup klavyeyi engelliyordu
+  // (15 Ağu 2026, "ekrana dokunmadan tuş takımı açılsın" isteğiyle düzeltildi).
+  const ilk = document.querySelector('.siparis-mk-miktar');
+  if(ilk) ilk.focus();
 }
 document.getElementById('siparisPickerDevam').onclick = () => siparisPickerAdim2Ac();
 document.getElementById('siparisPickerGeri').onclick = () => siparisPickerAdim1Goster();
