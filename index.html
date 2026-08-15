@@ -4030,6 +4030,7 @@ document.getElementById('quickTxSave').onclick = () => {
   }
   c.transactions.push(tx);
   syncCariHareketToSheets(c.name, tx.type, tx.desc, signedAmount(tx), tx.date, quickTxLedger === 'tedarikci' ? 'tedarikci' : 'cari');
+  cv2ExcelOtoSync(c, quickTxLedger === 'tedarikci' ? 'tedarikci' : 'cari');
 
   if(quickTxType === 'ÖDEME') state.cash -= amount;
   if(quickTxType === 'TAHSİLAT') state.cash += amount;
@@ -5266,6 +5267,37 @@ function cv2AksiyonUygula(id, tur, act){
 // boşken buton bilgilendirici bir uyarı gösterir, çalışmaz. Gönderilen her seferinde
 // hedef sayfadaki eski veri SİLİNİP yeni ekstre yazılır (kullanıcı özellikle istedi).
 const EXCEL_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbx-__xISVJpguylZCsvxXZk5Y_4gir_Io7awbOKi9hCMp3_PUqHNgLRUei9GZBYwSPR/exec';
+
+// Otomatik Excel senkronu (15 Ağu 2026, kullanıcı "her hareket değişikliğinde
+// otomatik çalışsın" istedi). cv2ExcelGonder ile AYNI mantık (tam ekstre snapshot,
+// eski veri silinip yeniden yazılır) ama SESSİZ: toast/alert/overlay YOK, hata
+// olursa sessizce yutulur — asıl kayıt akışını (save()) asla etkilemez/bloklamaz.
+// Tahsilat/Ödeme/Satış/Alış eklendiğinde, düzenlendiğinde veya silindiğinde,
+// o carinin transactions'ı GÜNCEL haliyle tekrar gönderilir.
+function cv2ExcelOtoSync(c, tur){
+  if(!c || !EXCEL_WEBHOOK_URL) return;
+  try{
+    const rows = (c.transactions || []).slice().sort((a,b)=> new Date(a.date) - new Date(b.date));
+    let running = 0;
+    const veri = rows.map(t=>{
+      const d = new Date(t.date);
+      const amt = signedAmount(t);
+      running += amt;
+      return {
+        tarih: isNaN(d) ? '' : cv2EkTarihGun(d) + ' ' + cv2EkTarihSaat(d),
+        aciklama: cv2TxLabel(t.type) + (t.desc ? ' - ' + t.desc : ''),
+        miktar: amt,
+        toplam: running
+      };
+    });
+    fetch(EXCEL_WEBHOOK_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ cariAdi: c.name, tur: tur === 'tedarikci' ? 'Tedarikçi' : 'Müşteri', rows: veri })
+    }).catch(()=>{});
+  }catch(e){ /* sessizce yut, ana akışı asla bozma */ }
+}
 async function cv2ExcelGonder(id, tur){
   const c = cv2Find(id, tur); if(!c) return;
   document.getElementById('cv2LpOverlay').classList.remove('show');
@@ -5785,6 +5817,7 @@ function cv2TxSilOnayla(tur, id, idx){
         save();
         renderCariV2();
         cv2RefreshSheetIfOpen(id, tur);
+        cv2ExcelOtoSync(c, tur);
       }, 900);
     }
   );
@@ -5815,6 +5848,7 @@ function cv2TxDuzenle(tur, id, idx){
           save();
           renderCariV2();
           cv2RefreshSheetIfOpen(id, tur);
+          cv2ExcelOtoSync(c, tur);
         }, 900);
       }
     }
@@ -8431,6 +8465,7 @@ document.getElementById('fisKaydet').onclick = () => {
   };
   cari.transactions.push(yeniCariHareket);
   syncCariHareketToSheets(cari.name, yeniCariHareket.type, yeniCariHareket.desc, signedAmount(yeniCariHareket), yeniCariHareket.date, ledgerKey === 'tedarikci' ? 'tedarikci' : 'cari');
+  cv2ExcelOtoSync(cari, ledgerKey);
 
   if(editingLegacyTx){
     wasLegacy = { cariId: editingLegacyTx.cari.id, ledgerKey };
