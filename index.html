@@ -2657,20 +2657,6 @@ function signedAmount(t){
 // ---------- Google Sheets senkronu (11 Ağu 2026, sadece Müşteri/cari hareketleri) ----------
 // Kapsamı sınırlı: sadece Satış Faturası kaydı ve Tahsilat/Ödeme hızlı ekle akışları.
 // Sessiz çalışır — sync başarısız olsa bile Hesap Defteri'nin kendi kaydını ASLA etkilemez.
-const SHEETS_SYNC_URL = 'https://script.google.com/macros/s/AKfycbzT9CQqmhyLoW9rp-0wQ7my9ioZbEdHGmYGe6fpJ3fnNDsdjmkiDfTR_IUH2GH4vVHT/exec';
-function syncCariHareketToSheets(cariAdi, tur, aciklama, tutarSigned, tarihIso, tip){
-  try{
-    if(!cariAdi) return;
-    const d = new Date(tarihIso);
-    const tarihStr = String(d.getDate()).padStart(2,'0') + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + d.getFullYear();
-    fetch(SHEETS_SYNC_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ cariAdi, tarih: tarihStr, tur, aciklama: aciklama || '', tutar: tutarSigned, tip: tip || 'cari' })
-    }).catch(()=>{});
-  }catch(e){ /* sessizce yut, ana akışı asla bozma */ }
-}
-
 // ---------- Stok Kartı ↔ Cari Hesap Entegrasyonu ----------
 function normAd(s){ return (s||'').trim().toLocaleLowerCase('tr-TR'); }
 
@@ -4029,7 +4015,6 @@ document.getElementById('quickTxSave').onclick = () => {
     };
   }
   c.transactions.push(tx);
-  syncCariHareketToSheets(c.name, tx.type, tx.desc, signedAmount(tx), tx.date, quickTxLedger === 'tedarikci' ? 'tedarikci' : 'cari');
   cv2ExcelOtoSync(c, quickTxLedger === 'tedarikci' ? 'tedarikci' : 'cari');
 
   if(quickTxType === 'ÖDEME') state.cash -= amount;
@@ -6931,7 +6916,7 @@ function cekCikisiUygula(tedarikciId){
     cekDetay: Object.assign({}, t.cekDetay)
   };
   tedarikci.transactions.push(odemeTx);
-  syncCariHareketToSheets(tedarikci.name, odemeTx.type, odemeTx.desc, signedAmount(odemeTx), odemeTx.date, 'tedarikci');
+  cv2ExcelOtoSync(tedarikci, 'tedarikci');
   state.cash -= amount;
   save();
   document.getElementById('cekCikisOverlay').classList.remove('show');
@@ -7899,7 +7884,7 @@ document.getElementById('skAlisSave').onclick = () => {
       skRef: kayit.id
     };
     cari.transactions.push(yeniHareket);
-    syncCariHareketToSheets(cari.name, yeniHareket.type, yeniHareket.desc, signedAmount(yeniHareket), yeniHareket.date, 'tedarikci');
+    cv2ExcelOtoSync(cari, 'tedarikci');
   }
   if(editingAlisId){
     const idx = c.alislar.findIndex(x=>x.id===editingAlisId);
@@ -8044,7 +8029,7 @@ document.getElementById('skSatisSave').onclick = () => {
       skRef: kayit.id
     };
     cari.transactions.push(yeniHareket);
-    syncCariHareketToSheets(cari.name, yeniHareket.type, yeniHareket.desc, signedAmount(yeniHareket), yeniHareket.date, 'cari');
+    cv2ExcelOtoSync(cari, 'cari');
   }
   if(editingSatisId){
     const idx = c.satislar.findIndex(x=>x.id===editingSatisId);
@@ -8464,7 +8449,6 @@ document.getElementById('fisKaydet').onclick = () => {
     skRef: d.id
   };
   cari.transactions.push(yeniCariHareket);
-  syncCariHareketToSheets(cari.name, yeniCariHareket.type, yeniCariHareket.desc, signedAmount(yeniCariHareket), yeniCariHareket.date, ledgerKey === 'tedarikci' ? 'tedarikci' : 'cari');
   cv2ExcelOtoSync(cari, ledgerKey);
 
   if(editingLegacyTx){
@@ -9035,7 +9019,7 @@ function sablonKullan(id){
     const tedarikci = bulYadaEkleCari('tedarikci', s.tedarikciAdi);
     const alisHareket = { type:'ALIŞ', desc:`${alisBelgeNo} · Şablon: ${s.ad}`, amount: alisToplam, date: now, skRef: alisFisId };
     tedarikci.transactions.push(alisHareket);
-    syncCariHareketToSheets(tedarikci.name, alisHareket.type, alisHareket.desc, signedAmount(alisHareket), alisHareket.date, 'tedarikci');
+    cv2ExcelOtoSync(tedarikci, 'tedarikci');
     state.sayaclar.alis = (state.sayaclar.alis||0) + 1;
 
     // --- Satış Fişleri (her müşteriye ayrı) ---
@@ -9065,7 +9049,7 @@ function sablonKullan(id){
       const musteri = bulYadaEkleCari('cari', cariAdi);
       const satisHareket = { type:'SATIŞ', desc:`${satisBelgeNo} · Şablon: ${s.ad}`, amount: satisToplam, date: now, skRef: satisFisId };
       musteri.transactions.push(satisHareket);
-      syncCariHareketToSheets(musteri.name, satisHareket.type, satisHareket.desc, signedAmount(satisHareket), satisHareket.date, 'cari');
+      cv2ExcelOtoSync(musteri, 'cari');
       state.sayaclar.satis = (state.sayaclar.satis||0) + 1;
       satisBelgeNolar.push(satisBelgeNo);
       satisDetaylar.push({ fisId: satisFisId, cariAdi, belgeNo: satisBelgeNo, kalemler: satisKalemler, toplam: satisToplam });
