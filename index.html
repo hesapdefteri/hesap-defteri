@@ -145,6 +145,11 @@
   .cv2-bal{font-size:16px;font-weight:800;letter-spacing:-.4px;white-space:nowrap;flex-shrink:0;}
   .cv2-bal.debt{color:var(--red);} .cv2-bal.credit{color:var(--green);} .cv2-bal.zero{color:var(--ink);}
   .cv2-siparis-tutar{font-size:10.5px;font-weight:800;white-space:nowrap;letter-spacing:-.1px;}
+  .cv2-info-btn{position:absolute;top:8px;right:10px;width:16px;height:16px;border-radius:50%;
+    background:#e4e8ea;color:var(--muted);font-size:12px;font-weight:800;font-style:italic;
+    font-family:Georgia,'Times New Roman',serif;display:flex;align-items:center;justify-content:center;
+    line-height:1;cursor:pointer;z-index:3;}
+  .cv2-info-btn:active{background:#d3d9dc;}
 
   /* ---- Hareketler bottom sheet ---- */
   #cv2Sheet{position:fixed;inset:0;z-index:820;display:none;}
@@ -1975,6 +1980,17 @@
       <div class="g-sheet-title" id="cv2LpTitle">Hesap</div>
     </div>
     <div id="cv2LpButtons"></div>
+  </div>
+</div>
+
+<!-- Cari Hesap: Kart Info Balonu (Tel/Mail/Adres/Vergi/İlgili Kişi) -->
+<div class="g-overlay" id="cv2InfoOverlay">
+  <div class="g-sheet" style="max-height:60vh;">
+    <div class="g-sheet-header">
+      <button class="g-sheet-close" id="cv2InfoKapat">‹</button>
+      <div class="g-sheet-title" id="cv2InfoTitle">Bilgiler</div>
+    </div>
+    <div id="cv2InfoBody" class="cari-card-info" style="padding:4px 20px 20px;"></div>
   </div>
 </div>
 
@@ -5089,6 +5105,7 @@ function CariCardV2(c, tur){
       ${paraBtns}
     </div>
     <div class="cv2-card" data-uid="${uid}" data-id="${c.id}" data-tur="${tur}">
+      <span class="cv2-info-btn" data-uid="${uid}">i</span>
       ${circleHtml}
       <div class="cv2-mid">
         <div class="cv2-name">${c.name}</div>
@@ -5151,6 +5168,7 @@ function cv2BindCards(){
     const uid = card.dataset.uid;
 
     card.addEventListener('pointerdown', e=>{
+      if(e.target.closest('.cv2-info-btn')) return;
       if(e.pointerType === 'mouse' && e.button !== 0) return;
       startX = e.clientX; startY = e.clientY;
       curX = parseFloat(card.dataset.tx || '0');
@@ -5232,7 +5250,37 @@ function cv2BindCards(){
       cv2AksiyonUygula(id, tur, act);
     });
   });
+
+  document.querySelectorAll('.cv2-info-btn').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      e.stopPropagation();
+      const uid = btn.dataset.uid;
+      const sep = uid.indexOf(':');
+      const tur = uid.slice(0, sep), id = uid.slice(sep + 1);
+      cv2InfoAc(id, tur);
+    });
+  });
 }
+
+// Kart üzerindeki küçük (i) ikonuna dokununca açılan bilgi balonu — Tel/Mail/
+// Vergi No/Vergi Dairesi/Adres/İlgili Kişi (15 Ağu 2026, kullanıcı isteği).
+function cv2InfoAc(id, tur){
+  const c = cv2Find(id, tur);
+  if(!c) return;
+  document.getElementById('cv2InfoTitle').textContent = c.name;
+  const rows = [
+    ['Tel', c.phone || '—'],
+    ['Mail', c.email || '—'],
+    ['Vergi No', c.taxNo || '—'],
+    ['Vergi Dairesi', c.taxOffice || '—'],
+    ['Adres', c.address || '—'],
+    ['İlgili Kişi', c.contact || '—']
+  ];
+  document.getElementById('cv2InfoBody').innerHTML = rows.map(([l,v])=>`<div class="cari-card-info-row"><span class="cil">${l}</span><span class="civ">${v}</span></div>`).join('');
+  document.getElementById('cv2InfoOverlay').classList.add('show');
+}
+document.getElementById('cv2InfoKapat').onclick = () => document.getElementById('cv2InfoOverlay').classList.remove('show');
+document.getElementById('cv2InfoOverlay').onclick = (e) => { if(e.target.id==='cv2InfoOverlay') document.getElementById('cv2InfoOverlay').classList.remove('show'); };
 
 // Kart aksiyonları (sağ/sol kaydırma butonları VE uzun basma menüsü ortak kullanır)
 function cv2AksiyonUygula(id, tur, act){
