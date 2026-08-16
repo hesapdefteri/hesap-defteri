@@ -606,6 +606,7 @@
   .am-badge.b-ayarlar{background:linear-gradient(135deg,#9aa8b8,#6d7c8d);}
   .am-badge.b-iletisim{background:linear-gradient(135deg,#6dd0c8,#2f9c8f);}
   .am-badge.b-sablon{background:linear-gradient(135deg,#c9973f,#8a6d1f);}
+  .am-badge.b-bildirim{background:linear-gradient(135deg,#ff8a65,#e64a19);}
 
   .urun-search-bar{display:flex;align-items:center;gap:10px;background:#fff;padding:calc(env(safe-area-inset-top) + 14px) 16px 14px 16px;flex-shrink:0;border-bottom:1px solid var(--line);}
   .urun-back{background:none;border:none;color:var(--accent);font-size:22px;cursor:pointer;padding:0 2px;}
@@ -1058,6 +1059,14 @@
   .sas-mini-form{margin-top:8px;}
   .sas-mini-form input{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;box-sizing:border-box;margin-bottom:7px;}
   .sas-mini-form label{font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;}
+  /* --- Bildirimler ekranı — 16 Ağu 2026 --- */
+  .bl-card{background:#fff;border-radius:14px;padding:15px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(20,40,50,.06);}
+  .bl-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:10px;}
+  .bl-cari{font-size:15px;font-weight:800;color:var(--ink);}
+  .bl-tutar{font-size:17px;font-weight:800;color:var(--ink);white-space:nowrap;}
+  .bl-kaynak{font-size:12px;color:var(--muted);margin-bottom:12px;}
+  .bl-btn{width:100%;padding:11px;border-radius:10px;border:none;background:#dd7a2c;color:#fff;font-weight:800;font-size:14px;cursor:pointer;}
+  .bl-done{display:flex;align-items:center;gap:7px;color:var(--green);font-weight:800;font-size:13.5px;background:#e8f5ee;padding:10px;border-radius:10px;justify-content:center;}
   .fis-toplam-row{display:flex;justify-content:space-between;font-size:15.5px;font-weight:800;color:var(--red);}
 
   .fatura-table{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 6px rgba(20,40,50,.05);margin-bottom:14px;}
@@ -1194,6 +1203,7 @@
 
 <div id="anaMenu">
   <div class="am-grid" id="amGrid">
+    <div class="am-tile" data-mod="bildirimler"><div class="am-badge b-bildirim"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><div class="am-badge-count" id="amBildirimBadge" style="display:none;"></div></div><div class="am-label">BİLDİRİMLER</div></div>
     <div class="am-tile" data-mod="cariV2"><div class="am-badge b-cari"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><circle cx="8.5" cy="11" r="2"/><path d="M5.3 16c.5-1.8 1.8-2.7 3.2-2.7s2.7.9 3.2 2.7"/><path d="M15 9.5h4M15 13h4"/></svg></div><div class="am-label">CARİ HESAP</div></div>
     <div class="am-tile" data-mod="urunler"><div class="am-badge b-urun"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12.6 2.6A2 2 0 0 0 11.2 2H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.7 8.7a2.4 2.4 0 0 0 3.4 0l6.6-6.6a2.4 2.4 0 0 0 0-3.4z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg></div><div class="am-label">STOKLAR</div></div>
     <div class="am-tile" data-mod="masraflar"><div class="am-badge b-masraf"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2.2"/><circle cx="12" cy="12" r="3"/><path d="M6 12h.01M18 12h.01"/></svg></div><div class="am-label">MASRAFLAR</div></div>
@@ -1455,6 +1465,15 @@
 </div>
 
 <!-- ===== Sipariş Fişi Listesi ===== -->
+<div class="report-screen" id="bildirimlerScreen">
+  <div class="urun-search-bar">
+    <span class="urun-search-icon">🔔</span>
+    <div style="flex:1;font-weight:800;color:var(--ink);font-size:16px;">Bildirimler</div>
+    <button class="urun-back" id="bildirimAddBtn" title="Yeni Bildirim" style="font-size:26px;">＋</button>
+  </div>
+  <div class="urun-list sk-list" id="bildirimList"></div>
+</div>
+
 <div class="report-screen" id="siparisListScreen">
   <div class="urun-search-bar">
     <span class="urun-search-icon">🔍</span>
@@ -3285,6 +3304,121 @@ document.getElementById('siparisGorOverlay').onclick = (e) => {
   if(e.target === document.getElementById('siparisGorOverlay')) document.getElementById('siparisGorOverlay').classList.remove('show');
 };
 
+// --- Bildirimler — 16 Ağu 2026 ---
+// Genel amaçlı, kalıcı bir "gelen ödeme bildirimi" kutusu: banka mailinden
+// tespit edilen bir ödeme burada listelenir, "Hesaptan Düş" ile hangi cariye
+// ait olduğu seçilip GERÇEK bir TAHSİLAT/ÖDEME hareketi oluşturulur.
+function ensureBildirimZaferPala(){
+  if(!state.bildirimler) state.bildirimler = [];
+  const ID = 'bildirim-zaferpala-20260815';
+  if(state.bildirimler.some(b=>b.id===ID)) return false;
+  state.bildirimler.unshift({
+    id: ID,
+    cariAdiTahmin: 'Pertek Kuru Temizleme',
+    tutar: 2960,
+    aciklama: "Zafer Pala'dan gelen ödeme",
+    kaynak: 'Garanti BBVA maili · 15 Ağu',
+    tarih: '2026-08-15T19:29:38.000Z',
+    durum: 'bekliyor',
+    cariId: null, ledgerKey: null, islenmeTarihi: null
+  });
+  return true;
+}
+function updateBildirimBadge(){
+  const badge = document.getElementById('amBildirimBadge');
+  if(!badge) return;
+  const count = (state.bildirimler||[]).filter(b=>b.durum!=='islendi').length;
+  if(count > 0){ badge.textContent = count; badge.style.display = 'flex'; }
+  else badge.style.display = 'none';
+}
+function renderBildirimler(){
+  if(!state.bildirimler) state.bildirimler = [];
+  const list = state.bildirimler.slice().sort((a,b)=> new Date(b.tarih) - new Date(a.tarih));
+  const el = document.getElementById('bildirimList');
+  el.innerHTML = list.length ? list.map(b=>{
+    const done = b.durum === 'islendi';
+    return `<div class="bl-card" data-id="${b.id}">
+      <div class="bl-top"><div class="bl-cari">${b.cariAdiTahmin || 'Cari seçilmedi'}</div><div class="bl-tutar">${fmt(b.tutar||0)}</div></div>
+      <div class="bl-kaynak">${b.aciklama||''}${b.kaynak ? ' · ' + b.kaynak : ''}</div>
+      ${done
+        ? `<div class="bl-done">✓ Hesaptan Düştüm · ${trDate(b.islenmeTarihi)}</div>`
+        : `<button type="button" class="bl-btn" data-hesaptan-dus="${b.id}">Hesaptan Düş</button>`}
+    </div>`;
+  }).join('') : '<div class="sk-empty">Bildirim yok</div>';
+  el.querySelectorAll('[data-hesaptan-dus]').forEach(btn=>{
+    btn.onclick = () => bildirimHesaptanDus(btn.dataset.hesaptanDus);
+  });
+  updateBildirimBadge();
+}
+function bildirimHesaptanDus(id){
+  const b = (state.bildirimler||[]).find(x=>x.id===id);
+  if(!b) return;
+  const tahmin = (b.cariAdiTahmin||'').trim().toLowerCase();
+  const secenekler = [
+    ...(state.cari||[]).map(c=>({id:c.id, ledger:'cari', name:c.name})),
+    ...(state.tedarikci||[]).map(c=>({id:c.id, ledger:'tedarikci', name:c.name}))
+  ];
+  const tamEslesen = secenekler.find(s=> (s.name||'').trim().toLowerCase() === tahmin);
+  const kismiEslesen = !tamEslesen && tahmin ? secenekler.find(s=> (s.name||'').toLowerCase().includes(tahmin)) : null;
+  const secili = tamEslesen || kismiEslesen;
+  const onSecili = secili ? (secili.ledger + ':' + secili.id) : '';
+  const optionsHtml = '<option value="">— Cari Seç —</option>' + secenekler.map(s=>{
+    const val = s.ledger + ':' + s.id;
+    return `<option value="${val}" ${val===onSecili?'selected':''}>${s.name}${s.ledger==='tedarikci'?' (Tedarikçi)':''}</option>`;
+  }).join('');
+  cv2ModalAc('Hesaptan Düş', 'Hangi cariye işlensin, tutarı kontrol et.',
+    `<div class="sas-mini-form">
+      <label>Cari</label>
+      <select id="blCariSec" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;margin-bottom:9px;">${optionsHtml}</select>
+      <label>Tutar (₺)</label>
+      <input type="number" step="0.01" id="blTutar" value="${b.tutar||0}">
+    </div>`,
+    'Hesaptan Düş', 'primary', () => {
+      const secim = document.getElementById('blCariSec')?.value || '';
+      const tutar = toNum(document.getElementById('blTutar')?.value);
+      if(!secim){ alertBox('Önce bir cari seç.'); return; }
+      const [ledgerKey, cariId] = secim.split(':');
+      const c = state[ledgerKey].find(x=>x.id===cariId);
+      if(!c){ alertBox('Cari bulunamadı.'); return; }
+      const txType = ledgerKey === 'cari' ? 'TAHSİLAT' : 'ÖDEME';
+      c.transactions = c.transactions || [];
+      c.transactions.push({ type: txType, desc: b.aciklama || 'Bildirimden işlendi', amount: tutar, date: new Date().toISOString(), bildirimRef: b.id });
+      b.durum = 'islendi';
+      b.islenmeTarihi = new Date().toISOString();
+      b.cariId = cariId; b.ledgerKey = ledgerKey; b.tutar = tutar;
+      save();
+      cv2ModalKapat();
+      renderBildirimler();
+      render();
+    });
+}
+function bildirimEkle(){
+  cv2ModalAc('Yeni Bildirim Ekle', "Elle bir ödeme bildirimi ekle (ör. başka bir banka mailinden).",
+    `<div class="sas-mini-form">
+      <label>Cari Adı (tahmini)</label><input type="text" id="blYeniCariAdi" placeholder="ör. Ahmet Usta">
+      <label>Tutar (₺)</label><input type="number" step="0.01" id="blYeniTutar" placeholder="0,00">
+      <label>Açıklama / Kaynak</label><input type="text" id="blYeniAciklama" placeholder="ör. Gelen para transferi">
+    </div>`,
+    'Ekle', 'primary', () => {
+      const cariAdi = (document.getElementById('blYeniCariAdi')?.value||'').trim();
+      const tutar = toNum(document.getElementById('blYeniTutar')?.value);
+      const aciklama = (document.getElementById('blYeniAciklama')?.value||'').trim();
+      if(!cariAdi){ alertBox('Cari adı gir.'); return; }
+      state.bildirimler = state.bildirimler || [];
+      state.bildirimler.unshift({
+        id: 'bildirim-' + Date.now(),
+        cariAdiTahmin: cariAdi, tutar: tutar||0,
+        aciklama: aciklama || 'Elle eklendi', kaynak: null,
+        tarih: new Date().toISOString(), durum: 'bekliyor',
+        cariId: null, ledgerKey: null, islenmeTarihi: null
+      });
+      save();
+      cv2ModalKapat();
+      renderBildirimler();
+    });
+}
+document.getElementById('bildirimAddBtn').onclick = bildirimEkle;
+
 let tamamlaCariId = null, tamamlaLedger = null;
 let siparisDetayDonusEkran = 'siparisler'; // 'siparisler' | 'cv2' — Sipariş Gör'den açılınca Cari Hesap'a dönsün diye 14 Ağu 2026'da eklendi
 function openTamamlaPopup(id, ledgerKey){
@@ -4938,6 +5072,7 @@ function hideAllScreens(){
   if(typeof kkModalKapat === 'function') kkModalKapat();
   document.getElementById('masrafScreen').classList.remove('show');
   document.getElementById('masrafDetayScreen').classList.remove('show');
+  document.getElementById('bildirimlerScreen').classList.remove('show');
   document.getElementById('anaMenuFloatBtn').style.display = 'flex';
   nudge();
 }
@@ -4960,6 +5095,7 @@ function showAnaMenu(){
   anaMenu.style.visibility = 'visible';
   document.getElementById('anaMenuFloatBtn').style.display = 'none';
   updateSiparisBadge();
+  updateBildirimBadge();
   nudge();
 }
 document.getElementById('anaMenuFloatBtn').onclick = () => showAnaMenu();
@@ -4999,6 +5135,11 @@ document.getElementById('anaMenu').querySelectorAll('.am-tile').forEach(tile=>{
       renderCariV2();
       hideAllScreens();
       document.getElementById('cv2Screen').classList.add('show');
+      nudge();
+    } else if(mod === 'bildirimler'){
+      renderBildirimler();
+      hideAllScreens();
+      document.getElementById('bildirimlerScreen').classList.add('show');
       nudge();
     } else if(mod === 'krediKarti'){
       hideAllScreens();
@@ -10883,6 +11024,7 @@ function cloudSyncAndBoot(user){
     if(ensureSafPlastUrunDetayiGeriGetir()) save();
     if(ensureSafPlastUrunDetayi2GeriGetir()) save();
     if(ensureSafPlastUrunDetayi3GeriGetir()) save();
+    if(ensureBildirimZaferPala()) save();
     hideAuthScreen();
     render();
   }).catch(err => {
