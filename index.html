@@ -6188,7 +6188,10 @@ function cv2DahaFazla(id, tur){
   // sipariş kendi "Geri Al" butonuyla (siparisGeriAl) tek tek geri alınabilir.
   const hasCompleted = state.siparisFisleri.some(f=>f.cariId===id && f.tamamlandi);
   const formHtml =
-    '<div class="cv2-field"><label>ÖDEME TARİHİ</label><input id="cv2OdemeTarihiInput" type="datetime-local" value="' + (c.odemeTarihi ? (c.odemeTarihi.includes('T') ? c.odemeTarihi : c.odemeTarihi + 'T11:00') : (new Date().toISOString().slice(0,10) + 'T11:00')) + '"></div>' +
+    '<div class="cv2-field"><label>ÖDEME TARİHİ</label><div style="display:flex;gap:8px;align-items:center;">' +
+    '<input id="cv2OdemeTarihiInput" type="datetime-local" style="flex:1;" value="' + (c.odemeTarihi ? (c.odemeTarihi.includes('T') ? c.odemeTarihi : c.odemeTarihi + 'T11:00') : (new Date().toISOString().slice(0,10) + 'T11:00')) + '">' +
+    '<button type="button" id="cv2OdemeTarihiSilBtn"' + (c.odemeTarihi ? '' : ' disabled') + ' style="flex-shrink:0;border:none;border-radius:12px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:#ff3b30;box-shadow:0 3px 8px rgba(255,59,48,.35);cursor:pointer;' + (c.odemeTarihi ? '' : 'opacity:.35;box-shadow:none;') + '"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4.8c0-.4.4-.8.8-.8h4.4c.4 0 .8.4.8.8V7"/><path d="M6 7l.8 12.2c0 .8.7 1.4 1.5 1.4h7.4c.8 0 1.5-.6 1.5-1.4L18 7"/><path d="M10 11v6M14 11v6"/></svg></button>' +
+    '</div></div>' +
     '<button class="cv2-more-row" data-act="siparis">Sipariş Ekle</button>' +
     '<button class="cv2-more-row" data-act="siparisgor">Sipariş Gör</button>' +
     '<button class="cv2-more-row"' + (hasPending ? '' : ' disabled') + ' data-act="tamamla">Sipariş Tamamlandı</button>' +
@@ -6229,6 +6232,16 @@ function cv2DahaFazla(id, tur){
       else if(act === 'geriAl') openSiparisGorPopup(id, tur);
       else if(act === 'hatirlatici') odemeHatirlaticiIndir(id, tur);
     });
+  });
+  // 16 Ağu 2026, kullanıcı isteği: ödeme tarihi/hatırlatıcı rozetini ("-2 gün
+  // gecikti" gibi) tek dokunuşla iptal edebilmek için ÖDEME TARİHİ alanının
+  // yanına "Sil" butonu eklendi — tarihi tamamen temizleyip modalı kapatır.
+  const silBtn = document.getElementById('cv2OdemeTarihiSilBtn');
+  if(silBtn) silBtn.addEventListener('click', () => {
+    c.odemeTarihi = null;
+    save();
+    cv2ModalKapat();
+    renderCariV2();
   });
 }
 
