@@ -7,10 +7,21 @@
   // GitHub Pages'in sunucu tarafı (CDN) önbelleğini atlıyoruz — meta etiketleri
   // sadece tarayıcı önbelleğini etkiliyor, CDN'i etkilemiyor (09 Ağu 2026,
   // tekrar tekrar eski veri gösterme sorunu sonrası eklendi).
+  //
+  // 16 Ağu 2026 DÜZELTME: "Ana Ekrana Ekle" ile oluşturulan ikon, eklendiği
+  // ANDAKİ tam URL'yi (o anki ?_fresh=... değeriyle BİRLİKTE) sabit olarak
+  // saklıyor. Eskiden burada sadece "parametre var mı" diye bakılıyordu — bu
+  // yüzden ikon, İLK eklendiği günkü eski _fresh değeriyle AYNI URL'yi her
+  // açılışta tekrar tekrar açıyor, koşul hep "true" olduğu için yeniden
+  // yönlendirme/tazeleme BİR DAHA HİÇ tetiklenmiyordu (kalıcı önbellek kilidi).
+  // Artık parametre değeri bir zaman damgası olarak okunuyor; 5 dakikadan eskiyse
+  // (ya da hiç yoksa) yine tazeleniyor — ikon üzerinden günler sonra açılsa bile.
   (function(){
     try {
       var url = new URL(window.location.href);
-      if(!url.searchParams.has('_fresh')){
+      var mevcut = parseInt(url.searchParams.get('_fresh') || '0', 10);
+      var besDk = 5 * 60 * 1000;
+      if(!mevcut || (Date.now() - mevcut) > besDk){
         url.searchParams.set('_fresh', Date.now().toString());
         window.location.replace(url.toString());
       }
