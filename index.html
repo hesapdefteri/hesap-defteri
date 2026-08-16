@@ -5317,10 +5317,11 @@ function cv2InfoAc(id, tur){
     `<div class="cv2i-row"><span class="cv2i-ic ${cls}">${CV2I_SVG[cls]}</span><span class="cv2i-txt">
       <span class="cv2i-lbl">${l}</span><span class="cv2i-val${v?'':' empty'}">${v || 'Girilmemiş'}</span>
     </span></div>`).join('');
+  cv2AmFloatGizle();
   document.getElementById('cv2InfoOverlay').classList.add('show');
 }
-document.getElementById('cv2InfoKapat').onclick = () => document.getElementById('cv2InfoOverlay').classList.remove('show');
-document.getElementById('cv2InfoOverlay').onclick = (e) => { if(e.target.id==='cv2InfoOverlay') document.getElementById('cv2InfoOverlay').classList.remove('show'); };
+document.getElementById('cv2InfoKapat').onclick = () => { document.getElementById('cv2InfoOverlay').classList.remove('show'); cv2AmFloatGeriGetir(); };
+document.getElementById('cv2InfoOverlay').onclick = (e) => { if(e.target.id==='cv2InfoOverlay'){ document.getElementById('cv2InfoOverlay').classList.remove('show'); cv2AmFloatGeriGetir(); } };
 
 // Kart aksiyonları (sağ/sol kaydırma butonları VE uzun basma menüsü ortak kullanır)
 function cv2AksiyonUygula(id, tur, act){
@@ -5426,10 +5427,11 @@ function cv2UzunBasMenuAc(id, tur){
       cv2AksiyonUygula(id, tur, btn.dataset.act);
     };
   });
+  cv2AmFloatGizle();
   document.getElementById('cv2LpOverlay').classList.add('show');
 }
-document.getElementById('cv2LpKapat').onclick = () => document.getElementById('cv2LpOverlay').classList.remove('show');
-document.getElementById('cv2LpOverlay').onclick = (e) => { if(e.target.id==='cv2LpOverlay') document.getElementById('cv2LpOverlay').classList.remove('show'); };
+document.getElementById('cv2LpKapat').onclick = () => { document.getElementById('cv2LpOverlay').classList.remove('show'); cv2AmFloatGeriGetir(); };
+document.getElementById('cv2LpOverlay').onclick = (e) => { if(e.target.id==='cv2LpOverlay'){ document.getElementById('cv2LpOverlay').classList.remove('show'); cv2AmFloatGeriGetir(); } };
 
 /* ---------- ekran ---------- */
 function cv2SegBtnleriGuncelle(){
@@ -5587,11 +5589,31 @@ function cv2BindTxCards(container, tur, id){
   });
 }
 
+// 16 Ağu 2026: Sağ altta yüzen "Ana Menü" butonu (anaMenuFloatBtn) ile Cari Hesap
+// içindeki overlay/sheet ekranlarının alt kısmı aynı bölgede — bir overlay kapanırken
+// kısa an tekrar tıklanabilir hale gelip yanlışlıkla Ana Menü'ye götürebiliyordu.
+// Her overlay açılışında gizlenir, kapanışında (daha önce görünürse) geri getirilir.
+function cv2AmFloatGizle(){
+  const b = document.getElementById('anaMenuFloatBtn');
+  if(!b) return;
+  if(b.dataset.cv2Hidden === undefined || b.dataset.cv2Hidden === '0'){
+    b.dataset.cv2Hidden = b.style.display === 'none' ? '0' : '1';
+  }
+  b.style.display = 'none';
+}
+function cv2AmFloatGeriGetir(){
+  const b = document.getElementById('anaMenuFloatBtn');
+  if(!b) return;
+  if(b.dataset.cv2Hidden === '1') b.style.display = 'flex';
+  b.dataset.cv2Hidden = '0';
+}
 function cv2Hareketler(id, tur){
   const c = cv2Find(id, tur); if(!c) return;
   cv2SheetCtx = { id, tur };
   const bal = cariBalance(c);
   const cls = cv2BalClass(bal);
+
+  cv2AmFloatGizle();
 
   document.getElementById('cv2ShTitle').textContent = c.name;
   document.getElementById('cv2ShDot').className = 'cv2-sh-dot ' + cls;
@@ -5690,6 +5712,7 @@ function cv2CloseSheet(hemen){
   const sh = document.getElementById('cv2Sheet');
   if(!sh) return;
   sh.classList.remove('in');
+  cv2AmFloatGeriGetir();
   if(hemen){ sh.classList.remove('show'); return; }
   setTimeout(()=>{ if(!sh.classList.contains('in')) sh.classList.remove('show'); }, 380);
 }
@@ -5997,8 +6020,10 @@ function cv2EkTarihSaat(d){
 }
 function cv2EkstreKapat(){
   document.getElementById('cv2EkstreScreen').classList.remove('show');
+  cv2AmFloatGeriGetir();
 }
 function cv2Ekstre(id, tur){
+  cv2AmFloatGizle();
   // Tablo tarzı resmi bir ekstre raporu — kronolojik koşan bakiyeli liste, EN YENİ
   // hareket EN ÜSTTE. Aylar arasına (13 Ağu 2026, ikinci tur) o ayın net cirosunu
   // gösteren sade bir kuşak satırı konuldu (eski karışık pos/neg/running üçlüsü değil).
