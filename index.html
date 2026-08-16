@@ -211,6 +211,7 @@
   .cv2-sh-quick{flex-shrink:0;padding:12px 20px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);}
   .cv2-sh-quick-lbl{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.2px;margin-bottom:8px;}
   .cv2-sh-quick-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+  .cv2-sh-quick-row.single{grid-template-columns:1fr;}
   .cv2-qbtn{border:none;border-radius:14px;padding:12px 10px;font-size:13.5px;font-weight:800;color:#fff;
     font-family:inherit;cursor:pointer;transition:transform .15s ease;}
   .cv2-qbtn:active{transform:scale(.96);}
@@ -218,6 +219,8 @@
   .cv2-qbtn.odeme{background:#c0392b;box-shadow:0 5px 12px rgba(192,57,43,.28);}
   .cv2-qbtn.satis{background:#2f6690;box-shadow:0 5px 12px rgba(47,102,144,.28);}
   .cv2-qbtn.alis{background:#b5650d;box-shadow:0 5px 12px rgba(181,101,13,.28);}
+  .cv2-qbtn.kapat{background:#34a853;color:#fff;padding:16px 10px;font-size:15px;
+    box-shadow:0 5px 12px rgba(52,168,83,.28);width:100%;}
   .cv2-txdetail{padding-top:2px;}
   .cv2-txdetail-amt{font-size:24px;font-weight:800;text-align:center;letter-spacing:-.6px;margin-bottom:10px;}
   .cv2-txdetail-amt.debt{color:var(--red);} .cv2-txdetail-amt.credit{color:var(--green);} .cv2-txdetail-amt.zero{color:var(--ink);}
@@ -2397,7 +2400,6 @@
     </div>
     <div class="cv2-sh-body" id="cv2ShBody"></div>
     <div class="cv2-sh-quick">
-      <div class="cv2-sh-quick-lbl">+ YENİ HAREKET</div>
       <div class="cv2-sh-quick-row" id="cv2ShQuickRow"></div>
     </div>
   </div>
@@ -5676,17 +5678,9 @@ function cv2Hareketler(id, tur){
   }
 
   const quickRow = document.getElementById('cv2ShQuickRow');
-  quickRow.innerHTML = tur === 'tedarikci'
-    ? '<button class="cv2-qbtn alis" id="cv2QLeft">Alış</button><button class="cv2-qbtn odeme" id="cv2QRight">Ödeme</button>'
-    : '<button class="cv2-qbtn tahsilat" id="cv2QLeft">Tahsilat</button><button class="cv2-qbtn satis" id="cv2QRight">Satış</button>';
-  document.getElementById('cv2QLeft').addEventListener('click', () => {
-    cv2CloseSheet(true);
-    if(tur === 'tedarikci') cv2Alis(id, tur); else openQuickTx(id, tur, 'TAHSİLAT');
-  });
-  document.getElementById('cv2QRight').addEventListener('click', () => {
-    cv2CloseSheet(true);
-    if(tur === 'tedarikci') openQuickTx(id, tur, 'ÖDEME'); else cv2Satis(id, tur);
-  });
+  quickRow.classList.add('single');
+  quickRow.innerHTML = '<button class="cv2-qbtn kapat" id="cv2QKapat">Kapat</button>';
+  document.getElementById('cv2QKapat').addEventListener('click', () => cv2CloseSheet());
 
   const shEl = document.getElementById('cv2Sheet');
   shEl.classList.add('show');
