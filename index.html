@@ -1036,6 +1036,28 @@
   .irsaliye-geri-al-btn{margin-top:10px;width:100%;padding:9px;border-radius:10px;border:1px solid #e5484d;background:#fff;
     color:#e5484d;font-size:12.5px;font-weight:800;cursor:pointer;}
   .irsaliye-geri-al-btn:disabled{border-color:#c7ced1;color:#c7ced1;cursor:not-allowed;}
+  /* --- Sipariş Süreç Adımları (dikey stepper) — 16 Ağu 2026 --- */
+  .sas-wrap{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
+  .sas-label{font-size:10.5px;font-weight:800;letter-spacing:.4px;color:var(--muted);margin-bottom:10px;}
+  .sas-step{display:flex;gap:11px;position:relative;padding-bottom:16px;}
+  .sas-step:last-child{padding-bottom:0;}
+  .sas-step-line{position:absolute;left:15px;top:32px;bottom:-16px;width:2px;background:#e0e4e7;}
+  .sas-step.sas-done .sas-step-line{background:#1f9d64;}
+  .sas-step:last-child .sas-step-line{display:none;}
+  .sas-node{width:32px;height:32px;border-radius:50%;flex:0 0 32px;display:flex;align-items:center;justify-content:center;background:#f0f2f4;color:#b5bcc2;z-index:1;}
+  .sas-node svg{width:15px;height:15px;}
+  .sas-step.sas-done .sas-node{background:#e8f5ee;color:#1f9d64;}
+  .sas-step.sas-active .sas-node{background:#dd7a2c;color:#fff;box-shadow:0 0 0 4px #fbe6d4;}
+  .sas-body{padding-top:4px;flex:1;}
+  .sas-title{font-size:13.5px;font-weight:700;color:var(--ink);}
+  .sas-step.sas-locked .sas-title{color:#b5bcc2;}
+  .sas-meta{font-size:11.5px;color:var(--muted);margin-top:1px;}
+  .sas-step.sas-active .sas-meta{color:#dd7a2c;font-weight:700;}
+  .sas-step.sas-done .sas-meta{color:#1f9d64;font-weight:600;}
+  .sas-action{margin-top:7px;display:inline-flex;align-items:center;gap:5px;background:#dd7a2c;color:#fff;font-size:12px;font-weight:700;padding:7px 13px;border:none;border-radius:9px;cursor:pointer;}
+  .sas-mini-form{margin-top:8px;}
+  .sas-mini-form input{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;box-sizing:border-box;margin-bottom:7px;}
+  .sas-mini-form label{font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;}
   .fis-toplam-row{display:flex;justify-content:space-between;font-size:15.5px;font-weight:800;color:var(--red);}
 
   .fatura-table{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 6px rgba(20,40,50,.05);margin-bottom:14px;}
@@ -3113,7 +3135,108 @@ function siparisGeriAl(fisId){
     }
   }, 'Evet, Geri Al');
 }
+// --- Sipariş Süreç Adımları — 16 Ağu 2026 ---
+// Her sipariş irsaliyesinin lojistik/tahsilat sürecini takip eden, cari
+// hesaptaki gerçek hareketlerden TAMAMEN BAĞIMSIZ, ayrı bir durum makinesi.
+// (Mevcut d.tamamlandi/tamamlanmaTarihi — "Tamamlandı"ya basınca SATIŞ/ALIŞ
+// hareketi oluşturan eski akış — buna dokunulmadı, aynen duruyor.)
+const SIPARIS_ASAMA_SIRA = ['onay','malHazir','sevkiyat','teslim','tahsilatFisi','tahsilatTarihi','tahsilatAl','kapandi'];
+const SIPARIS_ASAMA_META = {
+  onay:          { label:'Sipariş Onay',           icon:'<polyline points="20 6 9 17 4 12"/>' },
+  malHazir:      { label:'Mal Hazır',               icon:'<path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/>' },
+  sevkiyat:      { label:'Sevkiyata Hazır',         icon:'<rect x="1" y="7" width="15" height="10" rx="1.5"/><path d="M16 10h3.2a1 1 0 0 1 .9.55L22 14v3h-6"/><circle cx="6" cy="19" r="1.6"/><circle cx="18" cy="19" r="1.6"/>' },
+  teslim:        { label:'Teslim Edildi',           icon:'<path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h9"/><polyline points="16 16 20 20 22 14"/>' },
+  tahsilatFisi:  { label:'Tahsilat Fişi Gir',        icon:'<path d="M6 2h9l3 3v17l-3-1.5-2.5 1.5L10 20.5 7.5 22 5 20.5V5a3 3 0 0 1 1-1"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/>' },
+  tahsilatTarihi:{ label:'Tahsilat Tarihi Belirle',  icon:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>' },
+  tahsilatAl:    { label:'Tahsilat Al',              icon:'<path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h3v-4Z"/>' },
+  kapandi:       { label:'Hesap Kapandı',            icon:'<circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/>' }
+};
+function siparisAsamaEnsure(d){
+  if(!d.asamalar) d.asamalar = {};
+  SIPARIS_ASAMA_SIRA.forEach(k=>{ if(!d.asamalar[k]) d.asamalar[k] = { durum:false, tarih:null }; });
+  return d.asamalar;
+}
+function siparisAsamaStepperHtml(d){
+  const asamalar = siparisAsamaEnsure(d);
+  let ilkAktifBulundu = false;
+  return `<div class="sas-wrap"><div class="sas-label">SÜREÇ</div>` + SIPARIS_ASAMA_SIRA.map((key,i)=>{
+    const a = asamalar[key];
+    const meta = SIPARIS_ASAMA_META[key];
+    const oncekiTamam = i===0 || asamalar[SIPARIS_ASAMA_SIRA[i-1]].durum;
+    let durumSinif = 'sas-locked';
+    if(a.durum) durumSinif = 'sas-done';
+    else if(oncekiTamam && !ilkAktifBulundu){ durumSinif = 'sas-active'; ilkAktifBulundu = true; }
+    let metaHtml = 'Bekleniyor';
+    if(a.durum) metaHtml = trDate(a.tarih) + ' · Tamamlandı';
+    else if(durumSinif==='sas-active') metaHtml = 'Şimdi işaretle';
+    let actionHtml = '';
+    if(durumSinif==='sas-active'){
+      actionHtml = `<button type="button" class="sas-action" data-fis="${d.id}" data-asama="${key}">✓ ${meta.label}</button>`;
+    }
+    return `<div class="sas-step ${durumSinif}">
+      <div class="sas-step-line"></div>
+      <div class="sas-node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">${meta.icon}</svg></div>
+      <div class="sas-body">
+        <div class="sas-title">${meta.label}</div>
+        <div class="sas-meta">${metaHtml}</div>
+        ${actionHtml}
+      </div>
+    </div>`;
+  }).join('') + `</div>`;
+}
+let siparisGorCariId = null, siparisGorLedgerKey = null;
+function siparisGorRefresh(){ if(siparisGorCariId) openSiparisGorPopup(siparisGorCariId, siparisGorLedgerKey); }
+function siparisAsamaIlerlet(fisId, key){
+  const d = state.siparisFisleri.find(x=>x.id===fisId);
+  if(!d) return;
+  const asamalar = siparisAsamaEnsure(d);
+  const i = SIPARIS_ASAMA_SIRA.indexOf(key);
+  if(i>0 && !asamalar[SIPARIS_ASAMA_SIRA[i-1]].durum) return; // sırayla zorunlu, önceki bitmeden ilerlemez
+  if(asamalar[key].durum) return;
+  if(key === 'tahsilatFisi'){
+    cv2ModalAc('Tahsilat Fişi Gir', 'Varsa fiş/dekont numarasını gir (boş bırakılabilir).',
+      `<div class="sas-mini-form"><label>Fiş No</label><input type="text" id="sasFisNo" placeholder="ör. 004521"></div>`,
+      'Kaydet', 'primary', () => {
+        const fisNo = (document.getElementById('sasFisNo')?.value || '').trim();
+        asamalar.tahsilatFisi = { durum:true, tarih:new Date().toISOString(), fisNo: fisNo || null };
+        save(); cv2ModalKapat(); siparisGorRefresh();
+      });
+    return;
+  }
+  if(key === 'tahsilatTarihi'){
+    const bugun = new Date().toISOString().slice(0,10);
+    cv2ModalAc('Tahsilat Tarihi Belirle', 'Tahsilatın alınması planlanan tarihi seç.',
+      `<div class="sas-mini-form"><label>Tarih</label><input type="date" id="sasTahsilatTarihi" value="${bugun}"></div>`,
+      'Kaydet', 'primary', () => {
+        const secilen = document.getElementById('sasTahsilatTarihi')?.value;
+        if(!secilen) return;
+        asamalar.tahsilatTarihi = { durum:true, tarih:new Date().toISOString(), planlananTarih: secilen };
+        save(); cv2ModalKapat(); siparisGorRefresh();
+      });
+    return;
+  }
+  if(key === 'tahsilatAl'){
+    cv2ModalAc('Tahsilat Al', 'Alınan tutarı ve tarihi gir. (Not: bu sadece sürecin kaydıdır, cari hesaba otomatik işlenmez — Cari Hesap\'tan ayrıca Tahsilat girilmeli.)',
+      `<div class="sas-mini-form">
+        <label>Tutar (₺)</label><input type="number" step="0.01" id="sasTutar" placeholder="0,00">
+        <label>Tarih</label><input type="date" id="sasTutarTarih" value="${new Date().toISOString().slice(0,10)}">
+      </div>`,
+      'Kaydet', 'primary', () => {
+        const tutar = toNum(document.getElementById('sasTutar')?.value);
+        const tarih = document.getElementById('sasTutarTarih')?.value;
+        if(!tarih) return;
+        asamalar.tahsilatAl = { durum:true, tarih:new Date().toISOString(), tutar: tutar||0, planlananTarih: tarih };
+        save(); cv2ModalKapat(); siparisGorRefresh();
+      });
+    return;
+  }
+  // basit adımlar: onay, malHazir, sevkiyat, teslim, kapandi
+  asamalar[key] = { durum:true, tarih:new Date().toISOString() };
+  save();
+  siparisGorRefresh();
+}
 function openSiparisGorPopup(id, ledgerKey){
+  siparisGorCariId = id; siparisGorLedgerKey = ledgerKey;
   const c = state[ledgerKey].find(x=>x.id===id);
   document.getElementById('siparisGorTitle').textContent = 'Sipariş İrsaliyeleri' + (c ? ' — ' + c.name : '');
   const list = state.siparisFisleri.filter(f=>f.cariId===id).sort((a,b)=> new Date(b.tarih) - new Date(a.tarih));
@@ -3135,11 +3258,13 @@ function openSiparisGorPopup(id, ledgerKey){
           </div>`).join('')}
       </div>
       <div class="irsaliye-toplam"><span>TOPLAM</span><span>${fmt(d.toplam||0)}</span></div>
+      ${siparisAsamaStepperHtml(d)}
       ${d.tamamlandi ? `<button class="irsaliye-geri-al-btn" data-geri-al="${d.id}">Tamamlandı'yı Geri Al</button>` : ''}
     </div>
   `).join('') : '<div class="sk-empty">Bu hesaba ait sipariş yok</div>';
   el.querySelectorAll('.irsaliye-card[data-id]').forEach(card=>{
-    card.onclick = () => {
+    card.onclick = (e) => {
+      if(e.target.closest('.sas-action') || e.target.closest('[data-geri-al]')) return;
       document.getElementById('siparisGorOverlay').classList.remove('show');
       siparisDetayDonusEkran = 'siparisgor';
       siparisDetayDonusCariId = id;
@@ -3149,6 +3274,9 @@ function openSiparisGorPopup(id, ledgerKey){
   });
   el.querySelectorAll('[data-geri-al]').forEach(btn=>{
     btn.onclick = (e) => { e.stopPropagation(); siparisGeriAl(btn.dataset.geriAl); };
+  });
+  el.querySelectorAll('.sas-action[data-fis]').forEach(btn=>{
+    btn.onclick = (e) => { e.stopPropagation(); siparisAsamaIlerlet(btn.dataset.fis, btn.dataset.asama); };
   });
   document.getElementById('siparisGorOverlay').classList.add('show');
 }
