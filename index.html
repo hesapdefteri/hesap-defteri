@@ -67,7 +67,7 @@
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
   #cv2Screen{background:linear-gradient(180deg,#eef2f4 0%,#f4f7f8 220px);}
-  #cv2Screen .cv2-head{flex-shrink:0;padding:calc(env(safe-area-inset-top) + 14px) 18px 10px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  #cv2Screen .cv2-head{flex-shrink:0;padding:calc(env(safe-area-inset-top) + 14px) 18px 10px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;}
   #cv2Screen .cv2-head h1{margin:0;font-size:23px;font-weight:800;letter-spacing:-.6px;color:var(--ink);}
   .cv2-addbtn{border:none;border-radius:14px;padding:10px 17px;font-size:13.5px;font-weight:800;color:#fff;
     background:linear-gradient(135deg,#3877ab,#1c3566);box-shadow:0 6px 16px rgba(28,53,102,.32);
@@ -84,22 +84,22 @@
     border-radius:50%;background:#e0392b;border:2px solid #f4f7f8;}
   .cv2-searchicon.active.filtreli::after{border-color:#1c3566;}
 
-  .cv2-filterpanel{display:none;position:absolute;top:46px;right:0;z-index:30;width:250px;
-    background:#fff;border-radius:18px;padding:16px;box-shadow:0 14px 38px rgba(16,24,32,.18);
-    border:1px solid rgba(16,24,32,.06);}
-  .cv2-filterpanel.show{display:block;animation:cv2FilterIn .16s ease;}
-  @keyframes cv2FilterIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
-  .cv2-filterpanel-arrow{position:absolute;top:-6px;right:52px;width:12px;height:12px;background:#fff;
-    transform:rotate(45deg);border-radius:2px;box-shadow:-2px -2px 4px rgba(16,24,32,.03);}
-  .cv2-filterpanel-grp{margin-bottom:14px;}
+  .cv2-filterpanel{display:none;position:absolute;top:100%;left:16px;right:16px;z-index:30;
+    background:#fff;border-radius:20px;padding:18px;box-shadow:0 16px 40px rgba(16,24,32,.2);
+    border:1px solid rgba(16,24,32,.06);margin-top:8px;}
+  .cv2-filterpanel.show{display:block;animation:cv2FilterIn .18s ease;}
+  @keyframes cv2FilterIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+  .cv2-filterpanel-grp{margin-bottom:16px;}
   .cv2-filterpanel-grp:last-child{margin-bottom:0;}
-  .cv2-filterpanel-lbl{font-size:10.5px;font-weight:800;color:var(--muted);letter-spacing:.4px;
-    text-transform:uppercase;margin-bottom:7px;}
+  .cv2-filterpanel-lbl{font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:.4px;
+    text-transform:uppercase;margin-bottom:9px;}
   .cv2-seg{display:flex;background:#eef1f3;border-radius:12px;padding:3px;gap:2px;flex:1 1 auto;min-width:150px;}
-  .cv2-seg button{flex:1;border:none;background:transparent;border-radius:9px;padding:7px 8px;
-    font-size:11.5px;font-weight:800;color:var(--muted);font-family:inherit;cursor:pointer;
+  .cv2-seg button{flex:1;border:none;background:transparent;border-radius:9px;padding:11px 8px;
+    font-size:13px;font-weight:800;color:var(--muted);font-family:inherit;cursor:pointer;
     white-space:nowrap;transition:background .15s ease,color .15s ease;}
+  .cv2-seg.cv2-seg-4 button{font-size:12px;padding:11px 4px;}
   .cv2-seg button.active{background:var(--accent);color:#fff;box-shadow:0 2px 6px rgba(16,24,32,.15);}
+  .cv2-seg button[data-val="arsiv"].active{background:#6a5fd6;}
 
   .cv2-summary{margin:0 16px 10px 16px;border-radius:18px;padding:12px 14px;flex-shrink:0;
     background:linear-gradient(150deg,rgba(255,255,255,.92),rgba(255,255,255,.68));
@@ -1099,6 +1099,11 @@
 .cv2i-row .cv2i-lbl{display:block;font-size:12.5px;color:var(--muted);font-weight:600;margin-bottom:2px;}
 .cv2i-row .cv2i-val{display:block;font-size:17px;color:var(--ink);font-weight:700;word-break:break-word;}
 .cv2i-row .cv2i-val.empty{color:#b7c0c3;font-weight:600;}
+.cv2i-arsiv-btn{width:100%;margin-top:14px;border:none;border-radius:14px;padding:14px 10px;
+  font-size:14.5px;font-weight:800;font-family:inherit;cursor:pointer;background:#fdeeee;color:#c0392b;
+  transition:transform .12s ease;}
+.cv2i-arsiv-btn:active{transform:scale(.98);}
+.cv2i-arsiv-btn.geri{background:#eaf6ee;color:#1f7a4d;}
 /* 14 Ağu 2026: Sipariş ürün seçici — çoklu seçim (checkbox) + mavi vurgu */
 .siparis-stok-row{display:flex;align-items:center;gap:10px;}
 .siparis-stok-row .siparis-stok-chk{width:20px;height:20px;flex-shrink:0;border-radius:6px;border:2px solid #c7c2b8;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800;}
@@ -2358,23 +2363,23 @@
       <button class="cv2-searchicon" id="cv2SearchToggleBtn" aria-label="Ara">🔍</button>
       <button class="cv2-searchicon" id="cv2FilterToggleBtn" aria-label="Filtrele">☰</button>
       <button class="cv2-addbtn" id="cv2AddBtn">+ Cari</button>
-      <div id="cv2FilterPanel" class="cv2-filterpanel">
-        <div class="cv2-filterpanel-arrow"></div>
-        <div class="cv2-filterpanel-grp">
-          <div class="cv2-filterpanel-lbl">Durum</div>
-          <div class="cv2-seg" id="cv2DurumSeg">
-            <button data-val="tumu" class="active">Tümü</button>
-            <button data-val="aktif">Aktifler</button>
-            <button data-val="pasif">Pasifler</button>
-          </div>
+    </div>
+    <div id="cv2FilterPanel" class="cv2-filterpanel">
+      <div class="cv2-filterpanel-grp">
+        <div class="cv2-filterpanel-lbl">Durum</div>
+        <div class="cv2-seg cv2-seg-4" id="cv2DurumSeg">
+          <button data-val="tumu" class="active">Tümü</button>
+          <button data-val="aktif">Aktifler</button>
+          <button data-val="pasif">Pasifler</button>
+          <button data-val="arsiv">Arşiv</button>
         </div>
-        <div class="cv2-filterpanel-grp">
-          <div class="cv2-filterpanel-lbl">Tür</div>
-          <div class="cv2-seg" id="cv2TurSeg">
-            <button data-val="hepsi" class="active">Hepsi</button>
-            <button data-val="alici">Alıcılar</button>
-            <button data-val="tedarikci">Tedarikçiler</button>
-          </div>
+      </div>
+      <div class="cv2-filterpanel-grp">
+        <div class="cv2-filterpanel-lbl">Tür</div>
+        <div class="cv2-seg" id="cv2TurSeg">
+          <button data-val="hepsi" class="active">Hepsi</button>
+          <button data-val="alici">Alıcılar</button>
+          <button data-val="tedarikci">Tedarikçiler</button>
         </div>
       </div>
     </div>
@@ -5036,10 +5041,18 @@ function cv2Liste(){
   tedarikciler.sort((a,b)=> cariBalance(b.c) - cariBalance(a.c));
   musteriler.sort((a,b)=> cariBalance(b.c) - cariBalance(a.c));
   let combined = [...tedarikciler, ...musteriler];
-  if(state.cariFilter === 'hareket'){
-    combined = combined.filter(({c}) => Math.abs(cariBalance(c)) > 0.005);
-  } else if(state.cariFilter === 'pasif'){
-    combined = combined.filter(({c}) => Math.abs(cariBalance(c)) <= 0.005);
+  // 16 Ağu 2026, kullanıcı isteği: arşivlenmiş cariler normal görünümlerde
+  // (Tümü/Aktifler/Pasifler) HİÇ görünmez; sadece Durum filtresinde "Arşiv"
+  // seçiliyken (state.cariFilter === 'arsiv') sadece onlar listelenir.
+  if(state.cariFilter === 'arsiv'){
+    combined = combined.filter(({c}) => c.arsiv === true);
+  } else {
+    combined = combined.filter(({c}) => c.arsiv !== true);
+    if(state.cariFilter === 'hareket'){
+      combined = combined.filter(({c}) => Math.abs(cariBalance(c)) > 0.005);
+    } else if(state.cariFilter === 'pasif'){
+      combined = combined.filter(({c}) => Math.abs(cariBalance(c)) <= 0.005);
+    }
   }
   if(state.cariTurFiltre === 'alici'){
     combined = combined.filter(({tur}) => tur === 'cari');
@@ -5345,9 +5358,42 @@ function cv2InfoAc(id, tur){
   document.getElementById('cv2InfoBody').innerHTML = rows.map(([cls,l,v,fld])=>
     `<div class="cv2i-row" data-field="${fld}"><span class="cv2i-ic ${cls}">${CV2I_SVG[cls]}</span><span class="cv2i-txt">
       <span class="cv2i-lbl">${l}</span><span class="cv2i-val${v?'':' empty'}">${v || 'Girilmemiş'}</span>
-    </span></div>`).join('');
+    </span></div>`).join('') +
+    `<button class="cv2i-arsiv-btn ${c.arsiv ? 'geri' : ''}" id="cv2InfoArsivBtn">${c.arsiv ? '↩ Arşivden Çıkar' : '🗄 Arşive Kaldır'}</button>`;
   document.querySelectorAll('#cv2InfoBody .cv2i-row').forEach(row=>{
     row.addEventListener('click', () => cv2InfoRowDuzenle(id, tur, row.dataset.field));
+  });
+  // 16 Ağu 2026, kullanıcı isteği: sık çalışılmayan carileri listeden gizlemek
+  // için Info ekranından tek dokunuşla arşive alma/çıkarma. Arşivlenen cari
+  // normal Tümü/Aktif/Pasif görünümlerinde görünmez, sadece filtre panelindeki
+  // "Arşiv" sekmesinde listelenir (cv2Liste() filtre mantığı).
+  // 16 Ağu 2026, kullanıcı isteği: sık çalışılmayan carileri listeden gizlemek
+  // için Info ekranından tek dokunuşla arşive alma/çıkarma. Arşivlenen cari
+  // normal Tümü/Aktif/Pasif görünümlerinde görünmez, sadece filtre panelindeki
+  // "Arşiv" sekmesinde listelenir (cv2Liste() filtre mantığı). Borcu/alacağı
+  // olan bir hesap yanlışlıkla gözden kaçırılmasın diye ARŞİVE KALDIRIRKEN
+  // (arşivden çıkarırken değil) bakiye varsa önce onay isteniyor.
+  document.getElementById('cv2InfoArsivBtn').addEventListener('click', () => {
+    const arsivEt = () => {
+      c.arsiv = !c.arsiv;
+      save();
+      renderCariV2();
+    };
+    if(!c.arsiv && Math.abs(cariBalance(c)) > 0.005){
+      const bal = cariBalance(c);
+      const durumYazi = bal < 0
+        ? `<b>${c.name}</b> hesabının <span style="color:var(--red);">${fmtWhole(Math.abs(bal))} borcu</span> var.`
+        : `<b>${c.name}</b> hesabının <span style="color:var(--green);">${fmtWhole(Math.abs(bal))} alacağı</span> var.`;
+      // Uyarı modalı (z-index 920), Info ekranından (z-index 9998) daha alçakta
+      // kalıyor — bu yüzden önce Info ekranı kapatılıp SONRA modal açılıyor.
+      document.getElementById('cv2InfoOverlay').classList.remove('show');
+      cv2AmFloatGeriGetir();
+      cv2ModalAc('Emin misin?', durumYazi + ' Yine de arşive kaldırmak istiyor musun?', '', 'Yine de Arşivle', 'danger', arsivEt);
+    } else {
+      arsivEt();
+      document.getElementById('cv2InfoOverlay').classList.remove('show');
+      cv2AmFloatGeriGetir();
+    }
   });
   cv2AmFloatGizle();
   document.getElementById('cv2InfoOverlay').classList.add('show');
@@ -5483,7 +5529,7 @@ document.getElementById('cv2LpOverlay').onclick = (e) => { if(e.target.id==='cv2
 /* ---------- ekran ---------- */
 function cv2SegBtnleriGuncelle(){
   document.querySelectorAll('#cv2DurumSeg button').forEach(btn=>{
-    const val = state.cariFilter === 'hareket' ? 'aktif' : (state.cariFilter === 'pasif' ? 'pasif' : 'tumu');
+    const val = state.cariFilter === 'hareket' ? 'aktif' : (state.cariFilter === 'pasif' ? 'pasif' : (state.cariFilter === 'arsiv' ? 'arsiv' : 'tumu'));
     btn.classList.toggle('active', btn.dataset.val === val);
   });
   document.querySelectorAll('#cv2TurSeg button').forEach(btn=>{
@@ -6193,7 +6239,7 @@ function cv2DahaFazla(id, tur){
 
   document.querySelectorAll('#cv2DurumSeg button').forEach(btn=>{
     btn.addEventListener('click', () => {
-      state.cariFilter = btn.dataset.val === 'tumu' ? 'tumu' : (btn.dataset.val === 'aktif' ? 'hareket' : 'pasif');
+      state.cariFilter = btn.dataset.val === 'tumu' ? 'tumu' : (btn.dataset.val === 'aktif' ? 'hareket' : (btn.dataset.val === 'arsiv' ? 'arsiv' : 'pasif'));
       save();
       renderCariV2();
     });
