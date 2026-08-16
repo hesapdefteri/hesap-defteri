@@ -6254,8 +6254,11 @@ function cv2DahaFazla(id, tur){
 
   const searchToggleBtn = document.getElementById('cv2SearchToggleBtn');
   if(searchToggleBtn) searchToggleBtn.addEventListener('click', () => {
-    document.getElementById('cv2FilterPanel').classList.remove('show');
-    document.getElementById('cv2FilterToggleBtn').classList.remove('active');
+    const filterPanel = document.getElementById('cv2FilterPanel');
+    if(filterPanel.classList.contains('show')){
+      filterPanel.classList.remove('show');
+      document.getElementById('cv2FilterToggleBtn').classList.remove('active');
+    }
     const wrap = document.getElementById('cv2SearchWrap');
     const acikMi = wrap.style.display !== 'none';
     if(acikMi){
@@ -6274,8 +6277,17 @@ function cv2DahaFazla(id, tur){
   const filterToggleBtn = document.getElementById('cv2FilterToggleBtn');
   if(filterToggleBtn) filterToggleBtn.addEventListener('click', (e) => {
     e.stopPropagation();
+    // 16 Ağu 2026 BUG FIX: arama kutusu sadece GÖRSEL olarak gizleniyordu, içindeki
+    // metin ve cv2SearchTerm aktif kalmaya devam edip filtre sekmeleri (Arşiv →
+    // Tümü vb.) arasında geçince listeyi sessizce boşaltıyordu. Artık panel
+    // açılırken arama tamamen temizleniyor.
     document.getElementById('cv2SearchWrap').style.display = 'none';
     document.getElementById('cv2SearchToggleBtn').classList.remove('active');
+    if(cv2SearchTerm){
+      cv2SearchTerm = '';
+      document.getElementById('cv2Search').value = '';
+      renderCariV2();
+    }
     const panel = document.getElementById('cv2FilterPanel');
     const acikMi = panel.classList.contains('show');
     panel.classList.toggle('show', !acikMi);
