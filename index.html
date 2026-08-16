@@ -5416,8 +5416,8 @@ function cv2UzunBasMenuAc(id, tur){
   const c = state[tur].find(x=>x.id===id);
   document.getElementById('cv2LpTitle').textContent = c ? c.name : 'Hesap';
   const items = tur === 'tedarikci'
-    ? [['alis','Alış'],['odeme','Ödeme'],['duzenle','Düzenle'],['hareketler','Hareketler'],['ekstre','Ekstre'],['excelGonder',"Excel'le Gönder"],['daha','Sipariş İşlemleri']]
-    : [['tahsilat','Tahsilat'],['satis','Satış'],['duzenle','Düzenle'],['hareketler','Hareketler'],['ekstre','Ekstre'],['excelGonder',"Excel'le Gönder"],['daha','Sipariş İşlemleri']];
+    ? [['alis','Alış'],['odeme','Ödeme'],['duzenle','Düzenle'],['hareketler','Hareketler'],['ekstre','Ekstre'],['daha','Sipariş İşlemleri']]
+    : [['tahsilat','Tahsilat'],['satis','Satış'],['duzenle','Düzenle'],['hareketler','Hareketler'],['ekstre','Ekstre'],['daha','Sipariş İşlemleri']];
   document.getElementById('cv2LpButtons').innerHTML = items.map(([act,label])=>
     `<button type="button" class="cv2-lp-btn" data-act="${act}">${label}</button>`
   ).join('');
