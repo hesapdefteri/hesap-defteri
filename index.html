@@ -1082,7 +1082,8 @@
   color:#5b6a70;cursor:pointer;line-height:1;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
 .cv2i-title{font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-.3px;flex:1;}
 .cv2i-body{display:flex;flex-direction:column;gap:10px;}
-.cv2i-row{display:flex;align-items:center;gap:14px;background:#f6f8f9;border-radius:14px;padding:11px 14px;}
+.cv2i-row{display:flex;align-items:center;gap:14px;background:#f6f8f9;border-radius:14px;padding:11px 14px;cursor:pointer;transition:transform .12s ease,background .12s ease;}
+.cv2i-row:active{transform:scale(.98);background:#eef1f2;}
 .cv2i-row .cv2i-ic{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;
   justify-content:center;flex-shrink:0;}
 .cv2i-row .cv2i-ic svg{width:19px;height:19px;}
@@ -5317,19 +5318,37 @@ function cv2InfoAc(id, tur){
   if(!c) return;
   document.getElementById('cv2InfoTitle').textContent = c.name;
   const rows = [
-    ['tel', 'Tel', c.phone],
-    ['mail', 'Mail', c.email],
-    ['vno', 'Vergi No', c.taxNo],
-    ['vd', 'Vergi Dairesi', c.taxOffice],
-    ['adr', 'Adres', c.address],
-    ['kisi', 'İlgili Kişi', c.contact]
+    ['tel', 'Tel', c.phone, 'ciPhone'],
+    ['mail', 'Mail', c.email, 'ciEmail'],
+    ['vno', 'Vergi No', c.taxNo, 'ciTaxNo'],
+    ['vd', 'Vergi Dairesi', c.taxOffice, 'ciTaxOffice'],
+    ['adr', 'Adres', c.address, 'ciAddress'],
+    ['kisi', 'İlgili Kişi', c.contact, 'ciContact']
   ];
-  document.getElementById('cv2InfoBody').innerHTML = rows.map(([cls,l,v])=>
-    `<div class="cv2i-row"><span class="cv2i-ic ${cls}">${CV2I_SVG[cls]}</span><span class="cv2i-txt">
+  document.getElementById('cv2InfoBody').innerHTML = rows.map(([cls,l,v,fld])=>
+    `<div class="cv2i-row" data-field="${fld}"><span class="cv2i-ic ${cls}">${CV2I_SVG[cls]}</span><span class="cv2i-txt">
       <span class="cv2i-lbl">${l}</span><span class="cv2i-val${v?'':' empty'}">${v || 'Girilmemiş'}</span>
     </span></div>`).join('');
+  document.querySelectorAll('#cv2InfoBody .cv2i-row').forEach(row=>{
+    row.addEventListener('click', () => cv2InfoRowDuzenle(id, tur, row.dataset.field));
+  });
   cv2AmFloatGizle();
   document.getElementById('cv2InfoOverlay').classList.add('show');
+}
+// 16 Ağu 2026: Info ekranındaki bir satıra dokununca doğrudan cari düzenleme
+// formunu, İLGİLİ ALANA odaklanmış (klavye açık) halde açar. openCariEditForm()
+// eski (V1) activeLedger/activeCariId globallerini kullandığı için buradan da
+// aynı globaller set edilip aynı fonksiyon çağrılıyor — form/kaydetme mantığı
+// TEK bir yerde kalmaya devam ediyor. focus() senkron çağrılmalı (iOS Safari
+// kuralı) — setTimeout/rAF araya girerse klavye açılmıyor.
+function cv2InfoRowDuzenle(id, tur, fieldId){
+  document.getElementById('cv2InfoOverlay').classList.remove('show');
+  cv2AmFloatGeriGetir();
+  activeLedger = tur;
+  activeCariId = id;
+  openCariEditForm();
+  const el = fieldId ? document.getElementById(fieldId) : null;
+  if(el) el.focus();
 }
 document.getElementById('cv2InfoKapat').onclick = () => { document.getElementById('cv2InfoOverlay').classList.remove('show'); cv2AmFloatGeriGetir(); };
 document.getElementById('cv2InfoOverlay').onclick = (e) => { if(e.target.id==='cv2InfoOverlay'){ document.getElementById('cv2InfoOverlay').classList.remove('show'); cv2AmFloatGeriGetir(); } };
