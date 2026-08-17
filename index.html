@@ -145,6 +145,11 @@
   .cv2-card{position:relative;z-index:2;background:#fff;border-radius:18px;padding:30px 16px;
     display:flex;align-items:center;gap:12px;cursor:pointer;touch-action:pan-y;will-change:transform;
     border:1px solid rgba(16,24,32,.04);-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
+  .cv2-card.cv2-card-siparisli{flex-direction:column;align-items:stretch;gap:10px;padding-top:14px;}
+  .cv2-name-top{text-align:center;font-size:17px;font-weight:800;color:var(--ink);letter-spacing:-.2px;}
+  .cv2-card-row{display:flex;align-items:center;gap:12px;}
+  .cv2-mavi-halka{border-radius:50%;border:3px solid #2f6fed;padding:3px;display:inline-flex;flex-shrink:0;box-shadow:0 0 0 2px rgba(47,111,237,.15);}
+  .cv2-date.cv2-siparis-buyuk{font-size:14.5px;}
   .cv2-card[data-tur="cari"]{border-color:#4285f4;}
   .cv2-card[data-tur="tedarikci"]{border-color:#e8792c;}
   .cv2-card.cv2-pressed{transform:scale(.985);transition:transform .12s ease;}
@@ -156,6 +161,7 @@
   .cv2-bal{font-size:16px;font-weight:800;letter-spacing:-.4px;white-space:nowrap;flex-shrink:0;}
   .cv2-bal.debt{color:var(--red);} .cv2-bal.credit{color:var(--green);} .cv2-bal.zero{color:var(--ink);}
   .cv2-siparis-tutar{font-size:10.5px;font-weight:800;white-space:nowrap;letter-spacing:-.1px;}
+  .cv2-card-siparisli .cv2-siparis-tutar{font-size:15px;}
   .cv2-info-btn{position:absolute;top:8px;right:10px;width:20px;height:20px;border-radius:50%;
     background:#e4e8ea;color:var(--muted);font-size:14px;font-weight:800;font-style:italic;
     font-family:Georgia,'Times New Roman',serif;display:flex;align-items:center;justify-content:center;
@@ -5783,8 +5789,10 @@ function CariCardV2(c, tur){
       return sum + fisToplam;
     }, 0);
     siparisTutarHtml = `<div class="cv2-siparis-tutar" style="color:${siparisRenk};">Sipariş: ${fmtWhole(siparisToplam)}</div>`;
-    // 16 Ağu 2026, kullanıcı isteği: bekleyen sipariş varken turuncu daireye
-    // dokununca doğrudan sipariş içeriği (Sipariş Gör popup'ı) açılsın.
+    // 17 Ağu 2026, kullanıcı isteği: sipariş bekleyen kartlarda daha belirgin
+    // olması için dairenin etrafına mavi bir halka daha eklendi, cari ismi üst
+    // ortaya taşındı, "Sipariş bekliyor" yazısı büyütüldü.
+    circleHtml = `<div class="cv2-mavi-halka">${circleHtml}</div>`;
   }
   // CH1'deki (Cari Hesaplar) swipeActionsHtml ile birebir aynı mantık: tedarikçide
   // Alış/Ödeme, müşteride Tahsilat/Satış — sadece Düzenle CV2'ye özgü ek bir buton.
@@ -5797,6 +5805,10 @@ function CariCardV2(c, tur){
     : `<button class="cv2-abtn tahsilat" data-act="tahsilat" data-uid="${uid}">Tahsilat</button>
       <button class="cv2-abtn satis" data-act="satis" data-uid="${uid}">Satış</button>
       <button class="cv2-abtn duzenle" data-act="duzenle" data-uid="${uid}">Düzenle</button>`;
+  const kartSinifi = 'cv2-card' + (hasPendingSiparis ? ' cv2-card-siparisli' : '');
+  const isimHtml = hasPendingSiparis
+    ? `<div class="cv2-name-top">${c.name}</div>`
+    : `<div class="cv2-name">${c.name}</div>`;
   return `
   <div class="cv2-wrap" data-uid="${uid}">
     <div class="cv2-actions left" style="display:none;">
@@ -5807,16 +5819,19 @@ function CariCardV2(c, tur){
     <div class="cv2-actions right" style="display:none;">
       ${paraBtns}
     </div>
-    <div class="cv2-card" data-uid="${uid}" data-id="${c.id}" data-tur="${tur}">
+    <div class="${kartSinifi}" data-uid="${uid}" data-id="${c.id}" data-tur="${tur}">
       <span class="cv2-info-btn" data-uid="${uid}">i</span>
-      ${circleHtml}
-      <div class="cv2-mid">
-        <div class="cv2-name">${c.name}</div>
-        <div class="cv2-date cv2-relzaman">${altYazi}</div>
-      </div>
-      <div class="cv2-bal-wrap">
-        <div class="cv2-bal ${cls}">${fmtWhole(bal)}</div>
-        ${siparisTutarHtml}
+      ${hasPendingSiparis ? isimHtml : ''}
+      <div class="cv2-card-row">
+        ${circleHtml}
+        <div class="cv2-mid">
+          ${hasPendingSiparis ? '' : isimHtml}
+          <div class="cv2-date cv2-relzaman${hasPendingSiparis ? ' cv2-siparis-buyuk' : ''}">${altYazi}</div>
+        </div>
+        <div class="cv2-bal-wrap">
+          <div class="cv2-bal ${cls}">${fmtWhole(bal)}</div>
+          ${siparisTutarHtml}
+        </div>
       </div>
     </div>
   </div>`;
