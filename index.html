@@ -1585,6 +1585,11 @@
       </div>
     </div>
     <p style="color:#a39685;font-size:12.5px;margin:16px 4px;">Cari hesap satırında hızlı işlemlere (Tahsilat/Satış, Alış/Ödeme, Düzenle vb.) erişim yolları. Açılır Menü: satıra basılı tutunca ortada açılan menü. Kayar Menü: satırı sağa/sola kaydırma. En az biri her zaman açık kalır.</p>
+    <div class="cv2-ayar-row" id="ayarCikisYapBtn" style="margin-top:18px;">
+      <div class="cv2-ayar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#b23b2e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></div>
+      <div class="cv2-ayar-text"><span class="cv2-ayar-name danger">Çıkış Yap (Yeniden Giriş)</span></div>
+    </div>
+    <p style="color:#a39685;font-size:12.5px;margin:10px 4px;">Bulut senkron oturumu takılı kaldıysa (ör. Bildirimler yeni kayıtları göstermiyorsa) bu, oturumu tamamen kapatıp e-posta/şifre ile yeniden giriş ekranına döner.</p>
   </div>
 
   </div>
@@ -9850,6 +9855,18 @@ document.getElementById('ayarMenuKullaniciBtn').onclick = () => {
 };
 document.getElementById('ayarAltGeriBtn1').onclick = () => ayarAnaMenuGoster();
 document.getElementById('ayarAltGeriBtn2').onclick = () => ayarAnaMenuGoster();
+
+// 17 Ağu 2026: bulut senkron oturumu (Firebase Auth) eski bir hesaba (ör.
+// kaldırılan Phone Auth günlerinden kalma) takılı kalmış olabilir — bu durumda
+// gelenBildirimler gibi yeni eklenen özellikler yanlış/boş bir hesabı okur.
+// Bu buton tamamen çıkış yapıp e-posta/şifre giriş ekranına döner, kullanıcı
+// doğru hesapla yeniden giriş yapabilsin diye.
+document.getElementById('ayarCikisYapBtn').onclick = () => {
+  openConfirm('Çıkış Yap', 'Oturumu tamamen kapatıp giriş ekranına döneceksin. Verilerin bulutta güvende, kaybolmaz. Emin misin?', () => {
+    if(fbAuth) fbAuth.signOut().then(() => { window.location.reload(); }).catch(() => { window.location.reload(); });
+    else window.location.reload();
+  }, 'Evet, Çıkış Yap');
+};
 
 document.getElementById('ayarYedekleBtn').onclick = () => {
   cv2KumSaatiGoster('Dışa aktarılıyor…').then(() => {
