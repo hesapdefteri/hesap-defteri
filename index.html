@@ -1060,6 +1060,7 @@
   .sas-action{margin-top:7px;display:inline-flex;align-items:center;gap:5px;background:#dd7a2c;color:#fff;font-size:12px;font-weight:700;padding:7px 13px;border:none;border-radius:9px;cursor:pointer;}
   .sas-mini-form{margin-top:8px;}
   .sas-mini-form input{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;box-sizing:border-box;margin-bottom:7px;}
+  .sas-mini-form select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;box-sizing:border-box;margin-bottom:7px;background:#fff;color:var(--ink);}
   .sas-mini-form label{font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;}
   /* --- Bildirimler ekranı — 16 Ağu 2026 --- */
   .bl-card{background:#fff;border-radius:14px;padding:15px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(20,40,50,.06);}
@@ -1450,12 +1451,13 @@
   </div>
 </div>
 
-<div class="overlay" id="siparisGorOverlay" style="z-index:90;">
-  <div class="modal" style="height:85vh;display:flex;flex-direction:column;padding-bottom:14px;">
-    <h3 id="siparisGorTitle" style="margin-bottom:10px;">Siparişler</h3>
-    <div id="siparisGorList" style="flex:1;overflow-y:auto;min-height:0;"></div>
-    <button id="siparisGorKapat" style="margin-top:8px;width:100%;padding:14px 0;border:none;border-radius:12px;background:#eef1f2;color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;">Kapat</button>
+<div class="detail-screen" id="siparisGorScreen">
+  <div class="d-header">
+    <button class="d-back" id="siparisGorKapat">‹</button>
+    <div class="d-title" id="siparisGorTitle">Sipariş Takip</div>
+    <button class="d-share" style="visibility:hidden;">📄</button>
   </div>
+  <div id="siparisGorList" style="flex:1;overflow-y:auto;padding:16px;"></div>
 </div>
 
 <div class="overlay" id="tamamlaOverlay" style="z-index:90;">
@@ -3161,11 +3163,24 @@ function siparisGeriAl(fisId){
     c.transactions = (c.transactions||[]).filter(t => t.siparisRef !== f.id);
     f.tamamlandi = false;
     delete f.tamamlanmaTarihi;
+    // 17 Ağu 2026: "Siparişi Faturaya Dönüştür" adımı artık gerçek hareket
+    // oluşturuyor — geri alınınca stepper'da o adım ve sonrasındaki (Tahsilat
+    // Tarihi Belirle, Tahsilat Al) adımlar da sıfırlanmalı, aksi halde stepper
+    // gerçekte olmayan bir faturayı "tamamlandı" gösterip tutarsız kalır.
+    if(f.asamalar){
+      ['faturaDonustur','tahsilatTarihi'].forEach(k=>{
+        if(f.asamalar[k]) f.asamalar[k] = { durum:false, tarih:null };
+      });
+    }
+    // Tahsilat Tarihi Belirle adımı c.odemeTarihi'ni bu siparişin tarihiyle
+    // set etmişti — geri alınınca o tarih de kaldırılmalı, aksi halde kartta
+    // artık geçersiz bir sipariş için ödeme tarihi halkası kalır.
+    if(c && c.odemeTarihi) delete c.odemeTarihi;
     save();
     render();
     // Hangi ekrandan çağrıldıysa o ekranı tazele — Sipariş Gör popup açıksa onu,
     // Siparişler ana listesi görünürdeyse onu güncelle.
-    if(document.getElementById('siparisGorOverlay').classList.contains('show')){
+    if(document.getElementById('siparisGorScreen').classList.contains('show')){
       openSiparisGorPopup(f.cariId, f.ledgerKey);
     }
     if(document.getElementById('siparisListScreen').classList.contains('show')){
@@ -3173,21 +3188,22 @@ function siparisGeriAl(fisId){
     }
   }, 'Evet, Geri Al');
 }
-// --- Sipariş Süreç Adımları — 16 Ağu 2026 ---
-// Her sipariş irsaliyesinin lojistik/tahsilat sürecini takip eden, cari
-// hesaptaki gerçek hareketlerden TAMAMEN BAĞIMSIZ, ayrı bir durum makinesi.
-// (Mevcut d.tamamlandi/tamamlanmaTarihi — "Tamamlandı"ya basınca SATIŞ/ALIŞ
-// hareketi oluşturan eski akış — buna dokunulmadı, aynen duruyor.)
-const SIPARIS_ASAMA_SIRA = ['onay','malHazir','sevkiyat','teslim','tahsilatFisi','tahsilatTarihi','tahsilatAl'];
+// --- Sipariş Süreç Adımları — 17 Ağu 2026 KOMPLE YENİDEN TASARIM ---
+// Kullanıcının el yazısı notu + sonraki netleştirmeler baz alınarak süreç
+// baştan yazıldı. "Tahsilat Al" adımı TAMAMEN KALDIRILDI. Her adım artık
+// kendi AÇILIR PENCERESİNE (cv2ModalAc) sahip; son adım (Tahsilat Tarihi
+// Belirle) otomatik +5 gün hesaplayıp hem sürece hem cari kartın ödeme
+// tarihi halkasına (c.odemeTarihi) işliyor.
+const SIPARIS_ASAMA_SIRA = ['onay','malHazir','sevkiyat','teslim','faturaDonustur','tahsilatTarihi'];
 const SIPARIS_ASAMA_META = {
   onay:          { label:'Sipariş Onay',           icon:'<polyline points="20 6 9 17 4 12"/>' },
   malHazir:      { label:'Mal Hazır',               icon:'<path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/>' },
   sevkiyat:      { label:'Sevkiyata Hazır',         icon:'<rect x="1" y="7" width="15" height="10" rx="1.5"/><path d="M16 10h3.2a1 1 0 0 1 .9.55L22 14v3h-6"/><circle cx="6" cy="19" r="1.6"/><circle cx="18" cy="19" r="1.6"/>' },
-  teslim:        { label:'Teslim Edildi',           icon:'<path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h9"/><polyline points="16 16 20 20 22 14"/>' },
-  tahsilatFisi:  { label:'Tahsilat Fişi Gir',        icon:'<path d="M6 2h9l3 3v17l-3-1.5-2.5 1.5L10 20.5 7.5 22 5 20.5V5a3 3 0 0 1 1-1"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/>' },
-  tahsilatTarihi:{ label:'Tahsilat Tarihi Belirle',  icon:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>' },
-  tahsilatAl:    { label:'Tahsilat Al',              icon:'<path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h3v-4Z"/>' }
+  teslim:        { label:'Teslim',                  icon:'<path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h9"/><polyline points="16 16 20 20 22 14"/>' },
+  faturaDonustur:{ label:'Siparişi Faturaya Dönüştür', icon:'<path d="M6 2h9l3 3v17l-3-1.5-2.5 1.5L10 20.5 7.5 22 5 20.5V5a3 3 0 0 1 1-1"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/>' },
+  tahsilatTarihi:{ label:'Tahsilat Tarihi Belirle',  icon:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>' }
 };
+function ambarlarEnsure(){ if(!state.ambarlar) state.ambarlar = []; return state.ambarlar; }
 function siparisAsamaEnsure(d){
   if(!d.asamalar) d.asamalar = {};
   SIPARIS_ASAMA_SIRA.forEach(k=>{ if(!d.asamalar[k]) d.asamalar[k] = { durum:false, tarih:null }; });
@@ -3230,78 +3246,182 @@ function siparisAsamaIlerlet(fisId, key){
   const i = SIPARIS_ASAMA_SIRA.indexOf(key);
   if(i>0 && !asamalar[SIPARIS_ASAMA_SIRA[i-1]].durum) return; // sırayla zorunlu, önceki bitmeden ilerlemez
   if(asamalar[key].durum) return;
-  if(key === 'tahsilatFisi'){
-    cv2ModalAc('Tahsilat Fişi Gir', 'Varsa fiş/dekont numarasını gir (boş bırakılabilir).',
-      `<div class="sas-mini-form"><label>Fiş No</label><input type="text" id="sasFisNo" placeholder="ör. 004521"></div>`,
-      'Kaydet', 'primary', () => {
-        const fisNo = (document.getElementById('sasFisNo')?.value || '').trim();
-        asamalar.tahsilatFisi = { durum:true, tarih:new Date().toISOString(), fisNo: fisNo || null };
+  if(key === 'onay'){
+    const tedarikciler = state.tedarikci || [];
+    const opts = tedarikciler.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+    cv2ModalAc('Sipariş Onay', 'Bu siparişi hangi tedarikçiden karşılayacaksın? Onaylanınca aynı kalemlerle o tedarikçiye de bir Alış Siparişi oluşturulur.',
+      `<div class="sas-mini-form"><label>Tedarikçi</label><select id="sasTedarikci">${opts || '<option value="">Tedarikçi yok</option>'}</select></div>`,
+      'Onayla', 'primary', () => {
+        const tedId = document.getElementById('sasTedarikci')?.value;
+        const tedarikci = tedarikciler.find(t=>t.id===tedId);
+        if(!tedarikci) return;
+        const ts = new Date().toISOString();
+        const karsi = {
+          id: 'sip_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+          ledgerKey: 'tedarikci',
+          cariId: tedarikci.id,
+          cariAdi: tedarikci.name,
+          belgeNo: (d.belgeNo || '') + '-TDK',
+          tarih: ts,
+          kalemler: JSON.parse(JSON.stringify(d.kalemler||[])),
+          kdvDahil: !!d.kdvDahil,
+          toplam: d.toplam || 0,
+          karsiSiparisId: d.id,
+          tamamlandi: false
+        };
+        state.siparisFisleri.push(karsi);
+        d.karsiSiparisId = karsi.id;
+        d.tedarikciId = tedarikci.id;
+        asamalar.onay = { durum:true, tarih: ts, tedarikciId: tedarikci.id };
+        save(); cv2ModalKapat(); siparisGorRefresh(); render();
+      });
+    return;
+  }
+  if(key === 'malHazir'){
+    const kalemHtml = (d.kalemler||[]).map(k=>`
+      <div class="fis-kalem-row">
+        <div><div class="k-name">${k.ad}</div><div class="k-sub">${fmtPlain(k.miktar)} adet</div></div>
+        <div class="k-tutar">${fmt(k.tutar)}</div>
+      </div>`).join('') || '<div class="sk-empty">Kalem yok</div>';
+    cv2ModalAc('Mal Hazır', 'Sipariş içeriği:', `<div class="sas-mini-form">${kalemHtml}</div>`,
+      'Mal Hazır Olarak İşaretle', 'primary', () => {
+        asamalar.malHazir = { durum:true, tarih:new Date().toISOString() };
         save(); cv2ModalKapat(); siparisGorRefresh();
+      });
+    return;
+  }
+  if(key === 'sevkiyat'){
+    const ambarlar = ambarlarEnsure();
+    const renderForm = () => {
+      const opts = ambarlar.map(a=>`<option value="${a.id}">${a.ad}${a.no?' ('+a.no+')':''}</option>`).join('');
+      return `<div class="sas-mini-form">
+        <label>Ambarı Ara</label>
+        <select id="sasAmbarSec">${opts}<option value="__yeni__">+ Yeni Ambar Ekle</option></select>
+        <div id="sasYeniAmbarAlan" style="display:none;margin-top:8px;">
+          <label>Ambar Adı</label><input type="text" id="sasYeniAmbarAd" placeholder="ör. Merkez Ambar">
+          <label>Ambar No</label><input type="text" id="sasYeniAmbarNo" placeholder="ör. 3">
+        </div>
+      </div>`;
+    };
+    cv2ModalAc('Sevkiyata Hazır', 'Sipariş hangi ambardan sevk edilecek?', renderForm(),
+      'Onayla', 'primary', () => {
+        const sec = document.getElementById('sasAmbarSec')?.value;
+        let ambarId = sec;
+        if(sec === '__yeni__'){
+          const ad = (document.getElementById('sasYeniAmbarAd')?.value || '').trim();
+          if(!ad) return;
+          const no = (document.getElementById('sasYeniAmbarNo')?.value || '').trim();
+          const yeni = { id: 'amb_' + Date.now().toString(36) + Math.random().toString(36).slice(2,5), ad, no };
+          ambarlar.push(yeni);
+          ambarId = yeni.id;
+        }
+        if(!ambarId) return;
+        d.ambarId = ambarId;
+        asamalar.sevkiyat = { durum:true, tarih:new Date().toISOString() };
+        save(); cv2ModalKapat(); siparisGorRefresh();
+      });
+    const selEl = document.getElementById('sasAmbarSec');
+    if(selEl) selEl.addEventListener('change', () => {
+      document.getElementById('sasYeniAmbarAlan').style.display = selEl.value === '__yeni__' ? 'block' : 'none';
+    });
+    return;
+  }
+  if(key === 'teslim'){
+    let secilenTur = 'kendisi';
+    const ambar = d.ambarId ? ambarlarEnsure().find(a=>a.id===d.ambarId) : null;
+    const bugun = new Date().toISOString().slice(0,10);
+    cv2ModalAc('Teslim', 'Teslimat tarihi ve malı kimin aldığını belirle.',
+      `<div class="sas-mini-form">
+        <label>Tarih</label><input type="date" id="sasTeslimTarih" value="${bugun}">
+        <label>Teslim Alan</label>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <button type="button" id="sasTeslimKendisi" class="ci-tur-btn active" style="flex:1;">Kendisi</button>
+          <button type="button" id="sasTeslimAmbar" class="ci-tur-btn" style="flex:1;">Ambara Teslim</button>
+        </div>
+        ${ambar ? `<div class="sas-meta" style="margin-top:6px;">Sevkiyat ambarı: ${ambar.ad}${ambar.no?' ('+ambar.no+')':''}</div>` : ''}
+      </div>`,
+      'Onayla', 'primary', () => {
+        const tarih = document.getElementById('sasTeslimTarih')?.value;
+        if(!tarih) return;
+        d.teslimTuru = secilenTur;
+        d.teslimAmbarId = secilenTur === 'ambar' ? d.ambarId : null;
+        asamalar.teslim = { durum:true, tarih:new Date().toISOString(), planlananTarih: tarih };
+        save(); cv2ModalKapat(); siparisGorRefresh();
+      });
+    const btnKendisi = document.getElementById('sasTeslimKendisi');
+    const btnAmbar = document.getElementById('sasTeslimAmbar');
+    if(btnKendisi && btnAmbar){
+      btnKendisi.onclick = () => { secilenTur = 'kendisi'; btnKendisi.classList.add('active'); btnAmbar.classList.remove('active'); };
+      btnAmbar.onclick = () => { secilenTur = 'ambar'; btnAmbar.classList.add('active'); btnKendisi.classList.remove('active'); };
+    }
+    return;
+  }
+  if(key === 'faturaDonustur'){
+    const c = state[d.ledgerKey].find(x=>x.id===d.cariId);
+    if(!c) return;
+    const kalemToplam = (d.kalemler||[]).reduce((s,k)=>s+toNum(k.tutar),0);
+    const kdvTutar = d.kdvDahil ? kalemToplam * 0.20 : 0;
+    const genelToplam = kalemToplam + kdvTutar;
+    cv2ModalAc('Siparişi Faturaya Dönüştür', `Bu sipariş cari hesaba fatura olarak işlenecek (borç düşecek). Toplam: ${fmtWhole(genelToplam)}. Bu ekrandan geri alınamaz — geri almak için Sipariş İrsaliyeleri listesinden "Tamamlandı'yı Geri Al" kullanılmalı.`,
+      '', 'Faturaya Dönüştür ve İşle', 'primary', () => {
+        const txType = d.ledgerKey === 'cari' ? 'SATIŞ' : 'ALIŞ';
+        const ts = new Date().toISOString();
+        let fisToplam = 0;
+        (d.kalemler||[]).forEach(k=>{
+          c.transactions.push({ type: txType, desc: k.ad, amount: k.tutar, date: ts, siparisRef: d.id });
+          fisToplam += toNum(k.tutar);
+        });
+        if(d.kdvDahil){
+          c.transactions.push({ type: txType, desc: 'KDV (%20)', amount: fisToplam * 0.20, date: ts, siparisRef: d.id });
+        }
+        d.tamamlandi = true;
+        d.tamamlanmaTarihi = ts;
+        asamalar.faturaDonustur = { durum:true, tarih: ts };
+        save(); cv2ModalKapat(); siparisGorRefresh(); render();
       });
     return;
   }
   if(key === 'tahsilatTarihi'){
-    const bugun = new Date().toISOString().slice(0,10);
-    cv2ModalAc('Tahsilat Tarihi Belirle', 'Tahsilatın alınması planlanan tarihi seç.',
-      `<div class="sas-mini-form"><label>Tarih</label><input type="date" id="sasTahsilatTarihi" value="${bugun}"></div>`,
+    const baz = asamalar.teslim && asamalar.teslim.planlananTarih ? new Date(asamalar.teslim.planlananTarih) : new Date();
+    const onerilen = new Date(baz.getTime() + 5*86400000).toISOString().slice(0,10);
+    cv2ModalAc('Tahsilat Tarihi Belirle', 'Standart olarak 5 gün sonrası önerildi, gerekirse değiştirebilirsin.',
+      `<div class="sas-mini-form"><label>Tarih</label><input type="date" id="sasTahsilatTarihi" value="${onerilen}"></div>`,
       'Kaydet', 'primary', () => {
         const secilen = document.getElementById('sasTahsilatTarihi')?.value;
         if(!secilen) return;
         asamalar.tahsilatTarihi = { durum:true, tarih:new Date().toISOString(), planlananTarih: secilen };
-        save(); cv2ModalKapat(); siparisGorRefresh();
+        // 17 Ağu 2026, kullanıcı isteği: belirlenen tahsilat tarihi cari kartın
+        // yuvarlak simgesindeki (ödeme tarihi halkası) tarihe de yansısın.
+        const c = state[d.ledgerKey].find(x=>x.id===d.cariId);
+        if(c) c.odemeTarihi = secilen;
+        save(); cv2ModalKapat(); siparisGorRefresh(); render();
       });
     return;
   }
-  if(key === 'tahsilatAl'){
-    const cariObj = (state[d.ledgerKey] || []).find(x => x.id === d.cariId);
-    const bakiye = cariObj ? cariBalance(cariObj) : 0;
-    const bakiyeRenk = bakiye > 0 ? '#c0392b' : (bakiye < 0 ? '#1f8a54' : '#6d7c8d');
-    const bakiyeHtml = `<div class="sas-bakiye" style="background:#f5f6f8;border-radius:12px;padding:10px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-size:12.5px;font-weight:700;color:var(--muted);">Bakiye</span>
-      <span style="font-size:17px;font-weight:800;color:${bakiyeRenk};">${fmtWhole(Math.abs(bakiye))}</span>
-    </div>`;
-    cv2ModalAc('Tahsilat Al', 'Alınan tutarı ve tarihi gir. (Not: bu sadece sürecin kaydıdır, cari hesaba otomatik işlenmez — Cari Hesap\'tan ayrıca Tahsilat girilmeli.)',
-      bakiyeHtml + `<div class="sas-mini-form">
-        <label>Tutar (₺)</label><input type="number" step="0.01" id="sasTutar" placeholder="0,00">
-        <label>Tarih</label><input type="date" id="sasTutarTarih" value="${new Date().toISOString().slice(0,10)}">
-      </div>`,
-      'Kaydet', 'primary', () => {
-        const tutar = toNum(document.getElementById('sasTutar')?.value);
-        const tarih = document.getElementById('sasTutarTarih')?.value;
-        if(!tarih) return;
-        asamalar.tahsilatAl = { durum:true, tarih:new Date().toISOString(), tutar: tutar||0, planlananTarih: tarih };
-        save(); cv2ModalKapat(); siparisGorRefresh();
-      });
-    return;
-  }
-  // basit adımlar: onay, malHazir, sevkiyat, teslim, kapandi
+  // basit adımlar (yedek yol — tüm anahtarlar için yukarıda özel dal var, buraya normalde düşülmez)
   asamalar[key] = { durum:true, tarih:new Date().toISOString() };
   save();
   siparisGorRefresh();
 }
 function openSiparisGorPopup(id, ledgerKey){
   siparisGorCariId = id; siparisGorLedgerKey = ledgerKey;
+  hideAllScreens();
   const c = state[ledgerKey].find(x=>x.id===id);
-  document.getElementById('siparisGorTitle').textContent = 'Sipariş İrsaliyeleri' + (c ? ' — ' + c.name : '');
+  document.getElementById('siparisGorTitle').textContent = 'Sipariş Takip' + (c ? ' — ' + c.name : '');
   const list = state.siparisFisleri.filter(f=>f.cariId===id).sort((a,b)=> new Date(b.tarih) - new Date(a.tarih));
   const el = document.getElementById('siparisGorList');
+  // 17 Ağu 2026, kullanıcı isteği: bu ekranda artık sadece SÜREÇ AKIŞI (stepper)
+  // gösteriliyor — sipariş kalemleri/toplamı (irsaliye-items, irsaliye-toplam)
+  // KALDIRILDI, sadece belge no + tarih + durum başlığı bırakıldı.
   el.innerHTML = list.length ? list.map(d => `
     <div class="irsaliye-card" data-id="${d.id}">
       <div class="irsaliye-head">
         <div>
-          <div class="irsaliye-label">SİPARİŞ İRSALİYESİ ${d.tamamlandi ? '<span class="irsaliye-tamamlandi">TAMAMLANDI</span>' : ''}</div>
+          <div class="irsaliye-label">SİPARİŞ ${d.tamamlandi ? '<span class="irsaliye-tamamlandi">TAMAMLANDI</span>' : ''}</div>
           <div class="irsaliye-belge">${d.belgeNo||''}</div>
         </div>
         <div class="irsaliye-tarih">${trDate(d.tarih)}</div>
       </div>
-      <div class="irsaliye-items">
-        ${d.kalemler.map(k=>`
-          <div class="fis-kalem-row">
-            <div><div class="k-name">${k.ad}</div><div class="k-sub">${fmtPlain(k.miktar)} adet</div></div>
-            <div class="k-tutar">${fmt(k.tutar)}</div>
-          </div>`).join('')}
-      </div>
-      <div class="irsaliye-toplam"><span>TOPLAM</span><span>${fmt(d.toplam||0)}</span></div>
       ${siparisAsamaStepperHtml(d)}
       ${d.tamamlandi ? `<button class="irsaliye-geri-al-btn" data-geri-al="${d.id}">Tamamlandı'yı Geri Al</button>` : ''}
     </div>
@@ -3309,7 +3429,6 @@ function openSiparisGorPopup(id, ledgerKey){
   el.querySelectorAll('.irsaliye-card[data-id]').forEach(card=>{
     card.onclick = (e) => {
       if(e.target.closest('.sas-action') || e.target.closest('[data-geri-al]')) return;
-      document.getElementById('siparisGorOverlay').classList.remove('show');
       siparisDetayDonusEkran = 'siparisgor';
       siparisDetayDonusCariId = id;
       siparisDetayDonusLedger = ledgerKey;
@@ -3322,12 +3441,14 @@ function openSiparisGorPopup(id, ledgerKey){
   el.querySelectorAll('.sas-action[data-fis]').forEach(btn=>{
     btn.onclick = (e) => { e.stopPropagation(); siparisAsamaIlerlet(btn.dataset.fis, btn.dataset.asama); };
   });
-  document.getElementById('siparisGorOverlay').classList.add('show');
+  document.getElementById('siparisGorScreen').classList.add('show');
 }
-document.getElementById('siparisGorKapat').onclick = () => document.getElementById('siparisGorOverlay').classList.remove('show');
-document.getElementById('siparisGorOverlay').onclick = (e) => {
-  if(e.target === document.getElementById('siparisGorOverlay')) document.getElementById('siparisGorOverlay').classList.remove('show');
-};
+function siparisGorGeriDon(){
+  hideAllScreens();
+  renderCariV2();
+  document.getElementById('cv2Screen').classList.add('show');
+}
+document.getElementById('siparisGorKapat').onclick = () => siparisGorGeriDon();
 
 // --- Bildirimler — 16 Ağu 2026 ---
 // Genel amaçlı, kalıcı bir "gelen ödeme bildirimi" kutusu: banka mailinden
@@ -5283,6 +5404,7 @@ function hideAllScreens(){
   document.getElementById('cariSecScreen').classList.remove('show');
   document.getElementById('siparisListScreen').classList.remove('show');
   document.getElementById('siparisDetayScreen').classList.remove('show');
+  document.getElementById('siparisGorScreen').classList.remove('show');
   document.getElementById('ayarlarScreen').classList.remove('show');
   document.getElementById('sablonListScreen').classList.remove('show');
   document.getElementById('sablonDetayScreen').classList.remove('show');
