@@ -1156,6 +1156,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
 </head>
 <body>
 
@@ -3335,7 +3336,7 @@ function renderBildirimler(){
   if(!state.bildirimler) state.bildirimler = [];
   const list = state.bildirimler.slice().sort((a,b)=> new Date(b.tarih) - new Date(a.tarih));
   const el = document.getElementById('bildirimList');
-  el.innerHTML = list.length ? list.map(b=>{
+  el.innerHTML = pushDurumBanner() + (list.length ? list.map(b=>{
     const done = b.durum === 'islendi';
     return `<div class="bl-card" data-id="${b.id}">
       <div class="bl-top"><div class="bl-cari">${b.cariAdiTahmin || 'Cari seçilmedi'}</div><div class="bl-tutar">${fmt(b.tutar||0)}</div></div>
@@ -3344,10 +3345,12 @@ function renderBildirimler(){
         ? `<div class="bl-done">✓ Hesaptan Düştüm · ${trDate(b.islenmeTarihi)}</div>`
         : `<button type="button" class="bl-btn" data-hesaptan-dus="${b.id}">Hesaptan Düş</button>`}
     </div>`;
-  }).join('') : '<div class="sk-empty">Bildirim yok</div>';
+  }).join('') : '<div class="sk-empty">Bildirim yok</div>');
   el.querySelectorAll('[data-hesaptan-dus]').forEach(btn=>{
     btn.onclick = () => bildirimHesaptanDus(btn.dataset.hesaptanDus);
   });
+  const pushBtn = document.getElementById('pushIzinBtn');
+  if(pushBtn) pushBtn.onclick = pushBildirimIzniIste;
   updateBildirimBadge();
 }
 function bildirimHesaptanDus(id){
@@ -3418,6 +3421,43 @@ function bildirimEkle(){
     });
 }
 document.getElementById('bildirimAddBtn').onclick = bildirimEkle;
+
+// --- Push Bildirim (FCM) — 16 Ağu 2026 ---
+const PUSH_VAPID_KEY = 'BCXnIlIdmEZy6JrkIK_K9O87eL2SdJgcUXC6FMqn9zQSFwSQT7VckUPhSI0MBjETBTDFxNoS_aHNcVwhvpvMBBQ';
+var fbMessaging = null;
+function getFbMessaging(){
+  if(fbMessaging) return fbMessaging;
+  try{ if(fbAvailable && firebase.apps && firebase.apps.length) fbMessaging = firebase.messaging(); }catch(e){ fbMessaging = null; }
+  return fbMessaging;
+}
+function pushDurumBanner(){
+  const m = getFbMessaging();
+  if(!m || typeof Notification === 'undefined') return '';
+  if(Notification.permission === 'granted') return '';
+  return `<div class="bl-card" style="text-align:center;">
+    <div style="font-size:13px;color:var(--muted);margin-bottom:10px;">Yeni bildirim geldiğinde telefona anında haber vermesi için bildirimleri aç.</div>
+    <button type="button" class="bl-btn" id="pushIzinBtn" style="background:#2f6690;">🔔 Bildirimleri Aç</button>
+  </div>`;
+}
+async function pushBildirimIzniIste(){
+  const m = getFbMessaging();
+  if(!m){ alertBox('Bu tarayıcı push bildirimi desteklemiyor.'); return; }
+  try{
+    const izin = await Notification.requestPermission();
+    if(izin !== 'granted'){ alertBox('Bildirim izni verilmedi.'); return; }
+    const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+    const token = await m.getToken({ vapidKey: PUSH_VAPID_KEY, serviceWorkerRegistration: reg });
+    if(token && fbAuth && fbAuth.currentUser){
+      const key = token.replace(/[.#$/\[\]]/g, '_');
+      await fbDb.ref('pushTokens/' + fbAuth.currentUser.uid + '/' + key).set(true);
+      alertBox('Bildirimler açıldı ✓');
+      renderBildirimler();
+      try{ m.onMessage(() => { renderBildirimler(); updateBildirimBadge(); }); }catch(e){}
+    }
+  }catch(e){
+    alertBox('Bildirim izni alınamadı: ' + (e && e.message ? e.message : e));
+  }
+}
 
 let tamamlaCariId = null, tamamlaLedger = null;
 let siparisDetayDonusEkran = 'siparisler'; // 'siparisler' | 'cv2' — Sipariş Gör'den açılınca Cari Hesap'a dönsün diye 14 Ağu 2026'da eklendi
