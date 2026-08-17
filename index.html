@@ -3248,13 +3248,20 @@ function siparisAsamaIlerlet(fisId, key){
   if(asamalar[key].durum) return;
   if(key === 'onay'){
     const tedarikciler = state.tedarikci || [];
-    const opts = tedarikciler.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+    // 17 Ağu 2026, kullanıcı isteği: arşivdeki tedarikçiler de listede görünsün
+    // (zaten görünüyordu, filtrelenmemişti) — seçildiğinde arşivden otomatik
+    // çıkarılacak (aşağıdaki onay callback'inde), listede "(Arşiv)" ibaresiyle
+    // ayırt edilsin diye işaretleniyor.
+    const opts = tedarikciler.map(t=>`<option value="${t.id}">${t.name}${t.arsiv ? ' (Arşiv)' : ''}</option>`).join('');
     cv2ModalAc('Sipariş Onay', 'Bu siparişi hangi tedarikçiden karşılayacaksın? Onaylanınca aynı kalemlerle o tedarikçiye de bir Alış Siparişi oluşturulur.',
       `<div class="sas-mini-form"><label>Tedarikçi</label><select id="sasTedarikci">${opts || '<option value="">Tedarikçi yok</option>'}</select></div>`,
       'Onayla', 'primary', () => {
         const tedId = document.getElementById('sasTedarikci')?.value;
         const tedarikci = tedarikciler.find(t=>t.id===tedId);
         if(!tedarikci) return;
+        // Arşivdeki bir tedarikçi seçilirse, sipariş verilmiş olması onu fiilen
+        // aktif hale getirir — kullanıcı ayrıca Arşiv ekranından çıkarmasın.
+        if(tedarikci.arsiv) tedarikci.arsiv = false;
         const ts = new Date().toISOString();
         const karsi = {
           id: 'sip_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6),
@@ -5649,13 +5656,31 @@ function cv2Find(id, tur){
 let cv2SearchTerm = '';
 function cv2Liste(){
   // CH1'deki (renderCariHesaplar) sıralamayla birebir aynı: önce tedarikçiler
-  // (bakiyeye göre azalan), sonra müşteriler (bakiyeye göre azalan). Filtre de
-  // aynı paylaşılan state.cariFilter değerini kullanıyor (Tümü / Aktifler / Pasifler)
+  // (bakiyeye göre azalan), sonra müşteriler. Filtre de aynı paylaşılan
+  // state.cariFilter değerini kullanıyor (Tümü / Aktifler / Pasifler)
   // + state.cariTurFiltre (Hepsi / Alıcılar / Tedarikçiler) — 07 Ağu 2026 eklendi.
+  // 17 Ağu 2026, kullanıcı isteği: müşteriler artık SADECE bakiyeye göre değil,
+  // önce "bekleyen siparişi olanlar" (sipariş durumuna göre — en uzun bekleyen
+  // en üstte) sonra bekleyen siparişi olmayanlar (eskisi gibi bakiyeye göre).
   const tedarikciler = state.tedarikci.map(c=>({c, tur:'tedarikci'}));
   const musteriler = state.cari.map(c=>({c, tur:'cari'}));
   tedarikciler.sort((a,b)=> cariBalance(b.c) - cariBalance(a.c));
-  musteriler.sort((a,b)=> cariBalance(b.c) - cariBalance(a.c));
+  const siparisGunFarkiOf = (c) => {
+    const pendingSiparisler = (state.siparisFisleri || []).filter(f => f.cariId === c.id && !f.tamamlandi);
+    if(!pendingSiparisler.length) return null;
+    const enEskiTarih = pendingSiparisler.reduce((min, f) => {
+      const t = new Date(f.tarih);
+      return (!min || t < min) ? t : min;
+    }, null);
+    return Math.max(0, Math.floor((new Date() - enEskiTarih) / 86400000));
+  };
+  musteriler.sort((a,b)=>{
+    const ga = siparisGunFarkiOf(a.c), gb = siparisGunFarkiOf(b.c);
+    if(ga !== null && gb === null) return -1;
+    if(ga === null && gb !== null) return 1;
+    if(ga !== null && gb !== null) return gb - ga; // en uzun bekleyen sipariş üstte
+    return cariBalance(b.c) - cariBalance(a.c);
+  });
   let combined = [...tedarikciler, ...musteriler];
   // 16 Ağu 2026, kullanıcı isteği: arşivlenmiş cariler normal görünümlerde
   // (Tümü/Aktifler/Pasifler) HİÇ görünmez; sadece Durum filtresinde "Arşiv"
