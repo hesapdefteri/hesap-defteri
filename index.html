@@ -693,6 +693,8 @@
   .siparis-date-circle.siparis-bekleyen.cv2-siparis-daire:active{transform:scale(.94);}
   .siparis-date-circle.siparis-bekleyen b{font-size:17px;}
   .cv2-ring{position:relative;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .cv2-ring.cv2-siparis-daire{cursor:pointer;}
+  .cv2-ring.cv2-siparis-daire:active{transform:scale(.94);}
   .cv2-ring-badge{position:absolute;top:-3px;left:-3px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;
     color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;
     box-shadow:0 1px 4px rgba(0,0,0,.3);font-family:inherit;letter-spacing:0;}
@@ -5603,14 +5605,18 @@ function CariCardV2(c, tur){
     const gecikti = kalanGun < 0;
     const renk = gecikti ? '#e5484d' : '#dd7a2c';
     const rozetYazi = gecikti ? String(kalanGun) : ('+' + kalanGun);
-    circleHtml = `<div class="cv2-ring" style="background:conic-gradient(${renk} ${deg}deg, #e4e8ea ${deg}deg 360deg);">
+    // 17 Ağu 2026, kullanıcı isteği: ödeme tarihi halkası VE bekleyen sipariş aynı
+    // anda varsa, halka artık pasif değil — dokununca da Sipariş Gör popup'ı açılsın
+    // (önceki davranışta halka görünüyordu ama tıklanamıyordu, sipariş erişilemez oluyordu).
+    const ringSiparisAttrs = hasPendingSiparis ? `cv2-siparis-daire" data-uid="${uid}` : '';
+    circleHtml = `<div class="cv2-ring ${ringSiparisAttrs}" style="background:conic-gradient(${renk} ${deg}deg, #e4e8ea ${deg}deg 360deg);">
       ${circleHtml}
       <span class="cv2-ring-badge" style="background:${renk};">${rozetYazi}</span>
     </div>`;
   }
   // Bekleyen sipariş varsa: EĞER ödeme tarihi halkası YOKSA dairenin kendisi
-  // sipariş rozetine döner; ödeme tarihi halkası VARSA ona dokunulmaz (14 Ağu'daki
-  // hata buydu — sipariş rozeti "-2 gün kaldı" halkasını tamamen gizliyordu).
+  // sipariş rozetine döner; ödeme tarihi halkası VARSA görünüm aynı kalır ama
+  // artık (17 Ağu düzeltmesi ile) o halkaya dokununca da Sipariş Gör açılır.
   // Her iki durumda da alt yazı ve sağdaki "Sipariş: X₺" metni gösterilir.
   let siparisTutarHtml = '';
   if(hasPendingSiparis){
