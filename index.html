@@ -1151,6 +1151,12 @@
 .gk-spin{width:12px;height:12px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:gkspin .7s linear infinite;flex-shrink:0;}
 .gk-toast.ok .gk-spin{display:none;}
 @keyframes gkspin{to{transform:rotate(360deg);}}
+/* 17 Ağu 2026: Firebase mail-algılama bildirimi — üstten inen tıklanabilir banner */
+.bm-banner{position:fixed;top:14px;left:50%;transform:translateX(-50%) translateY(-140%);width:calc(100% - 32px);max-width:420px;background:linear-gradient(135deg,#ff7a45,#e8483a);color:#fff;padding:13px 16px;border-radius:14px;display:flex;align-items:center;gap:10px;z-index:1000;box-shadow:0 8px 22px rgba(0,0,0,.28);transition:transform .3s cubic-bezier(.34,1.4,.64,1);cursor:pointer;}
+.bm-banner.show{transform:translateX(-50%) translateY(0);}
+.bm-banner .bm-icon{font-size:22px;flex-shrink:0;}
+.bm-banner .bm-txt{flex:1;font-size:13.5px;font-weight:600;line-height:1.3;}
+.bm-banner .bm-txt small{display:block;font-weight:500;opacity:.9;font-size:11.5px;margin-top:2px;}
 </style>
 <!-- Firebase (telefon numarasıyla giriş + bulut senkronizasyonu) -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -3338,20 +3344,142 @@ function renderBildirimler(){
   const el = document.getElementById('bildirimList');
   el.innerHTML = pushDurumBanner() + (list.length ? list.map(b=>{
     const done = b.durum === 'islendi';
+    const masraf = b.tur === 'masraf';
     return `<div class="bl-card" data-id="${b.id}">
-      <div class="bl-top"><div class="bl-cari">${b.cariAdiTahmin || 'Cari seçilmedi'}</div><div class="bl-tutar">${fmt(b.tutar||0)}</div></div>
+      <div class="bl-top"><div class="bl-cari">${masraf ? '🧾 Muhasebesel Hareket' : (b.cariAdiTahmin || 'Cari seçilmedi')}</div><div class="bl-tutar">${fmt(b.tutar||0)}</div></div>
       <div class="bl-kaynak">${b.aciklama||''}${b.kaynak ? ' · ' + b.kaynak : ''}</div>
       ${done
-        ? `<div class="bl-done">✓ Hesaptan Düştüm · ${trDate(b.islenmeTarihi)}</div>`
-        : `<button type="button" class="bl-btn" data-hesaptan-dus="${b.id}">Hesaptan Düş</button>`}
+        ? `<div class="bl-done">✓ ${masraf ? 'Hesaba İşlendi' : 'Hesaptan Düştüm'} · ${trDate(b.islenmeTarihi)}</div>`
+        : masraf
+          ? `<button type="button" class="bl-btn" data-hesaba-isle="${b.id}">Hesaba İşle</button>`
+          : `<button type="button" class="bl-btn" data-hesaptan-dus="${b.id}">Hesaptan Düş</button>`}
     </div>`;
   }).join('') : '<div class="sk-empty">Bildirim yok</div>');
   el.querySelectorAll('[data-hesaptan-dus]').forEach(btn=>{
     btn.onclick = () => bildirimHesaptanDus(btn.dataset.hesaptanDus);
   });
+  el.querySelectorAll('[data-hesaba-isle]').forEach(btn=>{
+    btn.onclick = () => bildirimHesabaIsle(btn.dataset.hesabaIsle);
+  });
   const pushBtn = document.getElementById('pushIzinBtn');
   if(pushBtn) pushBtn.onclick = pushBildirimIzniIste;
   updateBildirimBadge();
+}
+// 17 Ağu 2026: mail'den algılanan hareketi bir MASRAF kalemine işleme onay akışı.
+// bildirimHesaptanDus()'un tersine bu bir CARİ'ye değil, state.masrafHesaplari
+// içindeki bir kaleme yeni bir transaction ekler.
+function bildirimHesabaIsle(id){
+  const b = (state.bildirimler||[]).find(x=>x.id===id);
+  if(!b) return;
+  const kalemler = state.masrafHesaplari || [];
+  const optionsHtml = '<option value="">— Masraf Kalemi Seç —</option>'
+    + kalemler.map(k=>`<option value="${k.id}">${k.name}</option>`).join('')
+    + '<option value="__yeni__">+ Yeni Kalem Oluştur</option>';
+  cv2ModalAc('Hesaba İşle', 'Bu hareket hangi masraf kalemine işlensin, tutarı kontrol et.',
+    `<div class="sas-mini-form">
+      <label>Masraf Kalemi</label>
+      <select id="blMasrafKalemSec" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;margin-bottom:9px;">${optionsHtml}</select>
+      <input type="text" id="blMasrafYeniAd" placeholder="Yeni kalem adı" style="display:none;width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;margin-bottom:9px;">
+      <label>Tutar (₺)</label>
+      <input type="number" step="0.01" id="blMasrafTutar" value="${b.tutar||0}">
+    </div>`,
+    'Hesaba İşle', 'primary', () => {
+      const secim = document.getElementById('blMasrafKalemSec')?.value || '';
+      const tutar = toNum(document.getElementById('blMasrafTutar')?.value);
+      if(!secim){ alertBox('Önce bir masraf kalemi seç.'); return; }
+      let kalem;
+      if(secim === '__yeni__'){
+        const ad = (document.getElementById('blMasrafYeniAd')?.value||'').trim();
+        if(!ad){ alertBox('Yeni kalem adı gir.'); return; }
+        kalem = { id: 'mk_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6), name: ad, transactions: [] };
+        state.masrafHesaplari.push(kalem);
+      } else {
+        kalem = state.masrafHesaplari.find(k=>k.id===secim);
+      }
+      if(!kalem){ alertBox('Kalem bulunamadı.'); return; }
+      kalem.transactions = kalem.transactions || [];
+      kalem.transactions.push({ desc: b.aciklama || 'Bildirimden işlendi', amount: tutar, date: new Date().toISOString(), bildirimRef: b.id });
+      b.durum = 'islendi';
+      b.islenmeTarihi = new Date().toISOString();
+      b.masrafKalemId = kalem.id;
+      b.tutar = tutar;
+      save();
+      cv2ModalKapat();
+      renderBildirimler();
+      if(document.getElementById('masrafScreen') && document.getElementById('masrafScreen').classList.contains('show')) renderMasrafScreen();
+    });
+  setTimeout(()=>{
+    const sel = document.getElementById('blMasrafKalemSec');
+    const yeniInput = document.getElementById('blMasrafYeniAd');
+    if(sel && yeniInput){
+      sel.onchange = () => { yeniInput.style.display = sel.value === '__yeni__' ? 'block' : 'none'; };
+    }
+  }, 50);
+}
+// Firebase'in users/{uid}/gelenBildirimler node'unu okur (Apps Script tarafından
+// yazılan, henüz "islendi" işaretlenmemiş mail-algılama kayıtları) ve her birini
+// tur:'masraf' olan yeni bir yerel bildirime dönüştürür. Aynı Firebase kaydı
+// bir daha içeri alınmasın diye kaynakKey ile eşleşme kontrolü yapılır VE
+// Firebase tarafında islendi:true olarak işaretlenir (tekil bir "içeri alındı"
+// bayrağıdır, "hesaba işlendi" ile karıştırılmamalı — o durum yerel b.durum'da).
+function gelenBildirimleriKontrolEt(uid){
+  if(!fbDb || !uid) return;
+  fbDb.ref('users/' + uid + '/gelenBildirimler').once('value').then(snap => {
+    if(!snap.exists()) return;
+    const veri = snap.val();
+    state.bildirimler = state.bildirimler || [];
+    let yeniSayisi = 0;
+    Object.keys(veri).forEach(key => {
+      const kayit = veri[key];
+      if(!kayit || kayit.islendi === true) return;
+      if(state.bildirimler.some(b => b.kaynakKey === key)) return;
+      state.bildirimler.unshift({
+        id: 'bildirim-mail-' + key,
+        tur: 'masraf',
+        cariAdiTahmin: null,
+        tutar: kayit.tutar || 0,
+        aciklama: kayit.baslik || 'Muhasebesel hareket algılandı',
+        kaynak: (kayit.kaynak === 'google-cloud-payment' ? 'Google Cloud/Firebase ödeme maili' : (kayit.kaynak || ''))
+          + (kayit.referans ? ' · Ref: ' + kayit.referans : ''),
+        tarih: kayit.tarih || new Date().toISOString(),
+        durum: 'bekliyor',
+        cariId: null, ledgerKey: null, islenmeTarihi: null,
+        kaynakKey: key, masrafKalemId: null
+      });
+      fbDb.ref('users/' + uid + '/gelenBildirimler/' + key + '/islendi').set(true).catch(()=>{});
+      yeniSayisi++;
+    });
+    if(yeniSayisi > 0){
+      save();
+      renderBildirimler();
+      bildirimMuhasebeselAlgilandiUyar(yeniSayisi);
+    }
+  }).catch(err => console.error('gelenBildirimler okuma hatası:', err));
+}
+// Sesli (SpeechSynthesis, mevcut cv2AciklamaSeslendir ile aynı desen) +
+// görsel (üstten inen banner) uyarı. Banner'a dokununca Bildirimler ekranı açılır.
+function bildirimMuhasebeselAlgilandiUyar(sayi){
+  try{
+    if('speechSynthesis' in window){
+      const konusma = new SpeechSynthesisUtterance('Muhasebesel bir hareket algılandı');
+      konusma.lang = 'tr-TR';
+      konusma.rate = 0.95;
+      window.speechSynthesis.speak(konusma);
+    }
+  }catch(e){}
+  const banner = document.getElementById('bmBanner');
+  if(!banner) return;
+  const alt = document.getElementById('bmBannerAlt');
+  if(alt) alt.textContent = sayi > 1 ? (sayi + ' yeni kayıt · Bildirimler ekranından onaylayın') : 'Bildirimler ekranından onaylayın';
+  banner.classList.add('show');
+  banner.onclick = () => {
+    banner.classList.remove('show');
+    renderBildirimler();
+    hideAllScreens();
+    document.getElementById('bildirimlerScreen').classList.add('show');
+  };
+  clearTimeout(window._bmBannerTimer);
+  window._bmBannerTimer = setTimeout(()=> banner.classList.remove('show'), 6000);
 }
 function bildirimHesaptanDus(id){
   const b = (state.bildirimler||[]).find(x=>x.id===id);
@@ -11065,6 +11193,7 @@ function cloudSyncAndBoot(user){
     if(ensureSafPlastUrunDetayi2GeriGetir()) save();
     if(ensureSafPlastUrunDetayi3GeriGetir()) save();
     if(ensureBildirimZaferPala()) save();
+    gelenBildirimleriKontrolEt(user.uid);
     hideAuthScreen();
     render();
   }).catch(err => {
@@ -11139,6 +11268,11 @@ try {
 <div id="genelKaydediliyorToast" class="gk-toast">
   <span class="gk-spin"></span>
   <span id="genelKaydediliyorMetin">Kaydediliyor...</span>
+</div>
+<!-- 17 Ağu 2026: mail'den algılanan muhasebesel hareket bildirimi banner'ı -->
+<div id="bmBanner" class="bm-banner">
+  <span class="bm-icon">🔔</span>
+  <span class="bm-txt">Muhasebesel bir hareket algılandı<small id="bmBannerAlt">Bildirimler ekranından onaylayın</small></span>
 </div>
 </body>
 </html>
