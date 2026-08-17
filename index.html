@@ -3344,15 +3344,17 @@ function renderBildirimler(){
   const el = document.getElementById('bildirimList');
   el.innerHTML = pushDurumBanner() + (list.length ? list.map(b=>{
     const done = b.durum === 'islendi';
-    const masraf = b.tur === 'masraf';
+    const baslik = b.cariAdiTahmin || '💰 Mali Hareket';
     return `<div class="bl-card" data-id="${b.id}">
-      <div class="bl-top"><div class="bl-cari">${masraf ? '🧾 Muhasebesel Hareket' : (b.cariAdiTahmin || 'Cari seçilmedi')}</div><div class="bl-tutar">${fmt(b.tutar||0)}</div></div>
+      <div class="bl-top"><div class="bl-cari">${baslik}</div><div class="bl-tutar">${fmt(b.tutar||0)}</div></div>
       <div class="bl-kaynak">${b.aciklama||''}${b.kaynak ? ' · ' + b.kaynak : ''}</div>
       ${done
-        ? `<div class="bl-done">✓ ${masraf ? 'Hesaba İşlendi' : 'Hesaptan Düştüm'} · ${trDate(b.islenmeTarihi)}</div>`
-        : masraf
-          ? `<button type="button" class="bl-btn" data-hesaba-isle="${b.id}">Hesaba İşle</button>`
-          : `<button type="button" class="bl-btn" data-hesaptan-dus="${b.id}">Hesaptan Düş</button>`}
+        ? `<div class="bl-done">✓ ${b.islenmeYeri === 'masraf' ? 'Masrafa İşlendi' : (b.islenmeYeri === 'siparis' ? 'Siparişe İşlendi' : 'Hesaptan Düştüm')} · ${trDate(b.islenmeTarihi)}</div>`
+        : `<div style="display:flex;gap:6px;flex-wrap:wrap;">
+             <button type="button" class="bl-btn" style="flex:1;min-width:90px;" data-hesaptan-dus="${b.id}">Cariye İşle</button>
+             <button type="button" class="bl-btn" style="flex:1;min-width:90px;background:#5a6b7a;" data-hesaba-isle="${b.id}">Masrafa İşle</button>
+             <button type="button" class="bl-btn" style="flex:1;min-width:90px;background:#2f6690;" data-siparise-isle="${b.id}">Siparişe İşle</button>
+           </div>`}
     </div>`;
   }).join('') : '<div class="sk-empty">Bildirim yok</div>');
   el.querySelectorAll('[data-hesaptan-dus]').forEach(btn=>{
@@ -3361,13 +3363,18 @@ function renderBildirimler(){
   el.querySelectorAll('[data-hesaba-isle]').forEach(btn=>{
     btn.onclick = () => bildirimHesabaIsle(btn.dataset.hesabaIsle);
   });
+  el.querySelectorAll('[data-siparise-isle]').forEach(btn=>{
+    btn.onclick = () => bildirimSipariseIsle(btn.dataset.sipariseIsle);
+  });
   const pushBtn = document.getElementById('pushIzinBtn');
   if(pushBtn) pushBtn.onclick = pushBildirimIzniIste;
   updateBildirimBadge();
 }
 // 17 Ağu 2026: mail'den algılanan hareketi bir MASRAF kalemine işleme onay akışı.
 // bildirimHesaptanDus()'un tersine bu bir CARİ'ye değil, state.masrafHesaplari
-// içindeki bir kaleme yeni bir transaction ekler.
+// içindeki bir kaleme yeni bir transaction ekler. Her bildirimde HEM bu HEM
+// bildirimHesaptanDus butonu birlikte gösterilir — hangisine ait olduğu mail
+// içeriğinden güvenilir tahmin edilemediği için seçim kullanıcıya bırakılır.
 function bildirimHesabaIsle(id){
   const b = (state.bildirimler||[]).find(x=>x.id===id);
   if(!b) return;
@@ -3375,7 +3382,7 @@ function bildirimHesabaIsle(id){
   const optionsHtml = '<option value="">— Masraf Kalemi Seç —</option>'
     + kalemler.map(k=>`<option value="${k.id}">${k.name}</option>`).join('')
     + '<option value="__yeni__">+ Yeni Kalem Oluştur</option>';
-  cv2ModalAc('Hesaba İşle', 'Bu hareket hangi masraf kalemine işlensin, tutarı kontrol et.',
+  cv2ModalAc('Masrafa İşle', 'Bu hareket hangi masraf kalemine işlensin, tutarı kontrol et.',
     `<div class="sas-mini-form">
       <label>Masraf Kalemi</label>
       <select id="blMasrafKalemSec" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;margin-bottom:9px;">${optionsHtml}</select>
@@ -3383,7 +3390,7 @@ function bildirimHesabaIsle(id){
       <label>Tutar (₺)</label>
       <input type="number" step="0.01" id="blMasrafTutar" value="${b.tutar||0}">
     </div>`,
-    'Hesaba İşle', 'primary', () => {
+    'Masrafa İşle', 'primary', () => {
       const secim = document.getElementById('blMasrafKalemSec')?.value || '';
       const tutar = toNum(document.getElementById('blMasrafTutar')?.value);
       if(!secim){ alertBox('Önce bir masraf kalemi seç.'); return; }
@@ -3401,6 +3408,7 @@ function bildirimHesabaIsle(id){
       kalem.transactions.push({ desc: b.aciklama || 'Bildirimden işlendi', amount: tutar, date: new Date().toISOString(), bildirimRef: b.id });
       b.durum = 'islendi';
       b.islenmeTarihi = new Date().toISOString();
+      b.islenmeYeri = 'masraf';
       b.masrafKalemId = kalem.id;
       b.tutar = tutar;
       save();
@@ -3416,12 +3424,44 @@ function bildirimHesabaIsle(id){
     }
   }, 50);
 }
+// 17 Ağu 2026: mail'den algılanan hareketi bir SİPARİŞ olarak işleme akışı.
+// Sipariş fişleri kalem bazlı (ürün/miktar) olduğu için burada otomatik fiş
+// OLUŞTURULMAZ — sadece hangi cariye ait olduğu seçtirilip mevcut "Yeni Sipariş
+// Fişi" ekranına, mail açıklaması ön-dolu şekilde yönlendirilir. Kalemleri
+// kullanıcı kendi ekler (mevcut openSiparis akışı, dokunulmadı).
+function bildirimSipariseIsle(id){
+  const b = (state.bildirimler||[]).find(x=>x.id===id);
+  if(!b) return;
+  const secenekler = (state.cari||[]).map(c=>({id:c.id, name:c.name}));
+  const optionsHtml = '<option value="">— Cari Seç —</option>' + secenekler.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  cv2ModalAc('Siparişe İşle', 'Bu mail hangi müşterinin siparişi, cariyi seç. Kalemleri bir sonraki ekranda kendin eklersin.',
+    `<div class="sas-mini-form">
+      <label>Müşteri (Cari)</label>
+      <select id="blSiparisCariSec" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;">${optionsHtml}</select>
+    </div>`,
+    'Sipariş Ekranına Git', 'primary', () => {
+      const cariId = document.getElementById('blSiparisCariSec')?.value || '';
+      if(!cariId){ alertBox('Önce bir cari seç.'); return; }
+      b.durum = 'islendi';
+      b.islenmeTarihi = new Date().toISOString();
+      b.islenmeYeri = 'siparis';
+      b.cariId = cariId; b.ledgerKey = 'cari';
+      save();
+      cv2ModalKapat();
+      renderBildirimler();
+      openSiparis(cariId, 'cari');
+      if(draftSiparis) draftSiparis.aciklama = b.aciklama || '';
+      siparisDetayDonusEkran = 'siparisler';
+    });
+}
 // Firebase'in users/{uid}/gelenBildirimler node'unu okur (Apps Script tarafından
-// yazılan, henüz "islendi" işaretlenmemiş mail-algılama kayıtları) ve her birini
-// tur:'masraf' olan yeni bir yerel bildirime dönüştürür. Aynı Firebase kaydı
-// bir daha içeri alınmasın diye kaynakKey ile eşleşme kontrolü yapılır VE
-// Firebase tarafında islendi:true olarak işaretlenir (tekil bir "içeri alındı"
-// bayrağıdır, "hesaba işlendi" ile karıştırılmamalı — o durum yerel b.durum'da).
+// yazılan, gelen kutusundaki mali içerikli mailler) ve her birini yerel bir
+// bildirime dönüştürür. Aynı Firebase kaydı bir daha içeri alınmasın diye
+// kaynakKey ile eşleşme kontrolü yapılır VE Firebase tarafında islendi:true
+// olarak işaretlenir (bu SADECE "içeri alındı" bayrağıdır, "hesaba işlendi"
+// ile karıştırılmamalı — o durum yerel b.durum'da tutulur). Hangi deftere
+// (cari mi masraf mı) işleneceği burada TAHMİN EDİLMEZ — Bildirimler
+// ekranında kullanıcı "Cariye İşle" veya "Masrafa İşle" ile kendi seçer.
 function gelenBildirimleriKontrolEt(uid){
   if(!fbDb || !uid) return;
   fbDb.ref('users/' + uid + '/gelenBildirimler').once('value').then(snap => {
@@ -3435,15 +3475,14 @@ function gelenBildirimleriKontrolEt(uid){
       if(state.bildirimler.some(b => b.kaynakKey === key)) return;
       state.bildirimler.unshift({
         id: 'bildirim-mail-' + key,
-        tur: 'masraf',
         cariAdiTahmin: null,
         tutar: kayit.tutar || 0,
-        aciklama: kayit.baslik || 'Muhasebesel hareket algılandı',
-        kaynak: (kayit.kaynak === 'google-cloud-payment' ? 'Google Cloud/Firebase ödeme maili' : (kayit.kaynak || ''))
+        aciklama: kayit.baslik || 'Mail üzerinden algılandı',
+        kaynak: (kayit.gonderen ? kayit.gonderen : (kayit.kaynak || 'Mail'))
           + (kayit.referans ? ' · Ref: ' + kayit.referans : ''),
         tarih: kayit.tarih || new Date().toISOString(),
         durum: 'bekliyor',
-        cariId: null, ledgerKey: null, islenmeTarihi: null,
+        cariId: null, ledgerKey: null, islenmeTarihi: null, islenmeYeri: null,
         kaynakKey: key, masrafKalemId: null
       });
       fbDb.ref('users/' + uid + '/gelenBildirimler/' + key + '/islendi').set(true).catch(()=>{});
@@ -3461,7 +3500,7 @@ function gelenBildirimleriKontrolEt(uid){
 function bildirimMuhasebeselAlgilandiUyar(sayi){
   try{
     if('speechSynthesis' in window){
-      const konusma = new SpeechSynthesisUtterance('Muhasebesel bir hareket algılandı');
+      const konusma = new SpeechSynthesisUtterance(sayi > 1 ? (sayi + ' yeni muhasebesel hareket algılandı') : 'Muhasebesel bir hareket algılandı');
       konusma.lang = 'tr-TR';
       konusma.rate = 0.95;
       window.speechSynthesis.speak(konusma);
