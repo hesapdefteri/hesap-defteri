@@ -5655,16 +5655,16 @@ function cv2Find(id, tur){
 }
 let cv2SearchTerm = '';
 function cv2Liste(){
-  // CH1'deki (renderCariHesaplar) sıralamayla birebir aynı: önce tedarikçiler
-  // (bakiyeye göre azalan), sonra müşteriler. Filtre de aynı paylaşılan
-  // state.cariFilter değerini kullanıyor (Tümü / Aktifler / Pasifler)
-  // + state.cariTurFiltre (Hepsi / Alıcılar / Tedarikçiler) — 07 Ağu 2026 eklendi.
-  // 17 Ağu 2026, kullanıcı isteği: müşteriler artık SADECE bakiyeye göre değil,
-  // önce "bekleyen siparişi olanlar" (sipariş durumuna göre — en uzun bekleyen
-  // en üstte) sonra bekleyen siparişi olmayanlar (eskisi gibi bakiyeye göre).
-  const tedarikciler = state.tedarikci.map(c=>({c, tur:'tedarikci'}));
-  const musteriler = state.cari.map(c=>({c, tur:'cari'}));
-  tedarikciler.sort((a,b)=> cariBalance(b.c) - cariBalance(a.c));
+  // 17 Ağu 2026, kullanıcı netleştirmesi (ekran görüntüsüyle test edilip düzeltildi):
+  // Eski kural (tedarikçiler HER ZAMAN en üstte, sipariş durumundan bağımsız) YANLIŞ
+  // bulundu — örnek: "Drysan Kuru Temizleme" (bekleyen siparişi olan bir MÜŞTERİ)
+  // en üstte çıkıyordu, bu istenmiyordu. DOĞRU KURAL:
+  //   1) SADECE bekleyen siparişi olan taraflar en üstte — bu grup içinde
+  //      TEDARİKÇİ türü müşteri türünden önce gelir, aynı türde ise en uzun
+  //      bekleyen sipariş üstte.
+  //   2) Geri kalan HERKES (tedarikçi+müşteri karışık, sipariş beklemeyen)
+  //      eskisi gibi sadece bakiyeye göre azalan sıralanır.
+  const tumu = [...state.tedarikci.map(c=>({c, tur:'tedarikci'})), ...state.cari.map(c=>({c, tur:'cari'}))];
   const siparisGunFarkiOf = (c) => {
     const pendingSiparisler = (state.siparisFisleri || []).filter(f => f.cariId === c.id && !f.tamamlandi);
     if(!pendingSiparisler.length) return null;
@@ -5674,14 +5674,14 @@ function cv2Liste(){
     }, null);
     return Math.max(0, Math.floor((new Date() - enEskiTarih) / 86400000));
   };
-  musteriler.sort((a,b)=>{
-    const ga = siparisGunFarkiOf(a.c), gb = siparisGunFarkiOf(b.c);
-    if(ga !== null && gb === null) return -1;
-    if(ga === null && gb !== null) return 1;
-    if(ga !== null && gb !== null) return gb - ga; // en uzun bekleyen sipariş üstte
-    return cariBalance(b.c) - cariBalance(a.c);
+  const siparisliGrup = tumu.filter(({c}) => siparisGunFarkiOf(c) !== null);
+  const digerGrup = tumu.filter(({c}) => siparisGunFarkiOf(c) === null);
+  siparisliGrup.sort((a,b)=>{
+    if(a.tur !== b.tur) return a.tur === 'tedarikci' ? -1 : 1;
+    return siparisGunFarkiOf(b.c) - siparisGunFarkiOf(a.c);
   });
-  let combined = [...tedarikciler, ...musteriler];
+  digerGrup.sort((a,b)=> cariBalance(b.c) - cariBalance(a.c));
+  let combined = [...siparisliGrup, ...digerGrup];
   // 16 Ağu 2026, kullanıcı isteği: arşivlenmiş cariler normal görünümlerde
   // (Tümü/Aktifler/Pasifler) HİÇ görünmez; sadece Durum filtresinde "Arşiv"
   // seçiliyken (state.cariFilter === 'arsiv') sadece onlar listelenir.
