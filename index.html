@@ -1159,7 +1159,7 @@
 .siparis-miktar-inputs{display:flex;gap:8px;}
 .siparis-miktar-inputs input{flex:1;}
 /* 14 Ağu 2026: genel "Kaydediliyor" toast — bkz. #genelKaydediliyorToast */
-.gk-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#1c2b30;color:#fff;padding:10px 18px;border-radius:30px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;z-index:999;box-shadow:0 6px 18px rgba(0,0,0,.25);}
+.gk-toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:#1c2b30;color:#fff;padding:10px 18px;border-radius:30px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;z-index:10001;box-shadow:0 6px 18px rgba(0,0,0,.25);}
 .gk-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .gk-spin{width:12px;height:12px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:gkspin .7s linear infinite;flex-shrink:0;}
 .gk-toast.ok .gk-spin{display:none;}
@@ -2709,7 +2709,7 @@ function kaydediliyorTamam(){
   el.classList.add('ok');
   document.getElementById('genelKaydediliyorMetin').textContent = 'Kaydedildi ✓';
   clearTimeout(_gkToastTimer);
-  _gkToastTimer = setTimeout(()=> el.classList.remove('show'), 900);
+  _gkToastTimer = setTimeout(()=> el.classList.remove('show'), 1700);
 }
 
 function save(){
