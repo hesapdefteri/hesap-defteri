@@ -164,6 +164,18 @@
   .cv2-card[data-tur="cari"]{border-color:#4285f4;}
   .cv2-card[data-tur="tedarikci"]{border-color:#e8792c;}
   .cv2-card.cv2-pressed{transform:scale(.985);transition:transform .12s ease;}
+  .cv2-botnav{display:flex;flex-shrink:0;border-top:1px solid var(--line);background:#fff;padding-bottom:env(safe-area-inset-bottom);}
+  .cv2-botnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 2px 8px 2px;
+    border:none;background:transparent;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:-.1px;cursor:pointer;}
+  .cv2-botnav-btn svg{width:21px;height:21px;}
+  .cv2-botnav-btn.active{color:#2f6690;}
+  .cv2-rapor-list{display:flex;flex-direction:column;gap:9px;}
+  .cv2-rapor-row{display:flex;justify-content:space-between;align-items:center;background:#fff;border-radius:14px;
+    padding:13px 15px;border:1px solid rgba(16,24,32,.04);}
+  .cv2-rapor-name{font-weight:700;font-size:14px;color:var(--ink);}
+  .cv2-rapor-val{font-weight:800;font-size:14.5px;display:flex;align-items:baseline;gap:5px;}
+  .cv2-rapor-val .etiket{font-size:10.5px;font-weight:700;opacity:.7;}
+  .cv2-rapor-val.debt{color:var(--red);} .cv2-rapor-val.credit{color:var(--green);}
   .cv2-mid{flex:1;min-width:0;}
   .cv2-name{font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .cv2-date{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:3px;}
@@ -2485,6 +2497,27 @@
   </div>
   <div class="cv2-listpane" id="cv2ListPane">
     <div class="cv2-list" id="cv2List"></div>
+  </div>
+  <div class="cv2-listpane" id="cv2RaporPane" style="display:none;">
+    <div class="cv2-rapor-list" id="cv2RaporList"></div>
+  </div>
+  <div class="cv2-botnav" id="cv2BotNav">
+    <button class="cv2-botnav-btn active" data-sekme="cari">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M4.5 20c1.4-4.2 4.2-6.4 7.5-6.4s6.1 2.2 7.5 6.4"/></svg>
+      Cari Hesaplar
+    </button>
+    <button class="cv2-botnav-btn" data-sekme="siparis">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="13" rx="1.6"/><path d="M8 7V5.5A2.5 2.5 0 0110.5 3h3A2.5 2.5 0 0116 5.5V7"/><path d="M4 11h16"/></svg>
+      Siparişler
+    </button>
+    <button class="cv2-botnav-btn" data-sekme="arsiv">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="4.5" rx="1.3"/><path d="M5 9v8.5a2 2 0 002 2h10a2 2 0 002-2V9"/><path d="M10 13h4"/></svg>
+      Arşiv
+    </button>
+    <button class="cv2-botnav-btn" data-sekme="raporlar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11M11 20V4M18 20v-7"/><path d="M3 20h18"/></svg>
+      Raporlar
+    </button>
   </div>
 </div>
 
@@ -5855,6 +5888,11 @@ function cv2Find(id, tur){
   return arr.find(x=>x.id===id);
 }
 let cv2SearchTerm = '';
+// 18 Ağu 2026, kullanıcı isteği: ekranın altına sabit menü — Cari Hesaplar/
+// Siparişler/Arşiv/Raporlar arasında geçiş. 'cari' varsayılan, mevcut Durum/Tür
+// filtrelerine (☰ paneli) dokunmaz; 'siparis' ve 'arsiv' onları BY-PASS eder;
+// 'raporlar' ayrı bir panelde (cv2RaporPane) borç/alacak/kalan listesini gösterir.
+let cv2AltSekme = 'cari';
 function cv2Liste(){
   // 17 Ağu 2026, kullanıcı netleştirmesi (ekran görüntüsüyle test edilip düzeltildi):
   // Eski kural (tedarikçiler HER ZAMAN en üstte, sipariş durumundan bağımsız) YANLIŞ
@@ -5883,6 +5921,11 @@ function cv2Liste(){
   });
   digerGrup.sort((a,b)=> cariBalance(b.c) - cariBalance(a.c));
   let combined = [...siparisliGrup, ...digerGrup];
+  if(cv2AltSekme === 'siparis'){
+    combined = combined.filter(({c}) => c.arsiv !== true && siparisGunFarkiOf(c) !== null);
+  } else if(cv2AltSekme === 'arsiv'){
+    combined = combined.filter(({c}) => c.arsiv === true);
+  } else {
   // 16 Ağu 2026, kullanıcı isteği: arşivlenmiş cariler normal görünümlerde
   // (Tümü/Aktifler/Pasifler) HİÇ görünmez; sadece Durum filtresinde "Arşiv"
   // seçiliyken (state.cariFilter === 'arsiv') sadece onlar listelenir.
@@ -5895,6 +5938,7 @@ function cv2Liste(){
     } else if(state.cariFilter === 'pasif'){
       combined = combined.filter(({c}) => Math.abs(cariBalance(c)) <= 0.005);
     }
+  }
   }
   if(state.cariTurFiltre === 'alici'){
     combined = combined.filter(({tur}) => tur === 'cari');
@@ -6398,7 +6442,6 @@ function renderCariV2(){
   const total  = tumHesaplar.reduce((s,c)=> s + cariBalance(c), 0);
   const borc   = tumHesaplar.reduce((s,c)=> s + Math.min(cariBalance(c), 0), 0);
   const alacak = tumHesaplar.reduce((s,c)=> s + Math.max(cariBalance(c), 0), 0);
-  const list = cv2Liste();
 
   const netEl = document.getElementById('cv2Net');
   netEl.textContent = fmtWhole(total);
@@ -6406,6 +6449,18 @@ function renderCariV2(){
   document.getElementById('cv2Borc').textContent = fmtWhole(Math.abs(borc));
   document.getElementById('cv2Alacak').textContent = fmtWhole(alacak);
 
+  const listPane = document.getElementById('cv2ListPane');
+  const raporPane = document.getElementById('cv2RaporPane');
+  if(cv2AltSekme === 'raporlar'){
+    listPane.style.display = 'none';
+    raporPane.style.display = '';
+    cv2RaporRender();
+    return;
+  }
+  listPane.style.display = '';
+  raporPane.style.display = 'none';
+
+  const list = cv2Liste();
   const wrap = document.getElementById('cv2List');
   cv2OpenId = null;
   if(!list.length){
@@ -6414,6 +6469,30 @@ function renderCariV2(){
   }
   wrap.innerHTML = list.map(({c,tur}) => CariCardV2(c,tur)).join('');
   cv2BindCards();
+}
+// 18 Ağu 2026, kullanıcı isteği: Raporlar sekmesi — borç/alacak bakiyesi olan
+// her cari için tek satırlık özet (isim + tutar), en büyük bakiyeden küçüğe.
+// Toplamlar zaten üstteki cv2-summary çubuğunda (BORÇ/ALACAK/KALAN) gösteriliyor.
+function cv2RaporRender(){
+  const el = document.getElementById('cv2RaporList');
+  if(!el) return;
+  const rows = [...state.tedarikci.map(c=>({c,tur:'tedarikci'})), ...state.cari.map(c=>({c,tur:'cari'}))]
+    .filter(({c}) => c.arsiv !== true)
+    .map(({c,tur}) => ({ c, tur, bal: cariBalance(c) }))
+    .filter(({bal}) => Math.abs(bal) > 0.005)
+    .sort((a,b) => Math.abs(b.bal) - Math.abs(a.bal));
+  if(!rows.length){
+    el.innerHTML = '<div class="cv2-empty">Borç/alacak bakiyesi olan cari yok</div>';
+    return;
+  }
+  el.innerHTML = rows.map(({c, bal}) => {
+    const cls = cv2BalClass(bal);
+    const etiket = bal < 0 ? 'Borç' : 'Alacak';
+    return `<div class="cv2-rapor-row">
+      <div class="cv2-rapor-name">${c.name}</div>
+      <div class="cv2-rapor-val ${cls}"><span>${fmtWhole(Math.abs(bal))}</span><span class="etiket">${etiket}</span></div>
+    </div>`;
+  }).join('');
 }
 
 /* ---------- ikon/etiket haritası (hareket tipi) ---------- */
@@ -7110,6 +7189,15 @@ function cv2DahaFazla(id, tur){
     btn.addEventListener('click', () => {
       state.cariTurFiltre = btn.dataset.val;
       save();
+      renderCariV2();
+    });
+  });
+
+  // 18 Ağu 2026, kullanıcı isteği: alt sabit menü (Cari Hesaplar/Siparişler/Arşiv/Raporlar)
+  document.querySelectorAll('#cv2BotNav .cv2-botnav-btn').forEach(btn=>{
+    btn.addEventListener('click', () => {
+      cv2AltSekme = btn.dataset.sekme;
+      document.querySelectorAll('#cv2BotNav .cv2-botnav-btn').forEach(b=> b.classList.toggle('active', b === btn));
       renderCariV2();
     });
   });
@@ -11728,7 +11816,7 @@ try {
      onay verir. Alış/Satış zaten kendi spinner+özet akışına sahip (fisKaydet),
      silme aksiyonları zaten openConfirm→showIslemYapiliyor akışından geçiyor —
      bu toast SADECE bu ikisinin dışında kalan ekleme noktalarına eklendi. -->
-<div class="app-build-tag" id="appBuildTag">v18Ağu-E</div>
+<div class="app-build-tag" id="appBuildTag">v18Ağu-F</div>
 <div id="genelKaydediliyorToast" class="gk-toast">
   <span class="gk-spin"></span>
   <span id="genelKaydediliyorMetin">Kaydediliyor...</span>
