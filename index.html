@@ -1068,6 +1068,10 @@
   .sas-mini-form input{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;box-sizing:border-box;margin-bottom:7px;}
   .sas-mini-form select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;box-sizing:border-box;margin-bottom:7px;background:#fff;color:var(--ink);}
   .sas-mini-form label{font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;}
+  .sas-swipe-wrap{position:relative;overflow:hidden;flex:1;border-bottom:none;border-radius:10px;}
+  .sas-swipe-wrap .swipe-actions{border-radius:0 10px 10px 0;overflow:hidden;}
+  .swipe-btn.sas-sil{background:#c0392b;}
+  .sas-swipe-content{display:flex;gap:16px;border-bottom:none !important;}
   /* --- Bildirimler ekranı — 16 Ağu 2026 --- */
   .bl-card{background:#fff;border-radius:14px;padding:15px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(20,40,50,.06);}
   .bl-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:10px;}
@@ -3232,16 +3236,57 @@ function siparisAsamaStepperHtml(d){
     if(durumSinif==='sas-active'){
       actionHtml = `<button type="button" class="sas-action" data-fis="${d.id}" data-asama="${key}">✓ ${meta.label}</button>`;
     }
-    return `<div class="sas-step ${durumSinif}">
-      <div class="sas-step-line"></div>
+    const nodeBodyHtml = `
       <div class="sas-node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">${meta.icon}</svg></div>
       <div class="sas-body">
         <div class="sas-title">${meta.label}</div>
         <div class="sas-meta">${metaHtml}</div>
         ${actionHtml}
-      </div>
+      </div>`;
+    // 18 Ağu 2026, kullanıcı isteği: tamamlanmış aşamalar sola kaydırılabilsin,
+    // "Sil" ile o aşamaya (ve sonrasına) geri dönülebilsin. Henüz tamamlanmamış
+    // (aktif/kilitli) aşamalarda geri dönülecek bir şey olmadığı için kaydırma yok.
+    const gövde = durumSinif==='sas-done'
+      ? `<div class="sas-swipe-wrap swipe-wrap">
+          <div class="swipe-actions">
+            <button type="button" class="swipe-btn sas-sil" data-fis="${d.id}" data-asama="${key}">Sil</button>
+          </div>
+          <div class="swipe-content sas-swipe-content">${nodeBodyHtml}</div>
+        </div>`
+      : nodeBodyHtml;
+    return `<div class="sas-step ${durumSinif}">
+      <div class="sas-step-line"></div>
+      ${gövde}
     </div>`;
   }).join('') + `</div>`;
+}
+function siparisAsamaGeriDon(fisId, key){
+  const d = state.siparisFisleri.find(x=>x.id===fisId);
+  if(!d) return;
+  const asamalar = siparisAsamaEnsure(d);
+  const i = SIPARIS_ASAMA_SIRA.indexOf(key);
+  if(i<0) return;
+  const c = state[d.ledgerKey].find(x=>x.id===d.cariId);
+  const meta = SIPARIS_ASAMA_META[key];
+  openConfirm('Aşamayı Geri Al', `"${meta.label}" ve sonrasındaki aşamalar sıfırlanacak, süreç bu noktaya geri dönecek. Emin misin?`, () => {
+    for(let j=i;j<SIPARIS_ASAMA_SIRA.length;j++){
+      const k = SIPARIS_ASAMA_SIRA[j];
+      if(k==='faturaDonustur' && asamalar[k] && asamalar[k].durum){
+        if(c) c.transactions = (c.transactions||[]).filter(t=>t.siparisRef!==d.id);
+        d.tamamlandi = false;
+        delete d.tamamlanmaTarihi;
+      }
+      if(k==='tahsilatTarihi' && asamalar[k] && asamalar[k].durum){
+        if(c && c.odemeTarihi) delete c.odemeTarihi;
+      }
+      asamalar[k] = { durum:false, tarih:null };
+    }
+    if(i<=SIPARIS_ASAMA_SIRA.indexOf('teslim')){ delete d.teslimTuru; delete d.teslimAmbarId; }
+    if(i<=SIPARIS_ASAMA_SIRA.indexOf('sevkiyat')){ delete d.ambarId; }
+    save();
+    render();
+    siparisGorRefresh();
+  }, 'Evet, Geri Al');
 }
 let siparisGorCariId = null, siparisGorLedgerKey = null;
 function siparisGorRefresh(){ if(siparisGorCariId) openSiparisGorPopup(siparisGorCariId, siparisGorLedgerKey); }
@@ -3444,7 +3489,7 @@ function openSiparisGorPopup(id, ledgerKey){
   `).join('') : '<div class="sk-empty">Bu hesaba ait sipariş yok</div>';
   el.querySelectorAll('.irsaliye-card[data-id]').forEach(card=>{
     card.onclick = (e) => {
-      if(e.target.closest('.sas-action') || e.target.closest('[data-geri-al]')) return;
+      if(e.target.closest('.sas-action') || e.target.closest('[data-geri-al]') || e.target.closest('.sas-swipe-wrap')) return;
       siparisDetayDonusEkran = 'siparisgor';
       siparisDetayDonusCariId = id;
       siparisDetayDonusLedger = ledgerKey;
@@ -3456,6 +3501,10 @@ function openSiparisGorPopup(id, ledgerKey){
   });
   el.querySelectorAll('.sas-action[data-fis]').forEach(btn=>{
     btn.onclick = (e) => { e.stopPropagation(); siparisAsamaIlerlet(btn.dataset.fis, btn.dataset.asama); };
+  });
+  enableSwipeRows(el);
+  el.querySelectorAll('.swipe-btn.sas-sil[data-fis]').forEach(btn=>{
+    btn.onclick = (e) => { e.stopPropagation(); siparisAsamaGeriDon(btn.dataset.fis, btn.dataset.asama); };
   });
   document.getElementById('siparisGorScreen').classList.add('show');
 }
