@@ -3334,9 +3334,13 @@ function siparisAsamaIlerlet(fisId, key){
         save(); cv2ModalKapat(); siparisGorRefresh();
       });
     const selEl = document.getElementById('sasAmbarSec');
-    if(selEl) selEl.addEventListener('change', () => {
+    const sasToggleYeniAlan = () => {
       document.getElementById('sasYeniAmbarAlan').style.display = selEl.value === '__yeni__' ? 'block' : 'none';
-    });
+    };
+    if(selEl){
+      selEl.addEventListener('change', sasToggleYeniAlan);
+      sasToggleYeniAlan();
+    }
     return;
   }
   if(key === 'teslim'){
