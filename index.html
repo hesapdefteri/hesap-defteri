@@ -3252,7 +3252,7 @@ function siparisAsamaStepperHtml(d){
     if(a.durum) durumSinif = 'sas-done';
     else if(oncekiTamam && !ilkAktifBulundu){ durumSinif = 'sas-active'; ilkAktifBulundu = true; }
     let metaHtml = 'Bekleniyor';
-    if(a.durum) metaHtml = trDate(a.tarih) + ' · Tamamlandı' + (a.otomatik ? ' <span class="sas-oto-tag">🔗 Karşı taraftan otomatik</span>' : '');
+    if(a.durum) metaHtml = trDateSaat(a.tarih) + ' · Tamamlandı' + (a.otomatik ? ' <span class="sas-oto-tag">🔗 Karşı taraftan otomatik</span>' : '');
     else if(durumSinif==='sas-active') metaHtml = 'Şimdi işaretle';
     let actionHtml = '';
     if(durumSinif==='sas-active'){
@@ -8204,6 +8204,12 @@ function renderRapor(){
 function genId(){ return 's_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 function toNum(v){ const n = parseFloat(String(v||'0').replace(',', '.')); return isNaN(n) ? 0 : n; }
 function trDate(iso){ const d = new Date(iso); return isNaN(d) ? '—' : d.toLocaleDateString('tr-TR'); }
+function trDateSaat(iso){
+  const d = new Date(iso);
+  if(isNaN(d)) return '—';
+  const saat = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+  return trDate(iso) + ' ' + saat;
+}
 function todayInputVal(){ return new Date().toISOString().slice(0,10); }
 
 // ---- Hesaplama yardımcıları ----
@@ -11695,7 +11701,7 @@ try {
      onay verir. Alış/Satış zaten kendi spinner+özet akışına sahip (fisKaydet),
      silme aksiyonları zaten openConfirm→showIslemYapiliyor akışından geçiyor —
      bu toast SADECE bu ikisinin dışında kalan ekleme noktalarına eklendi. -->
-<div class="app-build-tag" id="appBuildTag">v18Ağu-B</div>
+<div class="app-build-tag" id="appBuildTag">v18Ağu-C</div>
 <div id="genelKaydediliyorToast" class="gk-toast">
   <span class="gk-spin"></span>
   <span id="genelKaydediliyorMetin">Kaydediliyor...</span>
