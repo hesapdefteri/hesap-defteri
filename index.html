@@ -3373,6 +3373,7 @@ let siparisGorCariId = null, siparisGorLedgerKey = null;
 // gerçek bir giriş ise) o anki görünür ekran hatırlanıyor, geri dönüşte
 // oraya dönülüyor.
 let siparisGorOncekiEkran = 'cv2';
+let siparisGorOncekiCariId = null, siparisGorOncekiLedger = null;
 function siparisGorRefresh(){ if(siparisGorCariId) openSiparisGorPopup(siparisGorCariId, siparisGorLedgerKey); }
 function siparisAsamaIlerlet(fisId, key){
   const d = state.siparisFisleri.find(x=>x.id===fisId);
@@ -3574,10 +3575,14 @@ function openSiparisGorPopup(id, ledgerKey){
   if(!document.getElementById('siparisGorScreen').classList.contains('show')){
     if(document.getElementById('cv2Screen').classList.contains('show')){
       siparisGorOncekiEkran = 'cv2';
+      siparisGorOncekiCariId = id;
+      siparisGorOncekiLedger = ledgerKey;
     } else if(anaMenu.style.display === 'flex' || anaMenu.style.display === ''){
       siparisGorOncekiEkran = 'anaMenu';
     } else {
       siparisGorOncekiEkran = 'cv2'; // güvenli varsayılan
+      siparisGorOncekiCariId = id;
+      siparisGorOncekiLedger = ledgerKey;
     }
   }
   siparisGorCariId = id; siparisGorLedgerKey = ledgerKey;
@@ -3646,8 +3651,14 @@ function siparisGorGeriDon(){
   } else {
     renderCariV2();
     document.getElementById('cv2Screen').classList.add('show');
+    // 18 Ağu 2026, kullanıcı isteği: "hangi adımdaysam bir geri adım çıksın,
+    // ana menüye/düz listeye atmasın" — düz cv2Screen'de bırakmak yerine,
+    // girildiği carinin Hareketler ekranı biliniyorsa DOĞRUDAN o açılır.
+    if(siparisGorOncekiCariId) cv2Hareketler(siparisGorOncekiCariId, siparisGorOncekiLedger);
   }
   siparisGorOncekiEkran = 'cv2';
+  siparisGorOncekiCariId = null;
+  siparisGorOncekiLedger = null;
 }
 document.getElementById('siparisGorKapat').onclick = () => siparisGorGeriDon();
 
@@ -6438,6 +6449,13 @@ function cv2SegBtnleriGuncelle(){
 
 function renderCariV2(){
   cv2SegBtnleriGuncelle();
+  // 18 Ağu 2026, kullanıcı isteği: hangi alt sekmedeysem (Cari Hesaplar/Siparişler/
+  // Arşiv/Raporlar) geri dönüşte de O sekme vurgulu kalsın — önceden sadece
+  // butona TIKLANINCA güncelleniyordu, başka bir ekrandan geri dönüldüğünde
+  // vurgu yanlışlıkla "Cari Hesaplar"da kalıyordu.
+  document.querySelectorAll('#cv2BotNav .cv2-botnav-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.sekme === cv2AltSekme);
+  });
   const tumHesaplar = [...state.tedarikci, ...state.cari];
   const total  = tumHesaplar.reduce((s,c)=> s + cariBalance(c), 0);
   const borc   = tumHesaplar.reduce((s,c)=> s + Math.min(cariBalance(c), 0), 0);
@@ -11816,7 +11834,7 @@ try {
      onay verir. Alış/Satış zaten kendi spinner+özet akışına sahip (fisKaydet),
      silme aksiyonları zaten openConfirm→showIslemYapiliyor akışından geçiyor —
      bu toast SADECE bu ikisinin dışında kalan ekleme noktalarına eklendi. -->
-<div class="app-build-tag" id="appBuildTag">v18Ağu-F</div>
+<div class="app-build-tag" id="appBuildTag">v18Ağu-G</div>
 <div id="genelKaydediliyorToast" class="gk-toast">
   <span class="gk-spin"></span>
   <span id="genelKaydediliyorMetin">Kaydediliyor...</span>
