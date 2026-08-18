@@ -165,10 +165,13 @@
   .cv2-card[data-tur="tedarikci"]{border-color:#e8792c;}
   .cv2-card.cv2-pressed{transform:scale(.985);transition:transform .12s ease;}
   .cv2-botnav{display:flex;flex-shrink:0;border-top:1px solid var(--line);background:#fff;padding-bottom:env(safe-area-inset-bottom);}
-  .cv2-botnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 2px 8px 2px;
+  .cv2-botnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 2px 8px 2px;
     border:none;background:transparent;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:-.1px;cursor:pointer;}
-  .cv2-botnav-btn svg{width:21px;height:21px;}
-  .cv2-botnav-btn.active{color:#2f6690;}
+  .cv2-botnav-ic{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background-color .15s ease;}
+  .cv2-botnav-btn svg{width:19px;height:19px;color:var(--c);opacity:.55;transition:opacity .15s ease,color .15s ease;}
+  .cv2-botnav-btn.active{color:var(--c);}
+  .cv2-botnav-btn.active .cv2-botnav-ic{background:var(--c);}
+  .cv2-botnav-btn.active svg{color:#fff;opacity:1;}
   .cv2-rapor-list{display:flex;flex-direction:column;gap:9px;}
   .cv2-rapor-row{display:flex;justify-content:space-between;align-items:center;background:#fff;border-radius:14px;
     padding:13px 15px;border:1px solid rgba(16,24,32,.04);}
@@ -1184,7 +1187,7 @@
 .siparis-miktar-inputs{display:flex;gap:8px;}
 .siparis-miktar-inputs input{flex:1;}
 /* 14 Ağu 2026: genel "Kaydediliyor" toast — bkz. #genelKaydediliyorToast */
-.app-build-tag{position:fixed;left:8px;bottom:calc(60px + env(safe-area-inset-bottom));font-size:9.5px;color:#c7c7c7;z-index:10001;pointer-events:none;font-weight:600;letter-spacing:.2px;}
+.app-build-tag{position:fixed;left:8px;bottom:calc(4px + env(safe-area-inset-bottom));font-size:9.5px;color:#c7c7c7;z-index:10001;pointer-events:none;font-weight:600;letter-spacing:.2px;}
 .gk-toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:#1c2b30;color:#fff;padding:10px 18px;border-radius:30px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;z-index:10001;box-shadow:0 6px 18px rgba(0,0,0,.25);}
 .gk-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .gk-spin{width:12px;height:12px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:gkspin .7s linear infinite;flex-shrink:0;}
@@ -2502,20 +2505,20 @@
     <div class="cv2-rapor-list" id="cv2RaporList"></div>
   </div>
   <div class="cv2-botnav" id="cv2BotNav">
-    <button class="cv2-botnav-btn active" data-sekme="cari">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M4.5 20c1.4-4.2 4.2-6.4 7.5-6.4s6.1 2.2 7.5 6.4"/></svg>
+    <button class="cv2-botnav-btn active" data-sekme="cari" style="--c:#2f6fed;">
+      <span class="cv2-botnav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M4.5 20c1.4-4.2 4.2-6.4 7.5-6.4s6.1 2.2 7.5 6.4"/></svg></span>
       Cari Hesaplar
     </button>
-    <button class="cv2-botnav-btn" data-sekme="siparis">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="13" rx="1.6"/><path d="M8 7V5.5A2.5 2.5 0 0110.5 3h3A2.5 2.5 0 0116 5.5V7"/><path d="M4 11h16"/></svg>
+    <button class="cv2-botnav-btn" data-sekme="siparis" style="--c:#dd7a2c;">
+      <span class="cv2-botnav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="13" rx="1.6"/><path d="M8 7V5.5A2.5 2.5 0 0110.5 3h3A2.5 2.5 0 0116 5.5V7"/><path d="M4 11h16"/></svg></span>
       Siparişler
     </button>
-    <button class="cv2-botnav-btn" data-sekme="arsiv">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="4.5" rx="1.3"/><path d="M5 9v8.5a2 2 0 002 2h10a2 2 0 002-2V9"/><path d="M10 13h4"/></svg>
+    <button class="cv2-botnav-btn" data-sekme="arsiv" style="--c:#8a5fd6;">
+      <span class="cv2-botnav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="4.5" rx="1.3"/><path d="M5 9v8.5a2 2 0 002 2h10a2 2 0 002-2V9"/><path d="M10 13h4"/></svg></span>
       Arşiv
     </button>
-    <button class="cv2-botnav-btn" data-sekme="raporlar">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11M11 20V4M18 20v-7"/><path d="M3 20h18"/></svg>
+    <button class="cv2-botnav-btn" data-sekme="raporlar" style="--c:#1f9d64;">
+      <span class="cv2-botnav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11M11 20V4M18 20v-7"/><path d="M3 20h18"/></svg></span>
       Raporlar
     </button>
   </div>
@@ -11871,7 +11874,7 @@ try {
      onay verir. Alış/Satış zaten kendi spinner+özet akışına sahip (fisKaydet),
      silme aksiyonları zaten openConfirm→showIslemYapiliyor akışından geçiyor —
      bu toast SADECE bu ikisinin dışında kalan ekleme noktalarına eklendi. -->
-<div class="app-build-tag" id="appBuildTag">v18Ağu-I</div>
+<div class="app-build-tag" id="appBuildTag">v18Ağu-J</div>
 <div id="genelKaydediliyorToast" class="gk-toast">
   <span class="gk-spin"></span>
   <span id="genelKaydediliyorMetin">Kaydediliyor...</span>
