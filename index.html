@@ -3323,6 +3323,12 @@ function siparisAsamaGeriDon(fisId, key){
   }, 'Evet, Geri Al');
 }
 let siparisGorCariId = null, siparisGorLedgerKey = null;
+// 18 Ağu 2026, kullanıcı isteği: Sipariş Takip ('‹') geri butonu HER ZAMAN
+// Cari Hesap listesine (cv2Screen) atlıyordu — hangi ekrandan girildiği hiç
+// bilinmiyordu. Artık popup ilk açıldığında (kendi kendine yenilenme DEĞİL,
+// gerçek bir giriş ise) o anki görünür ekran hatırlanıyor, geri dönüşte
+// oraya dönülüyor.
+let siparisGorOncekiEkran = 'cv2';
 function siparisGorRefresh(){ if(siparisGorCariId) openSiparisGorPopup(siparisGorCariId, siparisGorLedgerKey); }
 function siparisAsamaIlerlet(fisId, key){
   const d = state.siparisFisleri.find(x=>x.id===fisId);
@@ -3518,6 +3524,18 @@ function siparisAsamaIlerlet(fisId, key){
   siparisGorRefresh();
 }
 function openSiparisGorPopup(id, ledgerKey){
+  // Sadece GERÇEK bir girişte (ekran henüz açık değilken) önceki ekranı
+  // kaydet — siparisGorRefresh() gibi kendi kendine yenilemelerde üzerine
+  // yazma, aksi halde asıl giriş noktası unutulur.
+  if(!document.getElementById('siparisGorScreen').classList.contains('show')){
+    if(document.getElementById('cv2Screen').classList.contains('show')){
+      siparisGorOncekiEkran = 'cv2';
+    } else if(anaMenu.style.display === 'flex' || anaMenu.style.display === ''){
+      siparisGorOncekiEkran = 'anaMenu';
+    } else {
+      siparisGorOncekiEkran = 'cv2'; // güvenli varsayılan
+    }
+  }
   siparisGorCariId = id; siparisGorLedgerKey = ledgerKey;
   hideAllScreens();
   const c = state[ledgerKey].find(x=>x.id===id);
@@ -3579,8 +3597,13 @@ function openSiparisGorPopup(id, ledgerKey){
 }
 function siparisGorGeriDon(){
   hideAllScreens();
-  renderCariV2();
-  document.getElementById('cv2Screen').classList.add('show');
+  if(siparisGorOncekiEkran === 'anaMenu'){
+    showAnaMenu();
+  } else {
+    renderCariV2();
+    document.getElementById('cv2Screen').classList.add('show');
+  }
+  siparisGorOncekiEkran = 'cv2';
 }
 document.getElementById('siparisGorKapat').onclick = () => siparisGorGeriDon();
 
@@ -11701,7 +11724,7 @@ try {
      onay verir. Alış/Satış zaten kendi spinner+özet akışına sahip (fisKaydet),
      silme aksiyonları zaten openConfirm→showIslemYapiliyor akışından geçiyor —
      bu toast SADECE bu ikisinin dışında kalan ekleme noktalarına eklendi. -->
-<div class="app-build-tag" id="appBuildTag">v18Ağu-C</div>
+<div class="app-build-tag" id="appBuildTag">v18Ağu-D</div>
 <div id="genelKaydediliyorToast" class="gk-toast">
   <span class="gk-spin"></span>
   <span id="genelKaydediliyorMetin">Kaydediliyor...</span>
