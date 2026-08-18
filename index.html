@@ -1668,6 +1668,9 @@
     <div class="ios-card">
       <div class="field-ios"><label>Tarih</label><input type="date" id="quickTxTarih"></div>
     </div>
+    <div class="ios-card">
+      <div class="field-ios"><label>Açıklama</label><input type="text" id="quickTxDesc" placeholder="İsteğe bağlı"></div>
+    </div>
 
     <div id="tahsilatYontemRow" class="hidden ios-card" style="margin-bottom:14px;">
       <button type="button" id="tahYontemSecBtn" class="field-ios" style="width:100%;border:none;background:none;cursor:pointer;">
@@ -4661,6 +4664,7 @@ function openQuickTx(id, ledgerKey, type){
   document.getElementById('quickTxAmountUyari').classList.add('hidden');
   document.getElementById('quickTxTarih').value = new Date().toISOString().slice(0,10);
   quickTxCekOn = false; quickTxCiroOn = false;
+  document.getElementById('quickTxDesc').value = '';
   document.getElementById('quickTxCekToggle').classList.remove('on');
   document.getElementById('quickTxCiroToggle').classList.remove('on');
   document.getElementById('quickTxCiroRow').classList.add('hidden');
@@ -4732,7 +4736,7 @@ document.getElementById('quickTxSave').onclick = () => {
     tarihIso = quickTxEditDate || new Date().toISOString();
   }
 
-  const tx = { type: quickTxType, desc: '', amount, date: tarihIso, cek: cekSecili, ciro: isTahsilat ? (cekSecili && quickTxPrevCiro) : (usesYontem ? cekSecili : (quickTxCekOn && quickTxCiroOn)) };
+  const tx = { type: quickTxType, desc: document.getElementById('quickTxDesc').value.trim(), amount, date: tarihIso, cek: cekSecili, ciro: isTahsilat ? (cekSecili && quickTxPrevCiro) : (usesYontem ? cekSecili : (quickTxCekOn && quickTxCiroOn)) };
   if(cekSecili && usesYontem){
     tx.cekId = 'cek_' + Date.now() + '_' + Math.floor(Math.random()*100000);
     tx.cekDetay = {
@@ -5428,6 +5432,7 @@ function openTxEditForm(t){
   quickTxPrevCiro = editWasCiro;
   document.getElementById('quickTxAmount').value = fmtPlain(editAmount);
   document.getElementById('quickTxTarih').value = new Date(editDate).toISOString().slice(0,10);
+  document.getElementById('quickTxDesc').value = t.desc || '';
   if(editType === 'TAHSİLAT' && editWasCek){
     tahYontemSec('cek');
     cekFormuDoldur({ cekDetay: editCekDetay });
@@ -6690,6 +6695,7 @@ function cv2TxAcOdeme(tur, id, idx){
   quickTxPrevCiro = !!t.ciro;
   document.getElementById('quickTxAmount').value = fmtPlain(Math.abs(t.amount));
   document.getElementById('quickTxTarih').value = new Date(t.date).toISOString().slice(0,10);
+  document.getElementById('quickTxDesc').value = t.desc || '';
   if(t.cek){
     tahYontemSec('cek');
     cekFormuDoldur({ cekDetay: t.cekDetay });
