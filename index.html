@@ -1159,6 +1159,7 @@
 .siparis-miktar-inputs{display:flex;gap:8px;}
 .siparis-miktar-inputs input{flex:1;}
 /* 14 Ağu 2026: genel "Kaydediliyor" toast — bkz. #genelKaydediliyorToast */
+.app-build-tag{position:fixed;left:8px;bottom:calc(4px + env(safe-area-inset-bottom));font-size:9.5px;color:#c7c7c7;z-index:10001;pointer-events:none;font-weight:600;letter-spacing:.2px;}
 .gk-toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:#1c2b30;color:#fff;padding:10px 18px;border-radius:30px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;z-index:10001;box-shadow:0 6px 18px rgba(0,0,0,.25);}
 .gk-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .gk-spin{width:12px;height:12px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:gkspin .7s linear infinite;flex-shrink:0;}
@@ -11591,6 +11592,7 @@ try {
      onay verir. Alış/Satış zaten kendi spinner+özet akışına sahip (fisKaydet),
      silme aksiyonları zaten openConfirm→showIslemYapiliyor akışından geçiyor —
      bu toast SADECE bu ikisinin dışında kalan ekleme noktalarına eklendi. -->
+<div class="app-build-tag" id="appBuildTag">v18Ağu-A</div>
 <div id="genelKaydediliyorToast" class="gk-toast">
   <span class="gk-spin"></span>
   <span id="genelKaydediliyorMetin">Kaydediliyor...</span>
