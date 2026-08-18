@@ -142,12 +142,23 @@
   .cv2-abtn.ekstre{background:#3d5a80;}
   .cv2-abtn.daha{background:#8a94a0;}
 
-  .cv2-card{position:relative;z-index:2;background:#fff;border-radius:18px;padding:30px 16px;
-    display:flex;align-items:center;gap:12px;cursor:pointer;touch-action:pan-y;will-change:transform;
+  .cv2-card{position:relative;z-index:2;background:#fff;border-radius:18px;padding:16px 16px 14px 16px;
+    display:flex;flex-direction:column;align-items:stretch;gap:10px;cursor:pointer;touch-action:pan-y;will-change:transform;
     border:1px solid rgba(16,24,32,.04);-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
-  .cv2-card.cv2-card-siparisli{flex-direction:column;align-items:stretch;gap:10px;padding-top:14px;}
-  .cv2-name-top{text-align:center;font-size:17px;font-weight:800;color:var(--ink);letter-spacing:-.2px;}
+  .cv2-card-siparisli{padding-top:14px;}
+  .cv2-name-top{text-align:left;font-size:17px;font-weight:800;color:var(--ink);letter-spacing:-.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .cv2-card-row{display:flex;align-items:center;gap:12px;}
+  .cv2-circles{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .cv2-odeme-row{margin-top:-2px;}
+  .cv2-odeme-txt{display:flex;flex-direction:column;justify-content:center;}
+  .cv2-odeme-txt .cv2-odeme-b1{font-size:12px;font-weight:700;color:var(--muted);}
+  .cv2-odeme-txt .cv2-odeme-b2{font-size:12.5px;font-weight:700;color:#dd7a2c;}
+  .cv2-odeme-txt.gecikti .cv2-odeme-b2{color:#e5484d;}
+  .cv2-ring2{position:relative;width:52px;height:52px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  .cv2-ring2-inner{width:44px;height:44px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .cv2-ring2-inner b{font-size:15px;font-weight:800;color:#dd7a2c;line-height:1;}
+  .cv2-ring2-inner span{font-size:8px;font-weight:700;color:var(--muted);letter-spacing:.2px;}
+  .cv2-ring2.gecikti .cv2-ring2-inner b{color:#e5484d;}
   .cv2-mavi-halka{border-radius:50%;border:3px solid #2f6fed;padding:3px;display:inline-flex;flex-shrink:0;box-shadow:0 0 0 2px rgba(47,111,237,.15);}
   .cv2-date.cv2-siparis-buyuk{font-size:14.5px;}
   .cv2-card[data-tur="cari"]{border-color:#4285f4;}
@@ -5918,10 +5929,14 @@ function CariCardV2(c, tur){
     siparisGunFarki = Math.max(0, Math.floor((new Date() - enEskiTarih) / 86400000));
     siparisRenk = siparisGunFarki >= 7 ? '#e5484d' : '#dd7a2c';
   }
-  // CH1'deki (Cari Hesaplar) tarih rozeti + "X gün/ay önce" mantığıyla birebir aynı
-  // (siparis-date-circle CSS'i ve relativeZaman() fonksiyonu doğrudan yeniden kullanılıyor).
+  // Birinci daire: son hareket tarihi ya da bekleyen sipariş göstergesi.
+  // 18 Ağu 2026, kullanıcı isteği: ödeme günü artık bu dairenin etrafına
+  // sarılmıyor — ayrı, bağımsız bir ikinci daire oldu (aşağıda).
   let circleHtml, altYazi;
-  if(sh){
+  if(hasPendingSiparis){
+    circleHtml = `<span class="siparis-date-circle siparis-bekleyen cv2-siparis-daire" data-uid="${uid}" style="background:${siparisRenk};"><b>+${siparisGunFarki}</b>GÜN</span>`;
+    altYazi = `Sipariş bekliyor · ${siparisGunFarki} gün önce`;
+  } else if(sh){
     const gun = sh.getDate();
     const ay = sh.toLocaleDateString('tr-TR', {month:'short'}).toUpperCase().replace('.', '');
     circleHtml = `<span class="siparis-date-circle son-hareket"><b>${gun}</b>${ay}</span>`;
@@ -5931,9 +5946,20 @@ function CariCardV2(c, tur){
     circleHtml = '<span class="siparis-date-circle siparis-date-circle-empty"></span>';
     altYazi = 'Henüz hareket yok';
   }
-  // Ödeme tarihi girilmişse dairenin etrafına, tarihe yaklaştıkça saat yönünde
-  // (12 hizasından başlayarak) dolan bir ilerleme halkası + sol üst köşede kalan
-  // gün sayısını gösteren minik rozet ekleniyor (05 Ağu 2026, kullanıcı isteği).
+  if(hasPendingSiparis) circleHtml = `<div class="cv2-mavi-halka">${circleHtml}</div>`;
+  let siparisTutarHtml = '';
+  if(hasPendingSiparis){
+    const siparisToplam = pendingSiparisler.reduce((sum, f) => {
+      let fisToplam = f.kalemler.reduce((s, k) => s + toNum(k.tutar), 0);
+      if(f.kdvDahil) fisToplam *= 1.20;
+      return sum + fisToplam;
+    }, 0);
+    siparisTutarHtml = `<div class="cv2-siparis-tutar" style="color:${siparisRenk};">Sipariş: ${fmtWhole(siparisToplam)}</div>`;
+  }
+  // İkinci daire: ödeme gününe kaç gün kaldığını gösteren bağımsız gösterge
+  // (18 Ağu 2026, kullanıcı isteği). Tarih girilmemişse gri/boş görünür,
+  // "Belirlenmedi" yazar. Dolgu oranı süreye göre artar, tarih geçince kırmızıya döner.
+  let odemeRingHtml, odemeTextHtml;
   if(c.odemeTarihi){
     const odemeStr = c.odemeTarihi.includes('T') ? c.odemeTarihi : (c.odemeTarihi + 'T11:00');
     const odeme = new Date(odemeStr);
@@ -5947,36 +5973,16 @@ function CariCardV2(c, tur){
     const kalanGun = Math.ceil((odeme - now) / 86400000);
     const gecikti = kalanGun < 0;
     const renk = gecikti ? '#e5484d' : '#dd7a2c';
-    const rozetYazi = gecikti ? String(kalanGun) : ('+' + kalanGun);
-    // 17 Ağu 2026, kullanıcı isteği: ödeme tarihi halkası VE bekleyen sipariş aynı
-    // anda varsa, halka artık pasif değil — dokununca da Sipariş Gör popup'ı açılsın
-    // (önceki davranışta halka görünüyordu ama tıklanamıyordu, sipariş erişilemez oluyordu).
-    const ringSiparisAttrs = hasPendingSiparis ? `cv2-siparis-daire" data-uid="${uid}` : '';
-    circleHtml = `<div class="cv2-ring ${ringSiparisAttrs}" style="background:conic-gradient(${renk} ${deg}deg, #e4e8ea ${deg}deg 360deg);">
-      ${circleHtml}
-      <span class="cv2-ring-badge" style="background:${renk};">${rozetYazi}</span>
+    const rozetYazi = gecikti ? String(Math.abs(kalanGun)) : String(kalanGun);
+    odemeRingHtml = `<div class="cv2-ring2${gecikti ? ' gecikti' : ''}" style="background:conic-gradient(${renk} ${deg}deg, #e4e8ea ${deg}deg 360deg);">
+      <div class="cv2-ring2-inner"><b>${rozetYazi}</b><span>GÜN</span></div>
     </div>`;
-  }
-  // Bekleyen sipariş varsa: EĞER ödeme tarihi halkası YOKSA dairenin kendisi
-  // sipariş rozetine döner; ödeme tarihi halkası VARSA görünüm aynı kalır ama
-  // artık (17 Ağu düzeltmesi ile) o halkaya dokununca da Sipariş Gör açılır.
-  // Her iki durumda da alt yazı ve sağdaki "Sipariş: X₺" metni gösterilir.
-  let siparisTutarHtml = '';
-  if(hasPendingSiparis){
-    if(!c.odemeTarihi){
-      circleHtml = `<span class="siparis-date-circle siparis-bekleyen cv2-siparis-daire" data-uid="${uid}" style="background:${siparisRenk};"><b>+${siparisGunFarki}</b>GÜN</span>`;
-    }
-    altYazi = `Sipariş bekliyor · ${siparisGunFarki} gün önce`;
-    const siparisToplam = pendingSiparisler.reduce((sum, f) => {
-      let fisToplam = f.kalemler.reduce((s, k) => s + toNum(k.tutar), 0);
-      if(f.kdvDahil) fisToplam *= 1.20;
-      return sum + fisToplam;
-    }, 0);
-    siparisTutarHtml = `<div class="cv2-siparis-tutar" style="color:${siparisRenk};">Sipariş: ${fmtWhole(siparisToplam)}</div>`;
-    // 17 Ağu 2026, kullanıcı isteği: sipariş bekleyen kartlarda daha belirgin
-    // olması için dairenin etrafına mavi bir halka daha eklendi, cari ismi üst
-    // ortaya taşındı, "Sipariş bekliyor" yazısı büyütüldü.
-    circleHtml = `<div class="cv2-mavi-halka">${circleHtml}</div>`;
+    odemeTextHtml = `<div class="cv2-odeme-txt${gecikti ? ' gecikti' : ''}"><span class="cv2-odeme-b1">Ödeme günü</span><span class="cv2-odeme-b2">${gecikti ? 'Ödemesi ' + Math.abs(kalanGun) + ' gün geçti' : 'Ödemeye ' + kalanGun + ' gün kaldı'}</span></div>`;
+  } else {
+    odemeRingHtml = `<div class="cv2-ring2" style="background:#e4e8ea;">
+      <div class="cv2-ring2-inner"><b>—</b><span>GÜN</span></div>
+    </div>`;
+    odemeTextHtml = `<div class="cv2-odeme-txt"><span class="cv2-odeme-b1">Ödeme günü</span><span class="cv2-odeme-b2" style="color:var(--muted);">Belirlenmedi</span></div>`;
   }
   // CH1'deki (Cari Hesaplar) swipeActionsHtml ile birebir aynı mantık: tedarikçide
   // Alış/Ödeme, müşteride Tahsilat/Satış — sadece Düzenle CV2'ye özgü ek bir buton.
@@ -5989,10 +5995,8 @@ function CariCardV2(c, tur){
     : `<button class="cv2-abtn tahsilat" data-act="tahsilat" data-uid="${uid}">Tahsilat</button>
       <button class="cv2-abtn satis" data-act="satis" data-uid="${uid}">Satış</button>
       <button class="cv2-abtn duzenle" data-act="duzenle" data-uid="${uid}">Düzenle</button>`;
-  const kartSinifi = 'cv2-card' + (hasPendingSiparis ? ' cv2-card-siparisli' : '');
-  const isimHtml = hasPendingSiparis
-    ? `<div class="cv2-name-top">${c.name}</div>`
-    : `<div class="cv2-name">${c.name}</div>`;
+  // 18 Ağu 2026, kullanıcı isteği: bekleyen sipariş olsun olmasın TÜM kartlar artık
+  // aynı düzen ve büyüklükte — isim her zaman üstte, sola hizalı.
   return `
   <div class="cv2-wrap" data-uid="${uid}">
     <div class="cv2-actions left" style="display:none;">
@@ -6003,20 +6007,20 @@ function CariCardV2(c, tur){
     <div class="cv2-actions right" style="display:none;">
       ${paraBtns}
     </div>
-    <div class="${kartSinifi}" data-uid="${uid}" data-id="${c.id}" data-tur="${tur}">
+    <div class="cv2-card${hasPendingSiparis ? ' cv2-card-siparisli' : ''}" data-uid="${uid}" data-id="${c.id}" data-tur="${tur}">
       <span class="cv2-info-btn" data-uid="${uid}">i</span>
-      ${hasPendingSiparis ? isimHtml : ''}
+      <div class="cv2-name-top">${c.name}</div>
       <div class="cv2-card-row">
-        ${circleHtml}
+        <div class="cv2-circles">${circleHtml}${odemeRingHtml}</div>
         <div class="cv2-mid">
-          ${hasPendingSiparis ? '' : isimHtml}
-          <div class="cv2-date cv2-relzaman${hasPendingSiparis ? ' cv2-siparis-buyuk' : ''}">${altYazi}</div>
+          <div class="cv2-date cv2-relzaman">${altYazi}</div>
         </div>
         <div class="cv2-bal-wrap">
           <div class="cv2-bal ${cls}">${fmtWhole(bal)}</div>
           ${siparisTutarHtml}
         </div>
       </div>
+      <div class="cv2-odeme-row">${odemeTextHtml}</div>
     </div>
   </div>`;
 }
@@ -11724,7 +11728,7 @@ try {
      onay verir. Alış/Satış zaten kendi spinner+özet akışına sahip (fisKaydet),
      silme aksiyonları zaten openConfirm→showIslemYapiliyor akışından geçiyor —
      bu toast SADECE bu ikisinin dışında kalan ekleme noktalarına eklendi. -->
-<div class="app-build-tag" id="appBuildTag">v18Ağu-D</div>
+<div class="app-build-tag" id="appBuildTag">v18Ağu-E</div>
 <div id="genelKaydediliyorToast" class="gk-toast">
   <span class="gk-spin"></span>
   <span id="genelKaydediliyorMetin">Kaydediliyor...</span>
