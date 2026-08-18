@@ -3527,23 +3527,53 @@ function siparisAsamaIlerlet(fisId, key){
     const kalemToplam = (d.kalemler||[]).reduce((s,k)=>s+toNum(k.tutar),0);
     const kdvTutar = d.kdvDahil ? kalemToplam * 0.20 : 0;
     const genelToplam = kalemToplam + kdvTutar;
-    cv2ModalAc('Siparişi Faturaya Dönüştür', `Bu sipariş cari hesaba fatura olarak işlenecek (borç düşecek). Toplam: ${fmtWhole(genelToplam)}. Bu ekrandan geri alınamaz — geri almak için Sipariş İrsaliyeleri listesinden "Tamamlandı'yı Geri Al" kullanılmalı.`,
-      '', 'Faturaya Dönüştür ve İşle', 'primary', () => {
-        const txType = d.ledgerKey === 'cari' ? 'SATIŞ' : 'ALIŞ';
-        const ts = new Date().toISOString();
-        let fisToplam = 0;
-        (d.kalemler||[]).forEach(k=>{
-          c.transactions.push({ type: txType, desc: k.ad, amount: k.tutar, date: ts, siparisRef: d.id });
-          fisToplam += toNum(k.tutar);
-        });
-        if(d.kdvDahil){
-          c.transactions.push({ type: txType, desc: 'KDV (%20)', amount: fisToplam * 0.20, date: ts, siparisRef: d.id });
-        }
-        d.tamamlandi = true;
-        d.tamamlanmaTarihi = ts;
-        asamalar.faturaDonustur = { durum:true, tarih: ts };
-        save(); cv2ModalKapat(); siparisGorRefresh(); render();
+    // 18 Ağu 2026, kullanıcı isteği: onay metni tarafa göre doğru terimi
+    // kullansın — tedarikçi tarafı (ör. Saf Plastik) bize mal sattığı için
+    // ona ALACAK olarak işlenir (bizim borcumuz); müşteri tarafı bizden mal
+    // aldığı için ona BORÇ olarak işlenir (bizim alacağımız).
+    const yonMetni = d.ledgerKey === 'tedarikci'
+      ? `Bu fatura <b>${c.name}</b>'e <b>ALACAK</b> olarak işlenecektir.`
+      : `Bu fatura <b>${c.name}</b>'a <b>BORÇ</b> olarak işlenecektir.`;
+    const kalemSatirlari = (d.kalemler||[]).map(k=>`
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:13.5px;">
+        <span style="color:var(--ink);">${k.ad || '—'}</span>
+        <span style="font-weight:700;color:var(--ink);">${fmtWhole(toNum(k.tutar))}</span>
+      </div>`).join('');
+    const faturaFormHtml = `
+      <div style="background:#f7f8f9;border-radius:14px;padding:14px 16px;margin:10px 0;">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.4px;margin-bottom:6px;">FATURA ÖNİZLEME — ${c.name}</div>
+        ${kalemSatirlari}
+        ${d.kdvDahil ? `<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:var(--muted);"><span>KDV (%20)</span><span>${fmtWhole(kdvTutar)}</span></div>` : ''}
+        <div style="display:flex;justify-content:space-between;padding-top:8px;margin-top:4px;border-top:2px solid var(--ink);font-size:15px;font-weight:800;">
+          <span>Genel Toplam</span><span>${fmtWhole(genelToplam)}</span>
+        </div>
+      </div>
+      <div style="font-size:13.5px;color:var(--ink);">${yonMetni} Onaylıyor musunuz?</div>`;
+    cv2ModalAc('Siparişi Faturaya Dönüştür', '', faturaFormHtml, 'Onayla ve İşle', 'primary', () => {
+      cv2ModalKapat();
+      kaydediliyorGoster();
+      const txType = d.ledgerKey === 'cari' ? 'SATIŞ' : 'ALIŞ';
+      const ts = new Date().toISOString();
+      let fisToplam = 0;
+      (d.kalemler||[]).forEach(k=>{
+        c.transactions.push({ type: txType, desc: k.ad, amount: k.tutar, date: ts, siparisRef: d.id });
+        fisToplam += toNum(k.tutar);
       });
+      if(d.kdvDahil){
+        c.transactions.push({ type: txType, desc: 'KDV (%20)', amount: fisToplam * 0.20, date: ts, siparisRef: d.id });
+      }
+      d.tamamlandi = true;
+      d.tamamlanmaTarihi = ts;
+      asamalar.faturaDonustur = { durum:true, tarih: ts };
+      save();
+      kaydediliyorTamam();
+      // 18 Ağu 2026, kullanıcı isteği: artık Sipariş Gör/Hareketler'de kalmıyor —
+      // doğrudan genel Cari Hesap menüsüne (kart listesi) dönüyor.
+      hideAllScreens();
+      renderCariV2();
+      document.getElementById('cv2Screen').classList.add('show');
+      nudge();
+    });
     return;
   }
   if(key === 'tahsilatTarihi'){
@@ -3559,7 +3589,14 @@ function siparisAsamaIlerlet(fisId, key){
         // yuvarlak simgesindeki (ödeme tarihi halkası) tarihe de yansısın.
         const c = state[d.ledgerKey].find(x=>x.id===d.cariId);
         if(c) c.odemeTarihi = secilen;
-        save(); cv2ModalKapat(); siparisGorRefresh(); render();
+        save(); cv2ModalKapat();
+        // 18 Ağu 2026, kullanıcı isteği: bu SÜRECİN SON adımı — artık Sipariş
+        // Gör/Hareketler'de kalmıyor, doğrudan genel Cari Hesap menüsüne
+        // (kart listesi) dönüyor.
+        hideAllScreens();
+        renderCariV2();
+        document.getElementById('cv2Screen').classList.add('show');
+        nudge();
       });
     return;
   }
@@ -11834,7 +11871,7 @@ try {
      onay verir. Alış/Satış zaten kendi spinner+özet akışına sahip (fisKaydet),
      silme aksiyonları zaten openConfirm→showIslemYapiliyor akışından geçiyor —
      bu toast SADECE bu ikisinin dışında kalan ekleme noktalarına eklendi. -->
-<div class="app-build-tag" id="appBuildTag">v18Ağu-G</div>
+<div class="app-build-tag" id="appBuildTag">v18Ağu-H</div>
 <div id="genelKaydediliyorToast" class="gk-toast">
   <span class="gk-spin"></span>
   <span id="genelKaydediliyorMetin">Kaydediliyor...</span>
