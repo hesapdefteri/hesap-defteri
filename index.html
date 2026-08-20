@@ -164,14 +164,33 @@
   .cv2-card[data-tur="cari"]{border-color:#4285f4;}
   .cv2-card[data-tur="tedarikci"]{border-color:#e8792c;}
   .cv2-card.cv2-pressed{transform:scale(.985);transition:transform .12s ease;}
-  .cv2-botnav{display:flex;flex-shrink:0;border-top:1px solid var(--line);background:#fff;padding-bottom:env(safe-area-inset-bottom);}
-  .cv2-botnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 2px 8px 2px;
-    border:none;background:transparent;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:-.1px;cursor:pointer;}
-  .cv2-botnav-ic{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background-color .15s ease;}
-  .cv2-botnav-btn svg{width:19px;height:19px;color:var(--c);opacity:.55;transition:opacity .15s ease,color .15s ease;}
-  .cv2-botnav-btn.active{color:var(--c);}
-  .cv2-botnav-btn.active .cv2-botnav-ic{background:var(--c);}
-  .cv2-botnav-btn.active svg{color:#fff;opacity:1;}
+  /* 19 Ağu 2026, kullanıcı isteği: Figma "Animated Bottom Navigation" referansına göre
+     uyarlandı — koyu lacivert kapsül bar, aktif sekmenin ikonu kendi rengindeki bir
+     daire içinde yukarı kayarak/genişleyerek öne çıkıyor, geçiş animasyonlu kayıyor.
+     19 Ağu 2026 (3. tur): CSS mask ile çentik tekniği kullanıcının cihazında
+     çalışmadı (destek sorunu, sessizce hiçbir şey yapmıyordu). Artık barın kendisi
+     bir DIV değil, gerçek bir SVG <path> — çentik matematiksel olarak çiziliyor ve
+     JS ile her cihazda aynı şekilde animasyonla kayıyor, tarayıcı desteğine bağlı değil.*/
+  .cv2-botnav{position:relative;display:flex;flex-shrink:0;overflow:visible;
+    margin:0 14px calc(10px + env(safe-area-inset-bottom)) 14px;padding:9px 8px 9px 8px;}
+  .cv2-botnav-bg{position:absolute;inset:0;z-index:0;pointer-events:none;
+    filter:drop-shadow(0 10px 22px rgba(11,26,61,.4));}
+  .cv2-nav-indicator{position:absolute;top:-14px;width:66px;height:66px;border-radius:50%;
+    background:var(--c,#2f6fed);box-shadow:0 8px 18px rgba(0,0,0,.32);
+    transition:left .38s cubic-bezier(.34,1.4,.4,1),background-color .3s ease;
+    pointer-events:none;z-index:1;}
+  .cv2-botnav-btn{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+    padding:8px 2px 2px 2px;border:none;background:transparent;color:rgba(255,255,255,.5);
+    font-size:9.5px;font-weight:700;letter-spacing:-.1px;cursor:pointer;
+    transition:color .25s ease;}
+  .cv2-botnav-ic{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    transition:transform .38s cubic-bezier(.34,1.4,.4,1);}
+  .cv2-botnav-btn svg{width:26px;height:26px;color:#fff;opacity:.55;transition:opacity .25s ease;}
+  .cv2-botnav-btn.active{color:#fff;}
+  .cv2-botnav-btn.active .cv2-botnav-ic{transform:translateY(-14px);}
+  .cv2-botnav-btn.active svg{opacity:1;}
+  .cv2-botnav-btn.active span:last-child{opacity:0;transform:translateY(2px);}
+  .cv2-botnav-btn span.cv2-botnav-lbl{transition:opacity .2s ease,transform .2s ease;}
   .cv2-rapor-list{display:flex;flex-direction:column;gap:9px;}
   .cv2-rapor-row{display:flex;justify-content:space-between;align-items:center;background:#fff;border-radius:14px;
     padding:13px 15px;border:1px solid rgba(16,24,32,.04);}
@@ -2505,21 +2524,31 @@
     <div class="cv2-rapor-list" id="cv2RaporList"></div>
   </div>
   <div class="cv2-botnav" id="cv2BotNav">
+    <svg class="cv2-botnav-bg" id="cv2NavSvg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="cv2NavGrad" x1="0" y1="0" x2="0.35" y2="1">
+          <stop offset="0" stop-color="#16264f"/>
+          <stop offset="1" stop-color="#0b1a3d"/>
+        </linearGradient>
+      </defs>
+      <path id="cv2NavPath" fill="url(#cv2NavGrad)"></path>
+    </svg>
+    <div class="cv2-nav-indicator" id="cv2NavIndicator" style="--c:#2f6fed;"></div>
     <button class="cv2-botnav-btn active" data-sekme="cari" style="--c:#2f6fed;">
       <span class="cv2-botnav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M4.5 20c1.4-4.2 4.2-6.4 7.5-6.4s6.1 2.2 7.5 6.4"/></svg></span>
-      Cari Hesaplar
+      <span class="cv2-botnav-lbl">Cari Hesaplar</span>
     </button>
     <button class="cv2-botnav-btn" data-sekme="siparis" style="--c:#dd7a2c;">
       <span class="cv2-botnav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="13" rx="1.6"/><path d="M8 7V5.5A2.5 2.5 0 0110.5 3h3A2.5 2.5 0 0116 5.5V7"/><path d="M4 11h16"/></svg></span>
-      Siparişler
+      <span class="cv2-botnav-lbl">Siparişler</span>
     </button>
     <button class="cv2-botnav-btn" data-sekme="arsiv" style="--c:#8a5fd6;">
       <span class="cv2-botnav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="4.5" rx="1.3"/><path d="M5 9v8.5a2 2 0 002 2h10a2 2 0 002-2V9"/><path d="M10 13h4"/></svg></span>
-      Arşiv
+      <span class="cv2-botnav-lbl">Arşiv</span>
     </button>
     <button class="cv2-botnav-btn" data-sekme="raporlar" style="--c:#1f9d64;">
       <span class="cv2-botnav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11M11 20V4M18 20v-7"/><path d="M3 20h18"/></svg></span>
-      Raporlar
+      <span class="cv2-botnav-lbl">Raporlar</span>
     </button>
   </div>
 </div>
@@ -6487,6 +6516,74 @@ function cv2SegBtnleriGuncelle(){
   if(filterBtn) filterBtn.classList.toggle('filtreli', filtreliMi);
 }
 
+// 19 Ağu 2026, kullanıcı isteği (3. tur): bar artık gerçek bir SVG şekil — çentik,
+// köşeleri yuvarlatılmış dikdörtgenin üst kenarına oyulmuş yumuşak bir "vadi" olarak
+// matematiksel hesaplanıyor, tüm cihazlarda aynı görünür (CSS mask desteğine bağlı değil).
+function cv2NavBarPathD(w, h, r, notchX, notchHalfW, notchDepth){
+  const minX = r + notchHalfW + 6, maxX = w - r - notchHalfW - 6;
+  const nx = Math.max(minX, Math.min(maxX, notchX));
+  const solCentik = nx - notchHalfW, sagCentik = nx + notchHalfW;
+  return `M ${r} 0
+    L ${solCentik} 0
+    C ${solCentik + notchHalfW*0.55} 0 ${nx - notchHalfW*0.8} ${notchDepth} ${nx} ${notchDepth}
+    C ${nx + notchHalfW*0.8} ${notchDepth} ${sagCentik - notchHalfW*0.55} 0 ${sagCentik} 0
+    L ${w - r} 0
+    Q ${w} 0 ${w} ${r}
+    L ${w} ${h - r}
+    Q ${w} ${h} ${w - r} ${h}
+    L ${r} ${h}
+    Q 0 ${h} 0 ${h - r}
+    L 0 ${r}
+    Q 0 0 ${r} 0 Z`;
+}
+
+function cv2NavBarCiz(notchX){
+  const bar = document.getElementById('cv2BotNav');
+  const svg = document.getElementById('cv2NavSvg');
+  const path = document.getElementById('cv2NavPath');
+  if(!bar || !svg || !path) return;
+  const w = bar.clientWidth, h = bar.clientHeight;
+  if(!w || !h) return;
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  svg.setAttribute('width', w);
+  svg.setAttribute('height', h);
+  path.setAttribute('d', cv2NavBarPathD(w, h, 22, notchX, 48, 26));
+  bar._cv2NotchX = notchX;
+}
+
+let cv2NavAnimRAF = null;
+function cv2NavBarAnimasyonluCiz(hedefX){
+  const bar = document.getElementById('cv2BotNav');
+  if(!bar) return;
+  const baslangic = (bar._cv2NotchX !== undefined) ? bar._cv2NotchX : hedefX;
+  const sure = 380, t0 = performance.now();
+  if(cv2NavAnimRAF) cancelAnimationFrame(cv2NavAnimRAF);
+  function adim(t){
+    const p = Math.min(1, (t - t0) / sure);
+    // hafif "taşma" hissi veren geri-esnemeli kolaylaştırma, göstergenin CSS geçişiyle uyumlu
+    const c1 = 1.35, c3 = c1 + 1;
+    const ease = 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2);
+    cv2NavBarCiz(baslangic + (hedefX - baslangic) * ease);
+    if(p < 1) cv2NavAnimRAF = requestAnimationFrame(adim);
+    else cv2NavBarCiz(hedefX);
+  }
+  cv2NavAnimRAF = requestAnimationFrame(adim);
+}
+
+// 19 Ağu 2026, kullanıcı isteği: aktif alt sekmenin rengindeki daireyi o sekmenin
+// ikonunun tam ortasına, bar üzerinden hafifçe taşacak şekilde konumlandırır.
+function cv2BotNavIndicatorGuncelle(){
+  const bar = document.getElementById('cv2BotNav');
+  const gosterge = document.getElementById('cv2NavIndicator');
+  const aktifBtn = bar && bar.querySelector('.cv2-botnav-btn.active');
+  if(!bar || !gosterge || !aktifBtn) return;
+  const renk = getComputedStyle(aktifBtn).getPropertyValue('--c').trim() || '#2f6fed';
+  const merkezX = aktifBtn.offsetLeft + aktifBtn.offsetWidth / 2;
+  gosterge.style.left = (merkezX - gosterge.offsetWidth / 2) + 'px';
+  gosterge.style.setProperty('--c', renk);
+  cv2NavBarAnimasyonluCiz(merkezX);
+}
+
 function renderCariV2(){
   cv2SegBtnleriGuncelle();
   // 18 Ağu 2026, kullanıcı isteği: hangi alt sekmedeysem (Cari Hesaplar/Siparişler/
@@ -6496,6 +6593,7 @@ function renderCariV2(){
   document.querySelectorAll('#cv2BotNav .cv2-botnav-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.sekme === cv2AltSekme);
   });
+  cv2BotNavIndicatorGuncelle();
   const tumHesaplar = [...state.tedarikci, ...state.cari];
   const total  = tumHesaplar.reduce((s,c)=> s + cariBalance(c), 0);
   const borc   = tumHesaplar.reduce((s,c)=> s + Math.min(cariBalance(c), 0), 0);
@@ -7252,13 +7350,17 @@ function cv2DahaFazla(id, tur){
   });
 
   // 18 Ağu 2026, kullanıcı isteği: alt sabit menü (Cari Hesaplar/Siparişler/Arşiv/Raporlar)
+  // 19 Ağu 2026, kullanıcı isteği: Figma "Animated Bottom Navigation" referansına göre
+  // aktif sekmeyi gösteren daire artık sekmeler arasında kayarak/animasyonlu geçiyor.
   document.querySelectorAll('#cv2BotNav .cv2-botnav-btn').forEach(btn=>{
     btn.addEventListener('click', () => {
       cv2AltSekme = btn.dataset.sekme;
       document.querySelectorAll('#cv2BotNav .cv2-botnav-btn').forEach(b=> b.classList.toggle('active', b === btn));
+      cv2BotNavIndicatorGuncelle();
       renderCariV2();
     });
   });
+  window.addEventListener('resize', cv2BotNavIndicatorGuncelle);
 
   const searchToggleBtn = document.getElementById('cv2SearchToggleBtn');
   if(searchToggleBtn) searchToggleBtn.addEventListener('click', () => {
@@ -11874,7 +11976,7 @@ try {
      onay verir. Alış/Satış zaten kendi spinner+özet akışına sahip (fisKaydet),
      silme aksiyonları zaten openConfirm→showIslemYapiliyor akışından geçiyor —
      bu toast SADECE bu ikisinin dışında kalan ekleme noktalarına eklendi. -->
-<div class="app-build-tag" id="appBuildTag">v18Ağu-J</div>
+<div class="app-build-tag" id="appBuildTag">v19Ağu-A</div>
 <div id="genelKaydediliyorToast" class="gk-toast">
   <span class="gk-spin"></span>
   <span id="genelKaydediliyorMetin">Kaydediliyor...</span>
