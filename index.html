@@ -1266,7 +1266,11 @@
   </div>
 </div>
 
-<button id="anaMenuFloatBtn" class="glass-fab" style="display:none;position:fixed;right:20px;bottom:92px;width:58px;height:58px;border-radius:50%;z-index:500;align-items:center;justify-content:center;cursor:pointer;">
+<!-- 19 Ağu 2026 bug fix: yeni yüzen kapsül alt menü (cv2-botnav) kenarlardan içeri
+     girintili ve daha yukarıda; eski sabit bottom:92px değeri artık üst üste
+     biniyordu (kullanıcı ekran görüntüsüyle bildirdi). Yeni menünün gerçek
+     yüksekliğinin üstüne net boşluk bırakacak şekilde yükseltildi. -->
+<button id="anaMenuFloatBtn" class="glass-fab" style="display:none;position:fixed;right:20px;bottom:calc(118px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:50%;z-index:500;align-items:center;justify-content:center;cursor:pointer;">
 </button>
 
 <div id="anaMenu">
@@ -11976,7 +11980,7 @@ try {
      onay verir. Alış/Satış zaten kendi spinner+özet akışına sahip (fisKaydet),
      silme aksiyonları zaten openConfirm→showIslemYapiliyor akışından geçiyor —
      bu toast SADECE bu ikisinin dışında kalan ekleme noktalarına eklendi. -->
-<div class="app-build-tag" id="appBuildTag">v19Ağu-A</div>
+<div class="app-build-tag" id="appBuildTag">v19Ağu-B</div>
 <div id="genelKaydediliyorToast" class="gk-toast">
   <span class="gk-spin"></span>
   <span id="genelKaydediliyorMetin">Kaydediliyor...</span>
