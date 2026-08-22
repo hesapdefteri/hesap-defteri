@@ -1240,6 +1240,11 @@
       <input id="authPassword" type="password" placeholder="Şifre" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false"
         style="width:100%;box-sizing:border-box;padding:14px 15px;border-radius:14px;border:none;margin:8px 0 18px 0;font-size:16px;font-family:inherit;">
       <button id="authSendCode" style="width:100%;padding:15px;border:none;border-radius:14px;background:#1f9d64;color:#fff;font-weight:800;font-size:15px;font-family:inherit;cursor:pointer;">Giriş Yap</button>
+      <!-- 19 Ağu 2026: Test hesabı oluşturma — gerçek verilerden tamamen izole,
+           yukarıdaki e-posta/şifre alanlarıyla yeni bir Firebase hesabı açar.
+           Sadece client-side createUserWithEmailAndPassword; Firebase Console'a
+           dokunmuyor, gerçek maile bir şey gitmiyor. -->
+      <button id="authCreateTest" style="width:100%;padding:13px;border:1.5px solid rgba(255,255,255,.25);border-radius:14px;background:transparent;color:#a9b8d0;font-weight:700;font-size:13.5px;font-family:inherit;cursor:pointer;margin-top:10px;">Test Hesabı Oluştur</button>
       <div id="authError" style="color:#ff9b9b;font-size:13px;font-weight:600;margin-top:14px;min-height:18px;"></div>
     </div>
 
@@ -2765,7 +2770,7 @@ function cv2GercekBulutaYaz(){
   const yeniStokSayi = cv2CountStok(state);
   const yeniFisSayi = cv2CountFisler(state);
   const stateKopyasi = JSON.parse(JSON.stringify(state));
-  fbDb.ref('users/' + fbAuth.currentUser.uid).update(state).then(() => {
+  fbDb.ref('users/' + fbAuth.currentUser.uid).set(state).then(() => {
     window._cv2LastCloudTxCount = yeniSayi;
     window._cv2LastCloudStokCount = yeniStokSayi;
     window._cv2LastCloudFisSayisi = yeniFisSayi;
@@ -11881,7 +11886,7 @@ function cloudSyncAndBoot(user){
       // Yerel veri aynı veya daha yeni VE en az bir kez gerçekten kaydedilmiş
       // (yerelDamga>0 = kullanıcı en az bir işlem yapıp save() tetiklemiş) VE
       // bu AYNI hesaba ait — yerelde kal ve bulutu buna göre güncelle.
-      fbDb.ref('users/' + user.uid).update(state).then(() => {
+      fbDb.ref('users/' + user.uid).set(state).then(() => {
         window._cv2LastCloudTxCount = cv2CountTx(state);
         window._cv2LastCloudStokCount = cv2CountStok(state);
         window._cv2LastCloudFisSayisi = cv2CountFisler(state);
@@ -11967,6 +11972,23 @@ try {
     });
     // Başarılıysa onAuthStateChanged tetiklenip cloudSyncAndBoot() zaten çağrılacak.
   });
+
+  document.getElementById('authCreateTest').addEventListener('click', () => {
+    authShowError('authError', '');
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value;
+    if(!email || !password){ authShowError('authError', 'E-posta ve şifre gir.'); return; }
+    if(password.length < 6){ authShowError('authError', 'Şifre en az 6 karakter olmalı.'); return; }
+    authShowLoading(true);
+    fbAuth.createUserWithEmailAndPassword(email, password).catch(err => {
+      authShowLoading(false);
+      let msg = err && err.message ? err.message : 'bilinmeyen hata';
+      if(err && err.code === 'auth/email-already-in-use') msg = 'Bu e-posta zaten kayıtlı — "Giriş Yap" ile devam et.';
+      authShowError('authError', 'Test hesabı oluşturulamadı: ' + msg);
+    });
+    // Başarılıysa onAuthStateChanged tetiklenip cloudSyncAndBoot() yeni/boş bir
+    // hesap olarak başlatacak — gerçek verilere hiç dokunmaz.
+  });
 } catch(e){
   // Firebase yüklenemedi (önizleme/çevrimdışı) — sessizce yerel veriyle devam
   fbAvailable = false;
@@ -11980,7 +12002,7 @@ try {
      onay verir. Alış/Satış zaten kendi spinner+özet akışına sahip (fisKaydet),
      silme aksiyonları zaten openConfirm→showIslemYapiliyor akışından geçiyor —
      bu toast SADECE bu ikisinin dışında kalan ekleme noktalarına eklendi. -->
-<div class="app-build-tag" id="appBuildTag">v20Ağu-A</div>
+<div class="app-build-tag" id="appBuildTag">v19Ağu-C</div>
 <div id="genelKaydediliyorToast" class="gk-toast">
   <span class="gk-spin"></span>
   <span id="genelKaydediliyorMetin">Kaydediliyor...</span>
